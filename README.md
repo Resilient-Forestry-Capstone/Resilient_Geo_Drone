@@ -5,7 +5,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 ----------------------------------------------
 
-### Table of Contents
+<h3>📑 Table of Contents</h3>
 1. [Setup](#setup)
    - [Before Initialization](#before-initialization)
    - [Initialization](#initialization)
@@ -21,7 +21,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 ----------------------------------------------
 
-### 📂 Directory Structure
+<h3>📂 Directory Structure</h3>
 
 
 ```plaintext
