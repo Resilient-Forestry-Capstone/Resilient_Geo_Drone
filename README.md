@@ -20,7 +20,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
    - [Stage 2: WebODM Point-Cloud Generation](#stage-2-webodm-point-cloud-generation)
    - [Stage 3: QGIS Geospatial Analysis](#stage-3-qgis-geospatial-analysis)
    - [Stage 4: Output Packaging](#stage-4-output-packaging)
-3. [🌟 Features](#features)
+3. [🌟 Features](#🌟-features)
 
 
 ----------------------------------------------
