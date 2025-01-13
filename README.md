@@ -9,11 +9,11 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 <h3>📑 Table of Contents</h3>
 
-1. [Directory Structure](#-directory-structure)
-2. [Setup](#-setup)
+1. [📂 Directory Structure](#-directory-structure)
+2. [🛠️ Setup](#-setup)
    - [Before Initialization](#before-initialization)
    - [Initialization](#initialization)
-3. [The Breakdown](#-the-breakdown)
+3. [🔍 The Breakdown](#-the-breakdown)
    - [Architecture Diagram](#architecture-diagram)
    - [Core Components](#core-components)
    - [Stage-Specific Components](#stage-specific-components)
@@ -21,7 +21,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
    - [Stage 2: WebODM Point-Cloud Generation](#stage-2-webodm-point-cloud-generation)
    - [Stage 3: QGIS Geospatial Analysis](#stage-3-qgis-geospatial-analysis)
    - [Stage 4: Output Packaging](#stage-4-output-packaging)
-4. [Features](#-features)
+4. [🌟 Features](#-features)
 
 
 ----------------------------------------------
