@@ -3,7 +3,9 @@
 
 Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For The Point Cloud And Geospatial Analysis. Because Of The External Dependency To Interface With The _**QGIS**_ API We Utilize `Window`'s .bat Files For Linking.
 
+
 ----------------------------------------------
+
 
 <h3>📑 Table of Contents</h3>
 1. [Setup](#setup)
@@ -19,7 +21,9 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
    - [Stage 4: Output Packaging](#stage-4-output-packaging)
 3. [Features](#features)
 
+
 ----------------------------------------------
+
 
 <h3>📂 Directory Structure</h3>
 
@@ -70,11 +74,14 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 ```
 
 
+----------------------------------------------
+
+
 <img src="https://github.com/user-attachments/assets/256a675f-65c3-4469-a943-436709c5eb71" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/256a675f-65c3-4469-a943-436709c5eb71" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/256a675f-65c3-4469-a943-436709c5eb71" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/256a675f-65c3-4469-a943-436709c5eb71" alt="Monkeys With A Drone" width="55" height="59"> 
 
 
 
-<h3>Setup:</h3>
+<h3>🛠️ Setup:</h3>
 
 <h6>Before Initialization</h6>
 
@@ -116,7 +123,7 @@ Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**
 
 
 
-<h3>The Breakdown:</h3>
+<h3>🔍 The Breakdown:</h3>
 
 <h4>Architecture Diagram</h4>
 
@@ -173,7 +180,7 @@ At The End, All Necesary Data Is Packaged Into A New _**YAML**_ File Which Conta
 <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> 
 
 
-<h3>Features:</h3>
+<h3>🌟 Features:</h3>
 
 
 <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> 
