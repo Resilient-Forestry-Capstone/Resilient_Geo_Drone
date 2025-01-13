@@ -9,7 +9,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 <h3>📑 Table of Contents</h3>
 
-1. [Directory Structure](%F0%9F%93%82-directory-structure)
+1. [Directory Structure](#%F0%9F%93%82-directory-structure)
 2. [Setup](#%EF%B8%8F-setup)
    - [Before Initialization](#before-initialization)
    - [Initialization](#initialization)
