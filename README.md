@@ -21,6 +21,53 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 ----------------------------------------------
 
+
+```plaintext
+. 
+├── README.md # Project overview and team introduction
+├── run_qgis_setup.bat # Batch script for setting up QGIS environment
+├── setup.py # Setup script for the project
+├── setup_env.py # Script for setting up the environment
+├── requirements.txt # Project dependencies
+├── main.py # Main pipeline script
+├── data/ # UAV imagery and ground truth datasets
+│   ├── raw/ # Raw UAV image data
+│   │   └── Bellarmine/
+│   ├── processed/ # Processed and georeferenced data
+│   └── output/ # Output data
+│       ├── point_cloud/
+│       ├── processed/
+│       └── analysis/
+├── logs/ # Log files
+├── src/ # Source code for automated workflows
+│   ├── preprocessing/ # Scripts for UAV image preprocessing
+│   │   ├── __init__.py
+│   │   ├── batch_processor.py
+│   │   ├── image_validator.py
+│   │   └── quality_metrics.py
+│   ├── point_cloud/ # Scripts for point cloud generation and analysis
+│   │   ├── __init__.py
+│   │   ├── cloud_processor.py
+│   │   ├── environment_params.py
+│   │   └── webodm_client.py
+│   ├── geospatial/ # Scripts for geospatial analysis
+│   │   ├── __init__.py
+│   │   ├── canopy_analysis.py
+│   │   ├── qgis_analyzer.py
+│   │   └── terrain_analysis.py
+│   └── utils/ # Utility scripts
+│       ├── __init__.py
+│       ├── config_loader.py
+│       ├── file_handler.py
+│       ├── logger.py
+│       ├── pdf_parser.py
+│       └── report_metadata.py
+├── tests/ # Unit and integration tests
+└── config/ # Configuration files
+    └── config.yaml
+```
+
+
 <img src="https://github.com/user-attachments/assets/256a675f-65c3-4469-a943-436709c5eb71" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/256a675f-65c3-4469-a943-436709c5eb71" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/256a675f-65c3-4469-a943-436709c5eb71" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/256a675f-65c3-4469-a943-436709c5eb71" alt="Monkeys With A Drone" width="55" height="59"> 
 
 
