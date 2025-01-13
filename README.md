@@ -40,7 +40,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 ├── main.py # Main pipeline script
 ├── data/ # UAV imagery and ground truth datasets
 │   ├── raw/ # Raw UAV image data
-│   │   └── Bellarmine/
+│   │   └── Image-Set/ # Sample File Containing Images
 │   ├── processed/ # Processed and georeferenced data
 │   └── output/ # Output data
 │       ├── point_cloud/
