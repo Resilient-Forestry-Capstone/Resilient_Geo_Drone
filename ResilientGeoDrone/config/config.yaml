@@ -1,0 +1,57 @@
+preprocessing:
+  supported_formats:
+    - .jpg
+    - .jpeg
+    - .tif
+    - .tiff
+  min_resolution:
+    - 1920  # width
+    - 1080  # height
+  blur_threshold: 100
+  brightness_range:
+    - 40    # min
+    - 220   # max
+  max_workers: 4
+
+point_cloud:
+  webodm:
+    host: "localhost"
+    port: 8000
+    timeout: 3600
+    environments:
+      sunny:
+        feature_quality: "ultra"
+        min_num_features: 8000
+        matcher_type: "bfmatcher"
+        point_cloud_quality: "high"
+        mesh_quality: "high"
+        max_concurrency: 4
+      rainy:
+        feature_quality: "high"
+        min_num_features: 6000
+        matcher_type: "flann"
+        point_cloud_quality: "medium"
+        mesh_quality: "medium"
+        max_concurrency: 2
+      foggy:
+        feature_quality: "medium"
+        min_num_features: 4000
+        matcher_type: "flann"
+        point_cloud_quality: "low"
+        mesh_quality: "low"
+        max_concurrency: 1
+        ignore_gsd: true
+
+geospatial:
+  qgis_path: "C:\\Program Files\\QGIS 3.40.1"
+  analysis:
+    min_tree_height: 2.0
+    canopy_threshold: 0.5
+    terrain:
+      slope_threshold: 30
+      roughness_threshold: 0.5
+  output:
+    formats:
+      - geotiff
+      - shapefile
+    resolution: 0.1  # meters per pixel
