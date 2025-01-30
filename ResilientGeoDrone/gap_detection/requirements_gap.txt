@@ -1,0 +1,8 @@
+numpy
+rasterio
+geojson
+opencv-python-headless
+pillow
+transformers
+torch
+matplotlib
