@@ -1,0 +1,64 @@
+geospatial:
+  analysis:
+    canopy_threshold: 0.5
+    min_tree_height: 2.0
+    terrain:
+      roughness_threshold: 0.5
+      slope_threshold: 30.0
+  output:
+    formats:
+    - geotiff
+    - shapefile
+    resolution: 0.1
+  qgis_path: C:\Program Files\QGIS 3.40.1
+point_cloud:
+  webodm:
+    environments:
+      foggy:
+        feature_quality: medium
+        ignore_gsd: true
+        matcher_type: flann
+        max_concurrency: 1
+        mesh_quality: low
+        min_num_features: 4000
+        point_cloud_quality: low
+      night:
+        feature_quality: high
+        matcher_type: flann
+        max_concurrency: 2
+        mesh_quality: medium
+        min_num_features: 6000
+        point_cloud_quality: medium
+      rainy:
+        feature_quality: high
+        matcher_type: flann
+        max_concurrency: 2
+        mesh_quality: medium
+        min_num_features: 6000
+        point_cloud_quality: medium
+      sunny:
+        feature_quality: ultra
+        matcher_type: bfmatcher
+        max_concurrency: 4
+        mesh_quality: high
+        min_num_features: 8000
+        point_cloud_quality: high
+    host: localhost
+    password: admin
+    port: 8000
+    timeout: 3600
+    username: kingerthanu
+preprocessing:
+  blur_threshold: 100
+  brightness_range:
+  - 40
+  - 220
+  max_workers: 4
+  min_resolution:
+  - 1920
+  - 1080
+  supported_formats:
+  - .jpg
+  - .jpeg
+  - .tif
+  - .tiff
