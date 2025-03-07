@@ -27,6 +27,7 @@ flake8>=3.9.0
 # Documentation
 sphinx>=4.0.0
 sphinx-rtd-theme>=0.5.0
+pyodm>=1.5.12
 
 # Version control
 setuptools>=57.0.0

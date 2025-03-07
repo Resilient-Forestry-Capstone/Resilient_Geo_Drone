@@ -3,11 +3,25 @@ import rasterio
 from pathlib import Path
 from ..utils.logger import LoggerSetup
 
+
+import sys
+import cv2
+import numpy as np
+import rasterio
+import geojson
+from pathlib import Path
+import torch
+from PIL import Image
+from transformers import pipeline
+import matplotlib.pyplot as plt
+
+
+
 class TerrainAnalyzer:
     """Digital Terrain Model Analysis"""
     
     def __init__(self, config_loader):
-        self.logger = LoggerSetup(__name__).get_logger()
+        self.logger = LoggerSetup().get_logger()
         self.config = config_loader.get_geospatial_config()
         
     def generate_dtm(self, point_cloud_path: Path) -> np.ndarray:

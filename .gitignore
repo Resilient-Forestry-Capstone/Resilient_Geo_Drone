@@ -1,0 +1,48 @@
+# Python cache files
+__pycache__/
+*.egg
+
+# Log files
+*.log
+logs/
+ResilientGeoDrone\logs\
+
+# Image files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.tif
+*.tiff
+*.bmp
+*.webp
+data/raw/Image-Set/
+data/processed/
+data/output/
+
+# Surface model files
+*.geojson
+*.tif
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+
+# WebODM outputs
+*.laz
+*.zip
+*.glb
+report_*.pdf
+
+# Temporary files
+gap_results/
+.DS_Store
+Thumbs.db
