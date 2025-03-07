@@ -4,8 +4,11 @@ import shutil
 import yaml
 from datetime import datetime
 
+<<<<<<< HEAD
 from .logger import LoggerSetup
 
+=======
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
 
 """
@@ -60,6 +63,7 @@ class FileHandler:
     
     """
     def create_directory(self, path: Union[str, Path]) -> Path:
+<<<<<<< HEAD
         try:
           self.logger.info(f"File Handler ID: {self}  -  Creating Directory {path}...")
           path = Path(path)
@@ -69,6 +73,11 @@ class FileHandler:
         except Exception as e:
             self.logger.error(f"File Handler ID: {self}  -  Directory Creation Failed: {str(e)}")
             raise
+=======
+        path = Path(path)
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
     
 
     """
@@ -88,6 +97,7 @@ class FileHandler:
     
     """
     def get_image_files(self, directory: Union[str, Path]) -> List[Path]:
+<<<<<<< HEAD
         try:
           self.logger.info(f"File Handler ID: {self}  -  Retrieving Image Files From {directory}...")
           directory = Path(directory)
@@ -105,6 +115,17 @@ class FileHandler:
         except Exception as e:
             self.logger.error(f"File Handler ID: {self}  -  Image File Retrieval Failed: {str(e)}")
             raise
+=======
+        directory = Path(directory)
+        if not directory.exists():
+            raise FileNotFoundError(f"Directory not found: {directory}")
+            
+        # Filter For Files That Are In Our Specified Supported Formats
+        return [
+            f for f in directory.glob("**/*")
+            if f.is_file() and f.suffix.lower() in self.supported_formats
+        ]
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
     
 
     """
@@ -124,6 +145,7 @@ class FileHandler:
     
     """
     def create_processing_directories(self, base_dir: Union[str, Path]) -> Dict[str, Path]:
+<<<<<<< HEAD
         
         self.logger.info(f"File Handler ID: {self}  -  Creating Processing Directories In {base_dir}...")
         try:
@@ -145,6 +167,24 @@ class FileHandler:
         except Exception as e:
             self.logger.error(f"File Handler ID: {self}  -  Processing Directory Creation Failed: {str(e)}")
             raise
+=======
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        base_path = Path(base_dir)
+        
+        # Create Processing Directories For Given TimeStamp
+        directories = {
+            'processed': base_path / 'processed' / timestamp,
+            'point_cloud': base_path / 'point_cloud' / timestamp,
+            'analysis': base_path / 'analysis' / timestamp
+        }
+        
+        # Create Directories If They Do Not Exist
+        for dir_path in directories.values():
+            self.create_directory(dir_path)
+            
+        return directories
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
     
 
     """
@@ -164,6 +204,7 @@ class FileHandler:
     
     """
     def save_results(self, results: Dict[str, Any], output_path: Union[str, Path]) -> None:
+<<<<<<< HEAD
         self.logger.info(f"File Handler ID: {self}  -  Saving Results To {output_path}...")
         try:
           output_path = Path(output_path)
@@ -175,6 +216,14 @@ class FileHandler:
         except Exception as e:
             self.logger.error(f"File Handler ID: {self}  -  Results Saving Failed: {str(e)}")
             raise
+=======
+        output_path = Path(output_path)
+        self.create_directory(output_path.parent)
+        
+        # Save Results As YAML
+        with open(output_path, 'w') as f:
+            yaml.dump(results, f, default_flow_style=False)
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
     
 
     """
@@ -184,6 +233,7 @@ class FileHandler:
     
     """
     def copy_files(self, files: List[Path], destination: Union[str, Path]) -> None:
+<<<<<<< HEAD
         self.logger.info(f"File Handler ID: {self}  -  Copying Files To {destination}...")
         try:
           destination = Path(destination)
@@ -196,3 +246,11 @@ class FileHandler:
         except Exception as e:
             self.logger.error(f"File Handler ID: {self}  -  File Copying Failed: {str(e)}.")
             raise
+=======
+        destination = Path(destination)
+        self.create_directory(destination)
+        
+        # Copy Files To Destination
+        for file in files:
+            shutil.copy2(file, destination / file.name)
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576

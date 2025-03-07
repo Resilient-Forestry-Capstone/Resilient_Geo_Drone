@@ -18,11 +18,16 @@ point_cloud:
         feature_quality: medium
         ignore_gsd: true
         matcher_type: flann
+<<<<<<< HEAD
         max_concurrency: 4
+=======
+        max_concurrency: 1
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         mesh_quality: low
         min_num_features: 4000
         point_cloud_quality: low
       night:
+<<<<<<< HEAD
         feature_quality: ultra
         matcher_type: bfmatcher
         max_concurrency: 8
@@ -33,13 +38,29 @@ point_cloud:
         feature_quality: high
         matcher_type: flann
         max_concurrency: 4
+=======
+        feature_quality: high
+        matcher_type: flann
+        max_concurrency: 2
+        mesh_quality: medium
+        min_num_features: 6000
+        point_cloud_quality: medium
+      rainy:
+        feature_quality: high
+        matcher_type: flann
+        max_concurrency: 2
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         mesh_quality: medium
         min_num_features: 6000
         point_cloud_quality: medium
       sunny:
         feature_quality: ultra
         matcher_type: bfmatcher
+<<<<<<< HEAD
         max_concurrency: 8
+=======
+        max_concurrency: 4
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         mesh_quality: high
         min_num_features: 8000
         point_cloud_quality: high
@@ -47,7 +68,11 @@ point_cloud:
     password: admin
     port: 8000
     timeout: 3600
+<<<<<<< HEAD
     username: admin
+=======
+    username: kingerthanu
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 preprocessing:
   blur_threshold: 100
   brightness_range:

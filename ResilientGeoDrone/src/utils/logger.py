@@ -16,6 +16,7 @@ from typing import Dict
 """
 class LoggerSetup:
     
+<<<<<<< HEAD
     # Create A Singleton Logger
     _instances: Dict[str, "LoggerSetup"] = {}
 
@@ -49,6 +50,8 @@ class LoggerSetup:
         return class_._instances[name]
     
 
+=======
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
     """
     
         Desc: Initializes Our Logger Setup With A name And Log Directory, log_dir.
@@ -65,18 +68,25 @@ class LoggerSetup:
             3. Log To Log Directory
 
     """
+<<<<<<< HEAD
     def __init__(self, name: str = f"Log_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}", log_dir: str = "logs", verbose : bool = False):
         
         # Skip Intialization If Already Initialized
         if self.initialized: return
 
         self.initialized = True
+=======
+    def __init__(self, name: str, log_dir: str = "logs"):
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
         # Set-Up Logger Name And Log Directory
         self.name = name
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(exist_ok=True)
+<<<<<<< HEAD
         self.verbose = verbose
+=======
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
         # Set-Up Logger With Timestamp And Log Levels
         self.logger = self._setup_logger()
@@ -116,13 +126,21 @@ class LoggerSetup:
             file_handler = logging.FileHandler(log_file)
             file_handler.setLevel(logging.DEBUG)
             
+<<<<<<< HEAD
             
             
+=======
+            # Console Handler For Standard Out As Using Informative
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_handler.setLevel(logging.INFO)
+            
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
             # Create Format For Log Messages
             formatter = logging.Formatter(
                 '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
             )
             file_handler.setFormatter(formatter)
+<<<<<<< HEAD
             if self.verbose:
               # Console Handler For Standard Out As Using Informative
               console_handler = logging.StreamHandler(sys.stdout)
@@ -130,6 +148,10 @@ class LoggerSetup:
               console_handler.setFormatter(formatter)
               logger.addHandler(console_handler)
               
+=======
+            console_handler.setFormatter(formatter)
+            
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
             # Add Handlers To Our Given Logger
             logger.addHandler(file_handler)
             

@@ -2,8 +2,11 @@ from pathlib import Path
 import json
 from typing import Dict, Any
 
+<<<<<<< HEAD
 from .logger import LoggerSetup
 
+=======
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
 
 """
@@ -16,6 +19,7 @@ from .logger import LoggerSetup
 class ReportMetadata:
 
     """
+<<<<<<< HEAD
     
         Desc: Initializes Our Report Metadata With A Report Path (report_path)
         To Load And Extract Metadata From. The Report Path Is Expected To Be
@@ -42,6 +46,27 @@ class ReportMetadata:
             self.logger.error(f"Report Metadata ID: {self}  -  Report Metadata Initialization Failed: {str(e)}.")
             raise
     
+=======
+    
+        Desc: Initializes Our Report Metadata With A Report Path (report_path)
+        To Load And Extract Metadata From. The Report Path Is Expected To Be
+        A Valid Path To A Report File. The Report Must Be A JSON File Of A
+        WebODM Report.
+    
+        Preconditions:
+            1. report_path: Path To WebODM Report File
+            2. report_path Must Be A Valid Path
+
+        Postconditions:
+            1. Set Our Report Path
+            2. Load Report Metadata
+
+    """
+    def __init__(self, report_path: Path):
+        self.report_path = report_path
+        self.metadata = self._load_metadata()
+    
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
     """
     
@@ -58,6 +83,7 @@ class ReportMetadata:
     
     """
     def _load_metadata(self) -> Dict[str, Any]:
+<<<<<<< HEAD
         self.logger.info(f"Report Metadata ID: {self}  -  Loading Report Metadata (Parse Or JSON)...")
         # If This Is A JSON File, Load It
         if self.report_path.suffix == '.json':
@@ -108,6 +134,41 @@ class ReportMetadata:
             self.logger.error(f"Report Metadata ID: {self}  -  Failed To Extract Benchmark Data: {str(e)}.")
             return {}
 
+=======
+        # If This Is A JSON File, Load It
+        if self.report_path.suffix == '.json':
+            with open(self.report_path) as f:
+                return json.load(f)
+        # Otherwise, Parse Metadata From Report
+        else:
+            return self._parse_metadata_from_report()
+    
+
+    """
+    
+        Desc: This Function Parses Metadata From A WebODM Report. The
+        Function Extracts Benchmark Information Including Ground Sampling
+        Distance, Coordinate System, Accuracy Metrics, And Quality Scores.
+        The Metadata Is Returned As A Dictionary. The Metadata Is Extracted
+        From A WebODM Report.
+
+        Preconditions:
+            1. metadata Is Intiialized With Values From Parsing Report
+
+        Postconditions:
+            1. Parses Metadata From WebODM Report
+            2. Returns Metadata As A Dictionary,
+    
+    """
+    def get_benchmark_data(self) -> Dict[str, Any]:
+        return {
+            'ground_sampling_distance': self.metadata.get('gsd', None),
+            'coordinate_system': self.metadata.get('crs', None),
+            'accuracy_metrics': self.metadata.get('accuracy', {}),
+            'quality_scores': self.metadata.get('quality', {})
+        }
+
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
     """
     
@@ -120,6 +181,7 @@ class ReportMetadata:
     
     """
     def validate_quality_metrics(self) -> Dict[str, bool]:
+<<<<<<< HEAD
         self.logger.info(f"Report Metadata ID: {self}  -  Validating Quality Metrics...")
         try:
           # Get Quality Metrics From Metadata
@@ -143,3 +205,21 @@ class ReportMetadata:
         except Exception as e:
             self.logger.error(f"Report Metadata ID: {self}  -  Quality Metrics Validation Failed: {str(e)}.")
             return {}
+=======
+        # Get Quality Metrics From Metadata
+        quality = self.metadata.get('quality', {})
+
+        # Quality Requirements
+        requirements = {
+            'min_gsd': 0.05,
+            'min_coverage': 0.95,
+            'max_rmse': 0.10
+        }
+
+        # Check Quality Metrics Against Requirements And Return Boolean Dictionary
+        return {
+            'gsd_check': quality.get('gsd', float('inf')) <= requirements['min_gsd'],
+            'coverage_check': quality.get('coverage', 0) >= requirements['min_coverage'],
+            'accuracy_check': quality.get('rmse', float('inf')) <= requirements['max_rmse']
+        }
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576

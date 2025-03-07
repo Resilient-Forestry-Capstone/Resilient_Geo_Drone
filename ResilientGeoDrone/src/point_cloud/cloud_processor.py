@@ -26,6 +26,7 @@ class CloudProcessor:
 
         Preconditions:
             1. config_loader: ConfigLoader Object
+<<<<<<< HEAD
         
         Postconditions:
             1. Set Our logger 
@@ -65,6 +66,40 @@ class CloudProcessor:
     def process_webodm_results(self, webodm_results: Dict[str, Any], output_dir: Path) -> Dict[str, Any]:
         try:
             self.logger.info(f"Cloud Processor ID: {self}  -  Processing WebODM Results...")
+=======
+        
+        Postconditions:
+            1. Set Our logger 
+            2. Load Point-Cloud Configuration Parameters
+            3. Initialize Surface Model Parser
+    
+    """
+    def __init__(self, config_loader):
+        self.logger = LoggerSetup(__name__).get_logger()
+        self.config = config_loader.get_point_cloud_config()
+        self.surface_parser = SurfaceModelParser(config_loader)
+        
+
+    """
+    
+        Desc: This Function Takes In webodm_results And output_dir And
+        Processes The WebODM Outputs To Generate Analysis. The Analysis
+        Includes Surface Models, Canopy Height Models, And Quality Metrics.
+        The Function Returns The Analysis Results As A Dictionary.
+
+        Preconditions:
+            1. webodm_results: Dictionary Of WebODM Outputs
+            2. output_dir: Path To Output Directory
+            3. webodm_results And output_dir Must Be Valid
+        
+        Postconditions:
+            1. Processes WebODM Outputs To Generate Analysis
+            2. Returns Analysis Results As A Dictionary
+    
+    """
+    def process_webodm_results(self, webodm_results: Dict[str, Any], output_dir: Path) -> Dict[str, Any]:
+        try:
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
             # Create Our Output Directory If It Does Not Exist
             output_dir.mkdir(parents=True, exist_ok=True)
             
@@ -75,7 +110,12 @@ class CloudProcessor:
             # Calculate Canopy Height Model (CHM) From dsm_data And dtm_data
             chm = self._calculate_chm(dsm_data['elevation'], dtm_data['elevation'])
             
+<<<<<<< HEAD
             result = {
+=======
+            # Return Our Analysis Results As A Dictionary
+            return {
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
                 'surface_models': {
                     'dsm': dsm_data,
                     'dtm': dtm_data,
@@ -91,11 +131,14 @@ class CloudProcessor:
                     'bounds': dsm_data['metadata']['bounds']
                 }
             }
+<<<<<<< HEAD
 
             self.logger.info(f"Cloud Processor ID: {self}  -  WebODM Results Processed.")
 
             # Return Our Analysis Results As A Dictionary
             return result
+=======
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         # Catch Any Exceptions And Log The Error   
         except Exception as e:
             self.logger.error(f"Cloud Processor ID: {self}  -  Results Processing Failed: {str(e)}.")
@@ -121,6 +164,7 @@ class CloudProcessor:
     
     """      
     def _calculate_chm(self, dsm: np.ndarray, dtm: np.ndarray) -> np.ndarray:
+<<<<<<< HEAD
         try:
           self.logger.info(f"Cloud Processor ID: {self}  -  Calculating Canopy Height Model (CHM)...")
           result = np.subtract(dsm, dtm)
@@ -130,6 +174,10 @@ class CloudProcessor:
         except Exception as e:
             self.logger.error(f"Cloud Processor ID: {self}  -  Failed To Calculate Canopy Height Model (CHM): {str(e)}.")
             raise
+=======
+        # Subtract The Digital Terrain Model (DTM) From The Digital Surface Model (DSM) For CHM
+        return np.subtract(dsm, dtm)
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         
 
     """
@@ -147,6 +195,7 @@ class CloudProcessor:
     
     """
     def _calculate_statistics(self, data: np.ndarray) -> Dict[str, float]:
+<<<<<<< HEAD
         
         try:
           self.logger.info(f"Cloud Processor ID: {self}  -  Calculating Statistics...")
@@ -164,6 +213,16 @@ class CloudProcessor:
             self.logger.error(f"Cloud Processor ID: {self}  -  Failed To Calculate Statistics: {str(e)}.")
             raise
         
+=======
+        return {
+            'mean': float(np.mean(data)),
+            'std': float(np.std(data)),
+            'min': float(np.min(data)),
+            'max': float(np.max(data)),
+            'median': float(np.median(data))
+        }
+        
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
     """
     
@@ -185,6 +244,7 @@ class CloudProcessor:
     """
     def _calculate_quality_metrics(self, dsm_data: Dict[str, Any], 
                                  dtm_data: Dict[str, Any]) -> Dict[str, Any]:
+<<<<<<< HEAD
         try:
           self.logger.info(f"Cloud Processor ID: {self}  -  Calculating Quality Metrics...")
           result = self._calculate_metrics(dsm_data, dtm_data)
@@ -193,6 +253,13 @@ class CloudProcessor:
         except Exception as e:
             self.logger.error(f"Cloud Processor ID: {self}  -  Failed To Calculate Quality Metrics: {str(e)}.")
             raise
+=======
+        return {
+            'resolution_check': self._check_resolution(dsm_data, dtm_data),
+            'coverage_check': self._check_coverage(dsm_data, dtm_data),
+            'noise_metrics': self._calculate_noise_metrics(dsm_data['elevation'])
+        }
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         
 
     """
@@ -214,6 +281,7 @@ class CloudProcessor:
     """
     def _check_resolution(self, dsm_data: Dict[str, Any], 
                          dtm_data: Dict[str, Any]) -> bool:
+<<<<<<< HEAD
         self.logger.info(f"Cloud Processor ID: {self}  -  Checking Resolution...")
         
         result = dsm_data['metadata']['resolution'] == dtm_data['metadata']['resolution']
@@ -223,6 +291,11 @@ class CloudProcessor:
         # Check If The Resolution Of The dsm_data And dtm_data Are The Same
         return result
         
+=======
+        # Check If The Resolution Of The dsm_data And dtm_data Are The Same
+        return dsm_data['metadata']['resolution'] == dtm_data['metadata']['resolution']
+        
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
     """
     
@@ -244,6 +317,7 @@ class CloudProcessor:
     """
     def _check_coverage(self, dsm_data: Dict[str, Any], 
                        dtm_data: Dict[str, Any]) -> bool:
+<<<<<<< HEAD
         self.logger.info(f"Cloud Processor ID: {self}  -  Checking Coverage...")
 
         # Check If The Bounds Of The dsm_data And dtm_data Are The Same
@@ -251,6 +325,10 @@ class CloudProcessor:
 
         self.logger.info(f"Cloud Processor ID: {self}  -  Coverage Check Complete, Result Is {result}.")
         return result
+=======
+        # Check If The Bounds Of The dsm_data And dtm_data Are The Same
+        return dsm_data['metadata']['bounds'] == dtm_data['metadata']['bounds']
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         
 
     """
@@ -268,6 +346,7 @@ class CloudProcessor:
     
     """
     def _calculate_noise_metrics(self, data: np.ndarray) -> Dict[str, float]:
+<<<<<<< HEAD
         try:
           self.logger.info(f"Cloud Processor ID: {self}  -  Calculating Noise Metrics...")
           # Calculate The Gradient Of The Surface Model Data
@@ -284,3 +363,11 @@ class CloudProcessor:
         except Exception as e:
             self.logger.error(f"Cloud Processor ID: {self}  -  Failed To Calculate Noise Metrics: {str(e)}.")
             raise
+=======
+        # Calculate The Gradient Of The Surface Model Data
+        gradient = np.gradient(data)
+        return {
+            'roughness': float(np.std(gradient)),
+            'noise_ratio': float(np.sum(np.abs(gradient)) / data.size)
+        } 
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576

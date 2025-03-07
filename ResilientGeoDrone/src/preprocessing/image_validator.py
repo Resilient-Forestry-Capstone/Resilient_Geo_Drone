@@ -34,6 +34,7 @@ class ImageValidator:
 
     """
     def __init__(self, config_loader):
+<<<<<<< HEAD
         self.logger = LoggerSetup().get_logger()
 
         try:
@@ -65,6 +66,31 @@ class ImageValidator:
         # Attempt To Load Image And Check Quality Metrics
         try:
             self.logger.info(f"ImageValidator ID: {self}  -  Validating Image {image_path}...")
+=======
+        self.logger = LoggerSetup(__name__).get_logger()
+        self.config = config_loader.get_preprocessing_config()
+        self.metrics = QualityMetrics(self.config)
+
+
+    """
+    
+        Desc: This Function Takes In image_path And Validates The Image
+        Using Quality Metrics. The Function Returns True If The Image
+        Passes All Quality Checks And False Otherwise.
+
+        Preconditions:
+            1. image_path: Path To Image
+            2. image_path Must Be A Valid Image
+
+        Postconditions:
+            1. Validates Single Image
+            2. Returns True If Image Passes Quality Checks And False Otherwise
+    
+    """  
+    def validate_image(self, image_path: Path) -> bool:
+        # Attempt To Load Image And Check Quality Metrics
+        try:
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
             # Load Image
             img = cv2.imread(str(image_path))
             if img is None:
@@ -72,17 +98,26 @@ class ImageValidator:
                 return False
                 
             # Check Image Quality Metrics
+<<<<<<< HEAD
             checks = all([
+=======
+            checks = [
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
                 self.metrics.check_resolution(img),
                 self.metrics.check_blur(img),
                 self.metrics.check_brightness(img),
                 self.metrics.check_contrast(img)
             ])
             
+<<<<<<< HEAD
             self.logger.info(f"ImageValidator ID: {self}  -  Image {image_path} Validation Results: {checks}")
 
             # Return True If All Checks Pass
             return checks
+=======
+            # Return True If All Checks Pass
+            return all(checks)
+>>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
             
         # Log Errors And Return False If Validation Fails
         except Exception as e:
