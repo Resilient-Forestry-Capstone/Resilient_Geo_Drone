@@ -29,7 +29,6 @@ class CanopyAnalyzer:
 
         Preconditions:
             1. config_loader: ConfigLoader Object
-<<<<<<< HEAD
         
         Postconditions:
             1. Set Our logger 
@@ -37,35 +36,6 @@ class CanopyAnalyzer:
     
     """
     def __init__(self, config_loader):
-=======
-        
-        Postconditions:
-            1. Set Our logger 
-            2. Load Geospatial Configuration Parameters
-    
-    """
-    def __init__(self, config_loader):
-        self.logger = LoggerSetup(__name__).get_logger()
-        self.config = config_loader.get_geospatial_config()
-        
-
-    """
-    
-        Desc: Generates A Canopy Height Model (CHM) From A Point Cloud File
-        At point_cloud_path. The CHM Is Generated Using The Process Point Cloud
-        Method. The CHM Is Returned As A Numpy Array.
-
-        Preconditions:
-            1. point_cloud_path: Path To Point Cloud File
-            2. point_cloud_path Must Be A Valid Point Cloud File
-
-        Postconditions:
-            1. Generates A Canopy Height Model (CHM)
-            2. Returns CHM As Numpy Array
-    
-    """
-    def generate_chm(self, point_cloud_path: Path) -> np.ndarray:
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         try:
           self.logger = LoggerSetup().get_logger()
           self.config = config_loader.get_geospatial_config()
@@ -73,7 +43,6 @@ class CanopyAnalyzer:
         except Exception as e:
             self.logger.error(f"Canopy Analyzer Initialization Failed: {str(e)}")
             raise
-<<<<<<< HEAD
         
 
     """
@@ -101,8 +70,6 @@ class CanopyAnalyzer:
         except Exception as e:
             self.logger.error(f"CanopyAnalyzer ID: {self}  -  CHM Generation Failed: {str(e)}")
             raise
-=======
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
 
     """
@@ -121,7 +88,6 @@ class CanopyAnalyzer:
 
     """ 
     def calculate_metrics(self, chm: np.ndarray) -> dict:
-<<<<<<< HEAD
         try:
           self.logger.info(f"CanopyAnalyzer ID: {self}  -  Calculating Canopy Metrics...")
 
@@ -138,14 +104,6 @@ class CanopyAnalyzer:
         except Exception as e:
             self.logger.error(f"CanopyAnalyzer ID: {self}  -  Canopy Metrics Calculation Failed: {str(e)}")
             raise
-=======
-        return {
-            'mean_height': np.mean(chm),
-            'max_height': np.max(chm),
-            'canopy_coverage': self._calculate_coverage(chm),
-            'height_distribution': self._height_distribution(chm)
-        }
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         
     def _process_point_cloud(self, src):
         """Process Point Cloud Data"""

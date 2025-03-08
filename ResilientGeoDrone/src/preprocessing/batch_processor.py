@@ -25,7 +25,6 @@ class BatchProcessor:
 
         Preconditions:
             1. config_loader: ConfigLoader Object
-<<<<<<< HEAD
         
         Postconditions:
             1. Set Our logger 
@@ -45,21 +44,6 @@ class BatchProcessor:
             self.logger.error(f"BatchProcessor ID: {self}  -  Batch Processor Initialization Failed: {str(e)}.")
             raise
         
-=======
-        
-        Postconditions:
-            1. Set Our logger 
-            2. Load Preprocessing Configuration Parameters
-            3. Initialize Image Validator
-            4. Initialize Image Processor
-    
-    """
-    def __init__(self, config_loader):
-        self.logger = LoggerSetup(__name__).get_logger()
-        self.config = config_loader.get_preprocessing_config()
-        self.validator = ImageValidator(config_loader)
-        
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
     """
     
@@ -80,7 +64,6 @@ class BatchProcessor:
     
     """
     def process_batch(self, image_paths: List[Path], max_workers: int = 4) -> Dict[str, List[Path]]:
-<<<<<<< HEAD
         
         self.logger.info(f"Batch Processor ID: {self}  -  Processing Batch Of Images...")
 
@@ -114,30 +97,3 @@ class BatchProcessor:
         except Exception as e:
           self.logger.error(f"Batch Processor ID: {self}  -  Batch Processing Failed: {str(e)}.")
           raise
-=======
-        # Results Dictionary
-        results = {'valid': [], 'invalid': []}
-        
-        # Send Out Multiple Workers To Process Images Concurrently
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            # Submit Image Validation Tasks
-            future_to_path = {
-                executor.submit(self.validator.validate_image, path): path 
-                for path in image_paths
-            }
-            
-            # Process Results As They Come In
-            for future in as_completed(future_to_path):
-                path = future_to_path[future]
-                try:
-                    if future.result():
-                        results['valid'].append(path)
-                    else:
-                        results['invalid'].append(path)
-                except Exception as e:
-                    self.logger.error(f"Error processing {path}: {str(e)}")
-                    results['invalid'].append(path)
-
-        # Return Results Of Valid Or Invalidated Images       
-        return results
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576

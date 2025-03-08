@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 numpy
 rasterio
 geojson
@@ -6,13 +5,4 @@ opencv-python-headless
 pillow
 transformers
 torch
-=======
-numpy
-rasterio
-geojson
-opencv-python-headless
-pillow
-transformers
-torch
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 matplotlib

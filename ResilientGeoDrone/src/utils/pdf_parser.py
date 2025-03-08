@@ -42,7 +42,6 @@ class PDFParser:
             self.logger.error(f"PDF Parser ID: {self}  -  PDF Parser Initialization Failed: {str(e)}.")
             raise
         
-<<<<<<< HEAD
         
 
     """
@@ -77,33 +76,6 @@ class PDFParser:
             self.logger.error(f"PDF Parser ID: {self}  -  Failed To Extract Text From PDF Report: {str(e)}.")
             return ""
     
-=======
-
-    """
-    
-        Desc: This Function Extracts All Text Content From The PDF Report.
-        The Function Returns The Extracted Text As A Single String. The
-        Text Content Is Extracted From All Pages Of The PDF Report For Utilization
-        In Our Pipeline For Analysis.
-
-        Preconditions:
-            1. PDF Report Must Be Loaded
-
-        Postconditions:
-            1. Extracts All Text Content From PDF Report
-            2. Returns Extracted Text As A Single String
-            3. Extracted Text Is Concatenated From All Pages
-    
-    """
-    def extract_text(self) -> str:
-        text = []
-        for page in self.doc:
-            text.append(page.get_text())
-
-        # Return Text Content As Single String With Newlines For Pages
-        return "\n".join(text)
-    
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
     """
     
         Desc: This Function Extracts All Images From The PDF Report. The
@@ -123,10 +95,7 @@ class PDFParser:
     
     """
     def extract_images(self, output_dir: Path) -> List[Dict[str, Any]]:
-<<<<<<< HEAD
         self.logger.info(f"PDF Parser ID: {self}  -  Extracting Images From PDF Report...")
-=======
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         # Create Output Direcotry If It Does Not Exist
         output_dir.mkdir(parents=True, exist_ok=True)
         image_data = []
@@ -168,10 +137,7 @@ class PDFParser:
                     self.logger.error(f"Failed To Extract Image {img_idx} From Page {page_num}: {str(e)}")
                     continue
 
-<<<<<<< HEAD
         self.logger.info(f"PDF Parser ID: {self}  -  Images Extracted From PDF Report.")
-=======
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         # Return Image Metadata      
         return image_data
     
@@ -191,10 +157,7 @@ class PDFParser:
 
     """
     def close(self):
-<<<<<<< HEAD
         self.logger.info(f"PDF Parser ID: {self}  -  Closing PDF Document...")
-=======
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         if self.doc:
             self.doc.close()
             self.logger.info(f"PDF Parser ID: {self}  -  PDF Document Closed.")
@@ -203,7 +166,6 @@ class PDFParser:
     
 
     """
-<<<<<<< HEAD
     
         Desc: This Function Acts As A Context Manager For The PDF Parser.
         The Function Allows The PDF Parser To Be Used As A Context Manager
@@ -221,25 +183,6 @@ class PDFParser:
     def __enter__(self):
         return self 
     
-=======
-    
-        Desc: This Function Acts As A Context Manager For The PDF Parser.
-        The Function Allows The PDF Parser To Be Used As A Context Manager
-        To Ensure Proper Resource Management. The PDF Document Is Closed
-        After Exiting The Context Manager using __exit__(...).
-
-        Preconditions:
-            1. PDF Report Must Be Loaded
-
-        Postconditions:
-            1. PDF Document Is Closed After Exiting Context Manager
-            2. Opens PDF Document's Context
-    
-    """
-    def __enter__(self):
-        return self 
-    
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
     """
     

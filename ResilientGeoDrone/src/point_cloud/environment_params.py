@@ -105,7 +105,6 @@ class EnvironmentConfig:
             2. Return Options As A Dictionary
     
     """
-<<<<<<< HEAD
     def to_webodm_options(self):
         """Convert environment config to WebODM options format"""
         options = [
@@ -120,22 +119,6 @@ class EnvironmentConfig:
             {"name": "auto-boundary", "value": self.auto_boundary},
             {"name": "ignore-gsd", "value": self.ignore_gsd},
         ]
-=======
-    def to_webodm_options(self) -> Dict[str, Any]:
-        options = {
-            'feature-quality': self.feature_quality,
-            'matcher-type': self.matcher_type,
-            'min-num-features': self.min_num_features,
-            'pc-quality': self.point_cloud_quality,
-            'mesh-size': self.mesh_quality,
-            'use-3dmesh': self.use_3dmesh,
-            'mesh-octree-depth': 10,
-            'pc-filter': 2,
-            'pc-geometric': True,
-            'auto-boundary': self.auto_boundary,
-            'ignore-gsd': self.ignore_gsd
-        }
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
         
         # Add Maximum Concurrency If Specified
         if self.max_concurrency:

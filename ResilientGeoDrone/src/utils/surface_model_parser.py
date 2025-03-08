@@ -4,11 +4,8 @@ from pathlib import Path
 from typing import Dict, Tuple, Any
 from matplotlib import pyplot as plt
 
-<<<<<<< HEAD
 from .logger import LoggerSetup
 
-=======
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
 
 """
@@ -62,7 +59,6 @@ class SurfaceModelParser:
     
     """
     def read_surface_model(self, file_path: Path) -> Dict[str, Any]:
-<<<<<<< HEAD
         self.logger.info(f"Surface Model Parser ID: {self}  -  Reading Surface Model: {file_path}...")
         try:
           # Open Surface Model File Using Rasterio
@@ -93,30 +89,6 @@ class SurfaceModelParser:
             self.logger.error(f"Surface Model Parser ID: {self}  -  Surface Model Reading Failed: {str(e)}.")
             raise
         
-=======
-        # Open Surface Model File Using Rasterio
-        with rasterio.open(file_path) as src:
-            metadata = {
-                'crs': src.crs,
-                'transform': src.transform,
-                'bounds': src.bounds,
-                'resolution': src.res
-            }
-
-            # Read Elevation Data
-            elevation_data = src.read(1)
-
-            # Extract Color Scale From Image
-            color_scale = self._extract_color_scale(src)
-
-            # Calculate Statistics
-            return {
-                'metadata': metadata,
-                'elevation': elevation_data,
-                'color_scale': color_scale,
-                'statistics': self._calculate_statistics(elevation_data)
-            }
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
     
 
     """
@@ -136,7 +108,6 @@ class SurfaceModelParser:
     
     """
     def _extract_color_scale(self, src) -> Dict[str, float]:
-<<<<<<< HEAD
         self.logger.info(f"Surface Model Parser ID: {self}  -  Extracting Color Scale...")
         try:
           # If We Have A Colormap, Parse It
@@ -157,18 +128,6 @@ class SurfaceModelParser:
         except Exception as e:
             self.logger.error(f"Surface Model Parser ID: {self}  -  Color Scale Extraction Failed: {str(e)}.")
             raise
-=======
-        # If We Have A Colormap, Parse It
-        if 'colormap' in src.tags():
-            return self._parse_colormap(src.tags()['colormap'])
-        
-        # Otherwise, Calculate Min And Max Elevation Values
-        data = src.read(1)
-        return {
-            'min_elevation': float(np.min(data)),
-            'max_elevation': float(np.max(data))
-        }
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
     
 
     """
@@ -186,14 +145,10 @@ class SurfaceModelParser:
     
     """
     def _calculate_statistics(self, data: np.ndarray) -> Dict[str, float]:
-<<<<<<< HEAD
       self.logger.info(f"Surface Model Parser ID: {self}  -  Calculating Statistics...")
 
       try:
         result = {
-=======
-        return {
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
             'mean_elevation': float(np.mean(data)),
             'std_elevation': float(np.std(data)),
             'median_elevation': float(np.median(data)),
@@ -201,7 +156,6 @@ class SurfaceModelParser:
             'max_elevation': float(np.max(data))
         }
 
-<<<<<<< HEAD
         self.logger.info(f"Surface Model Parser ID: {self}  -  Statistics Calculated.")
 
         return result
@@ -248,43 +202,12 @@ class SurfaceModelParser:
             self.logger.error(f"Surface Model Parser ID: {self}  -  Validation Against Benchmark Failed: {str(e)}.")
             raise
 
-=======
-
-    """
-    
-        Desc: This Function Takes In A model_data As Well As benchmark_path
-        And Validates The Surface Model Against A Benchmark. The Function
-        Checks The Resolution, Coverage, And Accuracy Of The Surface Model
-        Against The Benchmark. The Results Are Returned As A Dictionary.
-
-        Preconditions:
-            1. model_data: Dictionary Representing Surface Model Data
-            2. benchmark_path: Path To Benchmark File
-            3. model_data And benchmark_path Must Be Valid
-            4. model_data And benchmark_path Must Be Of The Same Orthophoto Image
-
-        Postconditions:
-            1. Validate Surface Model Against Benchmark
-            2. Returns Results As A Dictionary
-    
-    """
-    def validate_against_benchmark(self, model_data: Dict[str, Any], benchmark_path: Path) -> Dict[str, bool]:
-        with rasterio.open(benchmark_path) as benchmark:
-            benchmark_data = benchmark.read(1)
-            return {
-                'resolution_check': self._check_resolution(model_data, benchmark),
-                'coverage_check': self._check_coverage(model_data, benchmark),
-                'accuracy_check': self._check_accuracy(model_data['elevation'], benchmark_data)
-            }
-
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
 
     """
     
         Desc: This Function Takes In model_data And benchmark_data As Well As
         A output_path And Generates A Difference Map Between The Model And
         Benchmark. The Difference Map Is Saved As A PNG Image In output_path.
-<<<<<<< HEAD
 
         Preconditions:
             1. model_data: Numpy Array Representing Surface Model Data
@@ -295,8 +218,6 @@ class SurfaceModelParser:
         Postconditions:
             1. Generate Difference Map Between Model And Benchmark
             2. Save Difference Map As PNG Image        
-=======
->>>>>>> 2c625a31f8302b2a8d38108e3b47c5b0ea12b576
     
     """
     def generate_difference_map(self, model_data: np.ndarray, benchmark_data: np.ndarray, output_path: Path) -> None:
