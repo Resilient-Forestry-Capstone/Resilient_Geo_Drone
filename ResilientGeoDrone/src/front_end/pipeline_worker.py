@@ -1,11 +1,11 @@
 from typing import List
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
-from src.utils.config_loader import ConfigLoader
-from src.point_cloud.webodm_client import WebODMClient
-from src.preprocessing.batch_processor import BatchProcessor
-from src.utils.file_handler import FileHandler
-from src.point_cloud.cloud_processor import CloudProcessor
-from src.utils.logger import LoggerSetup
+from ..utils.config_loader import ConfigLoader
+from ..point_cloud.webodm_client import WebODMClient
+from ..preprocessing.batch_processor import BatchProcessor
+from ..utils.file_handler import FileHandler
+from ..point_cloud.cloud_processor import CloudProcessor
+from ..utils.logger import LoggerSetup
 import time
 from pathlib import Path
 

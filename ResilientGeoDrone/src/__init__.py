@@ -1,11 +1,11 @@
-from src.front_end import PipelineWorker, MainClientWindow, DragDropWidget, ProgressWidget, PipelineWorker
-from src.point_cloud import WebODMClient, CloudProcessor
-from src.preprocessing import BatchProcessor
-from src.utils import ConfigLoader, FileHandler, LoggerSetup
-from src.utils.logger import LoggerSetup
-from src.utils.config_loader import ConfigLoader
-from src.point_cloud.webodm_client import WebODMClient
-from src.preprocessing.batch_processor import BatchProcessor
+from .front_end import PipelineWorker, MainClientWindow, DragDropWidget, ProgressWidget, PipelineWorker
+from .point_cloud import WebODMClient, CloudProcessor
+from .preprocessing import BatchProcessor
+from .utils import ConfigLoader, FileHandler, LoggerSetup
+from .utils.logger import LoggerSetup
+from .utils.config_loader import ConfigLoader
+from .point_cloud.webodm_client import WebODMClient
+from .preprocessing.batch_processor import BatchProcessor
 
 
 # Package metadata

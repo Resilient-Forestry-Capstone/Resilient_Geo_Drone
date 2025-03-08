@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QLabel
 from PyQt5.QtCore import Qt
 import os
-from src.utils import FileHandler, ConfigLoader
+from ..utils import FileHandler, ConfigLoader
 
 
 
