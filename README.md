@@ -143,7 +143,16 @@ After That, You Should Be Able To Call The Pipeline Properly Through The UI.
 The UI Has Some Basic Functionality Presented:
 
 * Main Page:
-     - gg
+     - `Drag And Drop` Region For Folders' Containing Digital Aerial Images To Use In Point Cloud Generation (The User Can Also Select Multiple Files Instead Of A Folder).
+        - `Launch Pipeline` Button Which Launces Our Pipeline With The Provided Image-Set Given In The Drag/Drop Region.
+     - `Settings` Button Which Opens Up A Pop-Up Window To All User-Configurable Parameters For The Pipeline.
+        - There Are 4 Main Tabs Available:
+           - `Preprocessing` Provides User Configurability With The Initial Preprocessing Of The Image-Set Before Point Cloud Generation.
+              - User Can Configure The `Supported Formats` Of Images To Use, `Minimum Resolution` Of A Image Before It Is Rejected, `Processing Settings` Which Provides Thresholds Like `Blur Threshold` `Min Brightness` `Max Brightness` And `Max Workers` (`Max Workers` Is Utilized For Multithreading To Expedite The Stages Runtime).
+           - `Point Cloud` Provides User Capabilities To Specify How We Generate The Point Clouds.
+              - User Can Configure The `WebODM Connection` Settings Like `Host` `Port` `Username` `Password` And `Timeout (s)` This Allows The Client To Specify--Maybe If Serving Multiple Instances Of WebODM--Where The WebODM API Can Be Accessed And Through Which User To Use It Among.
+              - `Weather Conditions` Allows The User To Select And Create New Presets For How The Parameterization Of WebODM Should Be Done Under Varying Conditions; This Is Because Weather Dictates A Lot Of The Means Of Point Cloud Generation, So Allowing User To Specify Specific Settings For Specific Weather Allows Them To Save Away Known Configurations For Specific Environments.
+                 - In `Weather Conditions`, We Can Set The `Feature Settings` Like Overall Features' `Quality`, The `Min Features` To Extrapolate, As Well As The `Matcher` Which Helps In Stitching Orthophotos. Likewise, We Also Include `Quality Settings` Like Overall `Point Cloud` Quality, And The `Mesh` Quality. We Also Include `Processing Settings` Which Has The `Max Concurrency` In WebODM To Help Multithread The Point Cloud Generation Inside WebODM.
 
 
 <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> 
