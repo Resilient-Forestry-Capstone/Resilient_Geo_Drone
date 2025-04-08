@@ -85,7 +85,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 <h3>🛠️ Setup:</h3>
 
-<h6>Before Initialization</h6>
+<h6>Before Initialization (CLI):</h6>
 
 Before Starting Up The Scripts There Are 3 Main Things That Need To Be Done:
 
@@ -94,11 +94,39 @@ Before Starting Up The Scripts There Are 3 Main Things That Need To Be Done:
 * You Are Running The Program Through A Windows OS **_(Or A Windows Virtual-Machine)_**
 
 
-<h6>Initialization</h6>
+<h6>Initialization (CLI):</h6>
 
 To Run The Program Properly With All Dependencies Linked, You Must Call The `run_qgis_setup.bat` File Which Will Call The Linking .bat For QGIS And Pip Install All Python Library Dependencies In A Python Virtual Environment.
 
 When Running `run_qgis_setup.bat`, You Will Be Stopped At A Python Script:
+
+<h6>Before Initialization (UI):</h6>
+
+Before Starting The Scripts There Is 2 Main Things That Needs To Be Done:
+
+* The Underlying Operating System Is Windows.
+* Call The `setup.bat` Which Will Set-Up The Environment For You.
+
+<h6>Initialization (UI):</h6>
+
+To Run The Program Now, All You Have To Do Is Call `main.py` Which Is Located Relatively, `ResilientGeoDrone/main.py`.
+
+After Calling This, It Should Take A Second For The UI To Display Itself, But After Should Provide You With Functionality.
+
+<h6>After Initialization (UI):</h6>
+
+After You Initialize The Process, You May Need To Go Into Settings And Alter Some Of The Default Parameters. These Can Be Found Under The `Settings` Button.
+
+One Main Setting You May Need To Change Is Your WebODM Login Credentials For API Access Which Is Found In `Settings` -> `Point Cloud`.
+
+After That, You Should Be Able To Call The Pipeline Properly Through The UI.
+
+<h6>UI Functionality:</h6>
+
+The UI Has Some Basic Functionality Presented:
+
+* Main Page:
+*    t
 
 ```Python Terminal
 
