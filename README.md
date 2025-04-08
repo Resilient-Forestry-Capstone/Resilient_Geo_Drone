@@ -100,6 +100,23 @@ To Run The Program Properly With All Dependencies Linked, You Must Call The `run
 
 When Running `run_qgis_setup.bat`, You Will Be Stopped At A Python Script:
 
+```Python Terminal
+
+Starting QGIS Environment Setup...
+  Checking Python Edition...
+    Python Version: 312 
+  Creating Python Virtual Environment...
+    Virtual Environment Created And Activated.
+  Initializing QGIS Dependency Linker .bat...
+Python 3.12.7 (main, Oct 25 2024, 11:18:09) [MSC v.1938 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> ^Z
+
+```
+
+Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**_ Needs To Call Python To Load In Everything For Python Before We Execute).
+
+
 <h6>Before Initialization (UI):</h6>
 
 Before Starting The Scripts There Is 2 Main Things That Needs To Be Done:
@@ -127,22 +144,6 @@ The UI Has Some Basic Functionality Presented:
 
 * Main Page:
 *    t
-
-```Python Terminal
-
-Starting QGIS Environment Setup...
-  Checking Python Edition...
-    Python Version: 312 
-  Creating Python Virtual Environment...
-    Virtual Environment Created And Activated.
-  Initializing QGIS Dependency Linker .bat...
-Python 3.12.7 (main, Oct 25 2024, 11:18:09) [MSC v.1938 64 bit (AMD64)] on win32
-Type "help", "copyright", "credits" or "license" for more information.
->>> ^Z
-
-```
-
-Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**_ Needs To Call Python To Load In Everything For Python Before We Execute).
 
 
 <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> 
