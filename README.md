@@ -85,6 +85,8 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 <h3>🛠️ Setup:</h3>
 
+<h4>Command-Line-Interface (CLI/Terminal)</h4>
+
 <h6>Before Initialization (CLI):</h6>
 
 Before Starting Up The Scripts There Are 3 Main Things That Need To Be Done:
@@ -116,6 +118,8 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**_ Needs To Call Python To Load In Everything For Python Before We Execute).
 
+
+<h4>User Interface (UI)</h4>
 
 <h6>Before Initialization (UI):</h6>
 
