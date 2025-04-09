@@ -95,12 +95,11 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
 
 ----------------------------------------------
 
-<h3>Packages</h3>
+<h3>🗄️ Packages</h3>
 
-Our Codebase Works With The Given External Packages:
+Our Codebase Works With The Given External Packages (Downloadable Through `pip install ___`):
 
 ```
-
 PyQt5
 rasterio
 numpy
@@ -113,7 +112,6 @@ transformers
 PyMuPDF
 pyyaml
 pytest
-
 ```
 
 ----------------------------------------------
