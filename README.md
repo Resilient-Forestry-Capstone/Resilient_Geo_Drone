@@ -103,7 +103,7 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
 
 <h3>🛠️ Setup: Command-Line-Interface (CLI/Terminal)</h3>
 
-<h6>Before Initialization (CLI):</h6>
+<h6>Before Initialization</h6>
 
 Before Starting Up The Scripts There Are 3 Main Things That Need To Be Done:
 
@@ -112,7 +112,7 @@ Before Starting Up The Scripts There Are 3 Main Things That Need To Be Done:
 * You Are Running The Program Through A Windows OS **_(Or A Windows Virtual-Machine)_**
 
 
-<h6>Initialization (CLI):</h6>
+<h6>Initialization</h6>
 
 To Run The Program Properly With All Dependencies Linked, You Must Call The `run_qgis_setup.bat` File Which Will Call The Linking .bat For QGIS And Pip Install All Python Library Dependencies In A Python Virtual Environment.
 
@@ -138,20 +138,20 @@ Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**
 
 <h3>🛠️ Setup: User Interface (UI)</h3>
 
-<h6>Before Initialization (UI):</h6>
+<h6>Before Initialization</h6>
 
 Before Starting The Scripts There Is 2 Main Things That Needs To Be Done:
 
 * The Underlying Operating System Is Windows.
 * Call The `setup.bat` Which Will Set-Up The Environment For You.
 
-<h6>Initialization (UI):</h6>
+<h6>Initialization</h6>
 
 To Run The Program Now, All You Have To Do Is Call `main.py` Which Is Located Relatively, `ResilientGeoDrone/main.py`.
 
 After Calling This, It Should Take A Second For The UI To Display Itself, But After Should Provide You With Functionality.
 
-<h6>After Initialization (UI):</h6>
+<h6>After Initialization</h6>
 
 After You Initialize The Process, You May Need To Go Into Settings And Alter Some Of The Default Parameters. These Can Be Found Under The `Settings` Button.
 
