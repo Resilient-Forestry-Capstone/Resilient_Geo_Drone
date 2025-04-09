@@ -162,7 +162,7 @@ After That, You Should Be Able To Call The Pipeline Properly Through The UI.
 
 ----------------------------------------------
 
-<h3>UI Functionality:</h3>
+<h3>📱 UI Functionality</h3>
 
 The UI Has Some Basic Functionality Presented:
 
