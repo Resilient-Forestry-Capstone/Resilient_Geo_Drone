@@ -167,13 +167,14 @@ The UI Has Some Basic Functionality Presented:
    - Allows The User To Select And Create New Presets For How The Parameterization Of WebODM Should Be Done Under Varying Conditions; This Is Because Weather Dictates A Lot Of The Means Of Point Cloud Generation, So Allowing User To Specify Specific Settings For Specific Weather Allows Them To Save Away Known Configurations For Specific Environments.
    - In `Weather Conditions`, We Can Set The `Feature Settings` Like Overall Features' `Quality`, The `Min Features` To Extrapolate, As Well As The `Matcher` Which Helps In Stitching Orthophotos. Likewise, We Also Include `Quality Settings` Like Overall `Point Cloud` Quality, And The `Mesh` Quality. We Also Include `Processing Settings` Which Has The `Max Concurrency` In WebODM To Help Multithread The Point Cloud Generation Inside WebODM.
               
-   ##### `Geospatial`Tab
+   ##### `Geospatial` Tab
   - Provides The User Configurability In The More Downstream Stages Of Our Pipeline After Point Cloud Generation.
   - User Is Allowed To Specify The `Output Settings` Which Specifies Where All Intermediate And Final Data Is Outputted Into.
   - User Also Has `Analysis Settings` Which Specifies The Gap Detection And Analysis Stages Of Our Code. This Includes `Min Tree Height (m)` As Well As The `Canopy threshold` And `Slope Threshold`.
      - There Also Is `Terrain Analysis` Which Specifies The `Roughness Threshold` We Provide On Our Terrain.
 
-   ##### `Logs` Provides The User The Ability To View The Reports Provided By The Code For Means Of Debugging And Analysis.
+   ##### `Logs` Tab
+  - Provides The User The Ability To View The Reports Provided By The Code For Means Of Debugging And Analysis.
   - The User Has the Ability To Click On A provided `Log Report` And It Will Open It's Content. Reports Are Written Mainly For Development Reasons, But Also Can Provide The User Resonings For Fail-Points So They Can Revise Code Or Parameters Accordingly.
 
 
