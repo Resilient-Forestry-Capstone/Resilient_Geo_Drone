@@ -93,6 +93,28 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
     └── config.yaml
 ```
 
+----------------------------------------------
+
+<h3>Packages</h3>
+
+Our Codebase Works With The Given External Packages:
+
+```
+
+PyQt5
+rasterio
+numpy
+matplotlib
+opencv-python
+geojson
+torch
+Pillow
+transformers
+PyMuPDF
+pyyaml
+pytest
+
+```
 
 ----------------------------------------------
 
