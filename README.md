@@ -102,6 +102,9 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
     └── config.yaml
 ```
 
+
+<img src="https://github.com/user-attachments/assets/c9069022-fbae-425a-92be-9b4ab855fa38" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/c9069022-fbae-425a-92be-9b4ab855fa38" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/c9069022-fbae-425a-92be-9b4ab855fa38" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/c9069022-fbae-425a-92be-9b4ab855fa38" alt="Monkeys With A Drone" width="55" height="59"> 
+
 ----------------------------------------------
 
 <h3>🗄️ Packages</h3>
