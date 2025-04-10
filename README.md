@@ -178,6 +178,10 @@ Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**
 
 ----------------------------------------------
 
+
+<img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59">
+
+
 <h3>🛠️ Setup: User Interface (UI)</h3>
 
 <h6>Before Initialization</h6>
