@@ -173,6 +173,9 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**_ Needs To Call Python To Load In Everything For Python Before We Execute).
 
+
+<img src="https://github.com/user-attachments/assets/2681617b-ebb4-4c95-ad24-ef53e00ce2a2" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2681617b-ebb4-4c95-ad24-ef53e00ce2a2" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2681617b-ebb4-4c95-ad24-ef53e00ce2a2" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2681617b-ebb4-4c95-ad24-ef53e00ce2a2" alt="Monkeys With A Drone" width="55" height="59">
+
 ----------------------------------------------
 
 <h3>🛠️ Setup: User Interface (UI)</h3>
