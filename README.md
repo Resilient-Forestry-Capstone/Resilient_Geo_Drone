@@ -107,6 +107,9 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
 
 ----------------------------------------------
 
+<img src="https://github.com/user-attachments/assets/f584e99d-f2d4-4001-b17b-fb5d97429369" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/f584e99d-f2d4-4001-b17b-fb5d97429369" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/f584e99d-f2d4-4001-b17b-fb5d97429369" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/f584e99d-f2d4-4001-b17b-fb5d97429369" alt="Monkeys With A Drone" width="55" height="59"> 
+
+
 <h3>🗄️ Packages</h3>
 
 Our Codebase Works With The Given External Packages (Downloadable Through `pip install ___`):
