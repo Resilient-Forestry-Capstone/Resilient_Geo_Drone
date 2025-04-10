@@ -209,6 +209,9 @@ After That, You Should Be Able To Call The Pipeline Properly Through The UI.
 
 ----------------------------------------------
 
+<img src="https://github.com/user-attachments/assets/c21297a6-548c-42d2-9196-f3960726a341" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/c21297a6-548c-42d2-9196-f3960726a341" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/c21297a6-548c-42d2-9196-f3960726a341" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/c21297a6-548c-42d2-9196-f3960726a341" alt="Monkeys With A Drone" width="55" height="59">
+
+
 <h3>📱 UI Functionality</h3>
 
 The UI Has Some Basic Functionality Presented:
