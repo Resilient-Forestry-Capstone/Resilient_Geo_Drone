@@ -178,8 +178,7 @@ Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**
 
 ----------------------------------------------
 
-
-<img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59">
+<img src="https://github.com/user-attachments/assets/02396314-ca2b-4882-9399-f2c0c36f453a" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/02396314-ca2b-4882-9399-f2c0c36f453a" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/02396314-ca2b-4882-9399-f2c0c36f453a" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/02396314-ca2b-4882-9399-f2c0c36f453a" alt="Monkeys With A Drone" width="55" height="59">
 
 
 <h3>🛠️ Setup: User Interface (UI)</h3>
@@ -205,6 +204,8 @@ One Main Setting You May Need To Change Is Your WebODM Login Credentials For API
 
 After That, You Should Be Able To Call The Pipeline Properly Through The UI.
 
+
+<img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/1ea8a5d2-c66a-48d2-ae77-295254de87b9" alt="Monkeys With A Drone" width="55" height="59">
 
 ----------------------------------------------
 
