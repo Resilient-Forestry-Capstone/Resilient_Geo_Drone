@@ -7,7 +7,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 ----------------------------------------------
 
 
-<h3>📑 Table of Contents</h3>
+<h2>📑 Table of Contents</h2>
 
 1. [📂 Directory Structure](#-directory-structure)
 2. [🛠️ Setup](#-setup)
