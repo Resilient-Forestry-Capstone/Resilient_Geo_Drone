@@ -7,7 +7,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 ----------------------------------------------
 
 
-<h2>📑 Table of Contents</h2>
+<h3>📑 Table of Contents</h3>
 
 1. [📂 Directory Structure](#-directory-structure)
 2. [🛠️ Setup](#-setup)
@@ -26,7 +26,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 ----------------------------------------------
 
-<h2>❓ The Problem At Hand</h2>
+<h3>❓ The Problem At Hand</h3>
 
 
 <h6>Speeding Up The Process</h6>
@@ -45,7 +45,7 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
 
 ----------------------------------------------
 
-<h2>📂 Directory Structure</h2>
+<h3>📂 Directory Structure</h3>
 
 
 ```plaintext
@@ -95,7 +95,7 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
 
 ----------------------------------------------
 
-<h2>🗄️ Packages</h2>
+<h3>🗄️ Packages</h3>
 
 Our Codebase Works With The Given External Packages (Downloadable Through `pip install ___`):
 
@@ -121,7 +121,7 @@ pytest
 
 
 
-<h2>🛠️ Setup: Command-Line-Interface (CLI/Terminal)</h2>
+<h3>🛠️ Setup: Command-Line-Interface (CLI/Terminal)</h3>
 
 <h6>Before Initialization</h6>
 
@@ -156,7 +156,7 @@ Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**
 
 ----------------------------------------------
 
-<h2>🛠️ Setup: User Interface (UI)</h2>
+<h3>🛠️ Setup: User Interface (UI)</h3>
 
 <h6>Before Initialization</h6>
 
@@ -182,7 +182,7 @@ After That, You Should Be Able To Call The Pipeline Properly Through The UI.
 
 ----------------------------------------------
 
-<h2>📱 UI Functionality</h2>
+<h3>📱 UI Functionality</h3>
 
 The UI Has Some Basic Functionality Presented:
 
@@ -224,7 +224,7 @@ The UI Has Some Basic Functionality Presented:
 
 
 
-<h2>🔍 The Breakdown:</h2>
+<h3>🔍 The Breakdown:</h3>
 
 <h4>Architecture Diagram</h4>
 
@@ -282,7 +282,7 @@ At The End, All Necesary Data Is Packaged Into A New _**YAML**_ File Which Conta
 <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> 
 
 
-<h2>🌟 Features:</h2>
+<h3>🌟 Features:</h3>
 
 
 <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> 
