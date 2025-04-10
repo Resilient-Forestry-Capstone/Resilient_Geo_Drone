@@ -231,7 +231,7 @@ The UI Has Some Basic Functionality Presented:
 ![image](https://github.com/user-attachments/assets/3ba7e594-e03c-4020-aa2b-ba5eda7621da)
 
 
-The Process Will Be Initialized With An Raw Digital Aerial Image-Set As One Of The Main Inputted Arguments--With The Other Being A Provided Environmental Tag For Fine-Tuning Of Parameters For The _**QGIS**_ And _**WebODM**_ Software. 
+<br>The Process Will Be Initialized With An Raw Digital Aerial Image-Set As One Of The Main Inputted Arguments--With The Other Being A Provided Environmental Tag For Fine-Tuning Of Parameters For The _**QGIS**_ And _**WebODM**_ Software. 
 
 Because Of The _**QGIS**_ External Dependency, We Utilize A Custom .bat (`run_qgis_setup.bat`) At Runtime To Properly Stage Our Program For All Dependencies Without Need For User Involvement. This Mainly Links _**QGIS**_ Through Its Provided Python .bat Setup Located In `"C:\Program Files\QGIS 3.40.1\bin\python-qgis.bat"` But Also Pip Installs Dependencies Pertaining To Our Codebase. This Is All Wrapped In A Virtual Environment Provided In Python Through `python -m venv .venv`.
 
