@@ -315,28 +315,32 @@ At The End, All Necesary Data Is Packaged Into A New _**YAML**_ File Which Conta
 <h3>🌟 Features:</h3>
 
 <h6>Home Window:</h6>
-<img src="https://github.com/user-attachments/assets/e66b91c9-b936-42a7-9b8c-e9a0257b3bfd">
+<img width="50%" height="50%" src="https://github.com/user-attachments/assets/e66b91c9-b936-42a7-9b8c-e9a0257b3bfd">
 
 <h6>Settings Pop-Up Window:</h6>
-<img src="https://github.com/user-attachments/assets/9cc59a39-0b22-4073-8c4f-ba6dcd4a3df0">
+<img width="50%" height="50%" src="https://github.com/user-attachments/assets/9cc59a39-0b22-4073-8c4f-ba6dcd4a3df0">
 
 <h6>Settings' Logs Tab:</h6>
-<img src="https://github.com/user-attachments/assets/6cc51cbf-2525-42b1-bfa9-8b1a193226b9">
+<img width="50%" height="50%" src="https://github.com/user-attachments/assets/6cc51cbf-2525-42b1-bfa9-8b1a193226b9">
 
 <h6>Results Viewer Pop-Up Window:</h6>
-<img src="https://github.com/user-attachments/assets/8f085e5b-9ea0-4ab3-81fa-a8b1f2efd57a">
+<img width="50%" height="50%" src="https://github.com/user-attachments/assets/8f085e5b-9ea0-4ab3-81fa-a8b1f2efd57a">
+
+<h6>Results Viewer .tif Colormap Modes:</h6>
+<img width="50%" height="50%" src="https://github.com/user-attachments/assets/9b0f2355-0542-40c6-9693-e9bc7ad99f99">
+
 
 <h6>Results Viewer .tif Inspector:</h6>
-<img src="https://github.com/user-attachments/assets/4a9c430d-ead9-431f-a30f-45580147e5da">
+<img width="50%" height="50%" src="https://github.com/user-attachments/assets/4a9c430d-ead9-431f-a30f-45580147e5da">
 
 <h6>Home Window Providing Image:</h6>
-<img src="https://github.com/user-attachments/assets/912215bc-499e-4a85-b396-2834304cd2b2">
+<img width="50%" height="50%" src="https://github.com/user-attachments/assets/912215bc-499e-4a85-b396-2834304cd2b2">
 
 <h6>Home Window Running Pipeline:</h6>
-<img src="https://github.com/user-attachments/assets/f5320b6a-9a64-44eb-9868-1658ce3c9ad3">
+<img width="50%" height="50%" src="https://github.com/user-attachments/assets/f5320b6a-9a64-44eb-9868-1658ce3c9ad3">
 
 <h6>Home Window Completed Pipeline:</h6>
-<img src="https://github.com/user-attachments/assets/a9b35483-5c80-4205-972e-aabfb1202380">
+<img width="50%" height="50%" src="https://github.com/user-attachments/assets/a9b35483-5c80-4205-972e-aabfb1202380">
 
 
 
