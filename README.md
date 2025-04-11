@@ -320,6 +320,22 @@ At The End, All Necesary Data Is Packaged Into A New _**YAML**_ File Which Conta
 <h6>Settings Pop-Up Window:</h6>
 <img src="https://github.com/user-attachments/assets/9cc59a39-0b22-4073-8c4f-ba6dcd4a3df0">
 
+<h6>Settings' Logs Tab:</h6>
+<img src="https://github.com/user-attachments/assets/6cc51cbf-2525-42b1-bfa9-8b1a193226b9">
+
+<h6>Results Viewer Pop-Up Window:</h6>
+<img src="https://github.com/user-attachments/assets/8f085e5b-9ea0-4ab3-81fa-a8b1f2efd57a">
+
+<h6>Results Viewer .tif Inspector:</h6>
+<img src="https://github.com/user-attachments/assets/4a9c430d-ead9-431f-a30f-45580147e5da">
+
+<h6>Home Window Providing Image:</h6>
+<img src="https://github.com/user-attachments/assets/912215bc-499e-4a85-b396-2834304cd2b2">
+
+<h6>Home Window Running Pipeline:</h6>
+<img src="https://github.com/user-attachments/assets/f5320b6a-9a64-44eb-9868-1658ce3c9ad3">
+
+
 
 <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> 
 
