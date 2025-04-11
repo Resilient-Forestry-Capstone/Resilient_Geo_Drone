@@ -13,17 +13,24 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
    - [Speeding Up The Process](#pah-speeding-up)
    - [Standardizing Dynamic Image Qualitys](#pah-standardize)
    - [Tree Gaps](#pah-gaps)
-3. [📂 Directory Structure](#directory-structure)
-4. [🗄️ Packages](#packages)
-5. [🛠️ Setup: Command-Line-Interface (CLI/Terminal)](#setup-cli)
+2. [📂 Directory Structure](#directory-structure)
+3. [🗄️ Packages](#packages)
+4. [🛠️ Setup: Command-Line-Interface (CLI/Terminal)](#setup-cli)
    - [Before Initialization](#before-initialization-cli)
    - [Initialization](#initialization-cli)
-6. [🛠️ Setup: User Interface (UI)](#setup-ui)
+5. [🛠️ Setup: User Interface (UI)](#setup-ui)
    - [Before Initialization](#before-initialization-ui)
    - [Initialization](#initialization-ui)
    - [After Initialization](#after-initialization)
-7. [📱 UI Functionality](#ui-functionality)
-8. [🔍 The Breakdown](#the-breakdown)
+6. [📱 UI Functionality](#ui-functionality)
+   - [Drag And Drop Region](#ui-drag-and-drop)
+   - [Settings Button](#ui-settings-button)
+     - [Preprocessing Tab](#ui-preprocessing-tab)
+     - [Point Cloud Tab](#ui-pointcloud-tab)
+     - [Weather Conditions Tab](#ui-weather-tab)
+     - [Geospatial Tab](#ui-geospatial-tab)
+     - [Logs Tab](#ui-logs-tab)
+7. [🔍 The Breakdown](#the-breakdown)
    - [Architecture Diagram](#architecture-diagram)
    - [Core Components](#core-components)
    - [Stage-Specific Components](#stage-specific-components)
@@ -31,7 +38,8 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
    - [Stage 2: WebODM Point-Cloud Generation](#stage-2-webodm-point-cloud-generation)
    - [Stage 3: QGIS Geospatial Analysis](#stage-3-qgis-geospatial-analysis)
    - [Stage 4: Output Packaging](#stage-4-output-packaging)
-9. [🌟 Features](#features)
+8. [🌟 Features](#features)
+
 
 
 
@@ -65,7 +73,7 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
 <img src="https://github.com/user-attachments/assets/5ac04fd0-c9aa-47f1-a6db-45eeb9494b1d" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/5ac04fd0-c9aa-47f1-a6db-45eeb9494b1d" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/5ac04fd0-c9aa-47f1-a6db-45eeb9494b1d" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/5ac04fd0-c9aa-47f1-a6db-45eeb9494b1d" alt="Monkeys With A Drone" width="55" height="59">
 
 
-<h3>📂 Directory Structure</h3>
+<h3 id="directory-structure">📂 Directory Structure</h3>
 
 
 ```plaintext
@@ -122,7 +130,7 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
 
 
 
-<h3>🗄️ Packages</h3>
+<h3 id="packages">🗄️ Packages</h3>
 
 Our Codebase Works With The Given External Packages (Downloadable Through `pip install ___`):
 
@@ -151,9 +159,9 @@ pytest
 
 
 
-<h3>🛠️ Setup: Command-Line-Interface (CLI/Terminal)</h3>
+<h3 id="setup-cli">🛠️ Setup: Command-Line-Interface (CLI/Terminal)</h3>
 
-<h6>Before Initialization</h6>
+<h6 id="before-initialization-cli">Before Initialization</h6>
 
 Before Starting Up The Scripts There Are 3 Main Things That Need To Be Done:
 
@@ -162,7 +170,7 @@ Before Starting Up The Scripts There Are 3 Main Things That Need To Be Done:
 * You Are Running The Program Through A Windows OS **_(Or A Windows Virtual-Machine)_**
 
 
-<h6>Initialization</h6>
+<h6 id="initialization-cli">Initialization</h6>
 
 To Run The Program Properly With All Dependencies Linked, You Must Call The `run_qgis_setup.bat` File Which Will Call The Linking .bat For QGIS And Pip Install All Python Library Dependencies In A Python Virtual Environment.
 
@@ -192,22 +200,22 @@ Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**
 <img src="https://github.com/user-attachments/assets/02396314-ca2b-4882-9399-f2c0c36f453a" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/02396314-ca2b-4882-9399-f2c0c36f453a" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/02396314-ca2b-4882-9399-f2c0c36f453a" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/02396314-ca2b-4882-9399-f2c0c36f453a" alt="Monkeys With A Drone" width="55" height="59">
 
 
-<h3>🛠️ Setup: User Interface (UI)</h3>
+<h3 id="setup-ui">🛠️ Setup: User Interface (UI)</h3>
 
-<h6>Before Initialization</h6>
+<h6 id="before-initialization-ui">Before Initialization</h6>
 
 Before Starting The Scripts There Is 2 Main Things That Needs To Be Done:
 
 * The Underlying Operating System Is Windows.
 * Call The `setup.bat` Which Will Set-Up The Environment For You.
 
-<h6>Initialization</h6>
+<h6 id="initialization-ui">Initialization</h6>
 
 To Run The Program Now, All You Have To Do Is Call `main.py` Which Is Located Relatively, `ResilientGeoDrone/main.py`.
 
 After Calling This, It Should Take A Second For The UI To Display Itself, But After Should Provide You With Functionality.
 
-<h6>After Initialization</h6>
+<h6 id="after-initialization">After Initialization</h6>
 
 After You Initialize The Process, You May Need To Go Into Settings And Alter Some Of The Default Parameters. These Can Be Found Under The `Settings` Button.
 
@@ -223,38 +231,35 @@ After That, You Should Be Able To Call The Pipeline Properly Through The UI.
 <img src="https://github.com/user-attachments/assets/c21297a6-548c-42d2-9196-f3960726a341" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/c21297a6-548c-42d2-9196-f3960726a341" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/c21297a6-548c-42d2-9196-f3960726a341" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/c21297a6-548c-42d2-9196-f3960726a341" alt="Monkeys With A Drone" width="55" height="59">
 
 
-<h3>📱 UI Functionality</h3>
+<h3 id="ui-functionality">📱 UI Functionality</h3>
 
-The UI Has Some Basic Functionality Presented:
+<h4 id="ui-drag-and-drop">Drag And Drop Region</h4>
+- For folders containing digital aerial images to use in point cloud generation (the user can also select multiple files instead of a folder).
+- A `Launch Pipeline` button which initiates the pipeline with the provided image set.
 
-  #### `Drag And Drop` Region
-  -  For Folders' Containing Digital Aerial Images To Use In Point Cloud Generation (The User Can Also Select Multiple Files Instead Of A Folder).
-  - `Launch Pipeline` Button Which Launces Our Pipeline With The Provided Image-Set Given In The Drag/Drop Region.
-  #### `Settings` Button 
-  - Which Opens Up A Pop-Up Window To All User-Configurable Parameters For The Pipeline.
-  - There Are 4 Main Tabs Available:
-    
-  ##### `Preprocessing` Tab
-   - Provides User Configurability With The Initial Preprocessing Of The Image-Set Before Point Cloud Generation.
-   - User Can Configure The `Supported Formats` Of Images To Use, `Minimum Resolution` Of A Image Before It Is Rejected, `Processing Settings` Which Provides Thresholds Like `Blur Threshold` `Min Brightness` `Max Brightness` And `Max Workers` (`Max Workers` Is Utilized For Multithreading To Expedite The Stages Runtime).
+<h4 id="ui-settings-button">Settings Button</h4>
+- Opens a pop-up window displaying all user-configurable parameters for the pipeline.
+- Contains 4 main tabs:
 
-  ##### `Point Cloud` Tab
-   - Provides User Capabilities To Specify How We Generate The Point Clouds.
-   - User Can Configure The `WebODM Connection` Settings Like `Host` `Port` `Username` `Password` And `Timeout (s)` This Allows The Client To Specify--Maybe If Serving Multiple Instances Of WebODM--Where The WebODM API Can Be Accessed And Through Which User To Use It Among.
-        
-  ##### `Weather Conditions` Tab
-   - Allows The User To Select And Create New Presets For How The Parameterization Of WebODM Should Be Done Under Varying Conditions; This Is Because Weather Dictates A Lot Of The Means Of Point Cloud Generation, So Allowing User To Specify Specific Settings For Specific Weather Allows Them To Save Away Known Configurations For Specific Environments.
-   - In `Weather Conditions`, We Can Set The `Feature Settings` Like Overall Features' `Quality`, The `Min Features` To Extrapolate, As Well As The `Matcher` Which Helps In Stitching Orthophotos. Likewise, We Also Include `Quality Settings` Like Overall `Point Cloud` Quality, And The `Mesh` Quality. We Also Include `Processing Settings` Which Has The `Max Concurrency` In WebODM To Help Multithread The Point Cloud Generation Inside WebODM.
-              
-   ##### `Geospatial` Tab
-  - Provides The User Configurability In The More Downstream Stages Of Our Pipeline After Point Cloud Generation.
-  - User Is Allowed To Specify The `Output Settings` Which Specifies Where All Intermediate And Final Data Is Outputted Into.
-  - User Also Has `Analysis Settings` Which Specifies The Gap Detection And Analysis Stages Of Our Code. This Includes `Min Tree Height (m)` As Well As The `Canopy threshold` And `Slope Threshold`.
-     - There Also Is `Terrain Analysis` Which Specifies The `Roughness Threshold` We Provide On Our Terrain.
+  <h5 id="ui-preprocessing-tab">Preprocessing Tab</h5>
+  - Provides configurability for the initial preprocessing of the image-set before point cloud generation.
+  - Allows configuration of supported formats, minimum resolution, and processing settings (e.g., blur threshold, min/max brightness, and max workers).
 
-   ##### `Logs` Tab
-  - Provides The User The Ability To View The Reports Provided By The Code For Means Of Debugging And Analysis.
-  - The User Has the Ability To Click On A provided `Log Report` And It Will Open It's Content. Reports Are Written Mainly For Development Reasons, But Also Can Provide The User Resonings For Fail-Points So They Can Revise Code Or Parameters Accordingly.
+  <h5 id="ui-pointcloud-tab">Point Cloud Tab</h5>
+  - Enables configuration of the WebODM connection settings (host, port, username, password, and timeout).
+
+  <h5 id="ui-weather-tab">Weather Conditions Tab</h5>
+  - Allows the user to select/create presets for different weather conditions which impact point cloud generation.
+  - Includes settings for feature extraction (quality, min features, matcher) and quality/mesh settings, plus max concurrency for processing.
+
+  <h5 id="ui-geospatial-tab">Geospatial Tab</h5>
+  - Provides configurable downstream stages of the pipeline.
+  - Includes output settings and analysis settings (min tree height, canopy threshold, slope threshold), plus terrain analysis (roughness threshold).
+
+  <h5 id="ui-logs-tab">Logs Tab</h5>
+  - Allows the user to view debugging and analysis reports.
+  - Enables clicking on individual log reports to open their content.
+
 
 
 <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> 
@@ -265,7 +270,7 @@ The UI Has Some Basic Functionality Presented:
 
 
 
-<h3>🔍 The Breakdown:</h3>
+<h3 id="the-breakdown">🔍 The Breakdown:</h3>
 
 <h4>Architecture Diagram</h4>
 
@@ -323,7 +328,7 @@ At The End, All Necesary Data Is Packaged Into A New _**YAML**_ File Which Conta
 <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> <img src="https://github.com/user-attachments/assets/9b992420-cac1-409d-ac26-fbbbff952879" alt="Cornstarch <3" width="55" height="69"> 
 
 
-<h3>🌟 Features:</h3>
+<h3 id="features">🌟 Features:</h3>
 
 <h6>Home Window:</h6>
 <img width="50%" height="50%" src="https://github.com/user-attachments/assets/e66b91c9-b936-42a7-9b8c-e9a0257b3bfd">
