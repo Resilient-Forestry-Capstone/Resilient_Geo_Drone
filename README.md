@@ -314,8 +314,11 @@ At The End, All Necesary Data Is Packaged Into A New _**YAML**_ File Which Conta
 
 <h3>🌟 Features:</h3>
 
-<h6>Home Page:</h6>
-![image](https://github.com/user-attachments/assets/e66b91c9-b936-42a7-9b8c-e9a0257b3bfd)
+<h6>Home Window:</h6>
+<img src="https://github.com/user-attachments/assets/e66b91c9-b936-42a7-9b8c-e9a0257b3bfd">
+
+<h6>Settings Pop-Up Window:</h6>
+<img src="https://github.com/user-attachments/assets/9cc59a39-0b22-4073-8c4f-ba6dcd4a3df0">
 
 
 <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> 
