@@ -233,32 +233,46 @@ After That, You Should Be Able To Call The Pipeline Properly Through The UI.
 
 <h3 id="ui-functionality">📱 UI Functionality</h3>
 
+
 <h4 id="ui-drag-and-drop">Drag And Drop Region</h4>
-- For folders containing digital aerial images to use in point cloud generation (the user can also select multiple files instead of a folder).
-- A `Launch Pipeline` button which initiates the pipeline with the provided image set.
+
+* For folders containing digital aerial images to use in point cloud generation (the user can also select multiple files instead of a folder).
+* A `Launch Pipeline` button which initiates the pipeline with the provided image set.
+
 
 <h4 id="ui-settings-button">Settings Button</h4>
-- Opens a pop-up window displaying all user-configurable parameters for the pipeline.
-- Contains 4 main tabs:
+
+* Opens a pop-up window displaying all user-configurable parameters for the pipeline.
+* Contains 4 main tabs:
+
 
   <h5 id="ui-preprocessing-tab">Preprocessing Tab</h5>
-  - Provides configurability for the initial preprocessing of the image-set before point cloud generation.
-  - Allows configuration of supported formats, minimum resolution, and processing settings (e.g., blur threshold, min/max brightness, and max workers).
+  
+  * Provides configurability for the initial preprocessing of the image-set before point cloud generation.
+  * Allows configuration of supported formats, minimum resolution, and processing settings (e.g., blur threshold, min/max brightness, and max workers).
+
 
   <h5 id="ui-pointcloud-tab">Point Cloud Tab</h5>
-  - Enables configuration of the WebODM connection settings (host, port, username, password, and timeout).
+  
+  * Enables configuration of the WebODM connection settings (host, port, username, password, and timeout).
+
 
   <h5 id="ui-weather-tab">Weather Conditions Tab</h5>
-  - Allows the user to select/create presets for different weather conditions which impact point cloud generation.
-  - Includes settings for feature extraction (quality, min features, matcher) and quality/mesh settings, plus max concurrency for processing.
+  
+  * Allows the user to select/create presets for different weather conditions which impact point cloud generation.
+  * Includes settings for feature extraction (quality, min features, matcher) and quality/mesh settings, plus max concurrency for processing.
+
 
   <h5 id="ui-geospatial-tab">Geospatial Tab</h5>
-  - Provides configurable downstream stages of the pipeline.
-  - Includes output settings and analysis settings (min tree height, canopy threshold, slope threshold), plus terrain analysis (roughness threshold).
+  
+  * Provides configurable downstream stages of the pipeline.
+  * Includes output settings and analysis settings (min tree height, canopy threshold, slope threshold), plus terrain analysis (roughness threshold).
+
 
   <h5 id="ui-logs-tab">Logs Tab</h5>
-  - Allows the user to view debugging and analysis reports.
-  - Enables clicking on individual log reports to open their content.
+  
+  * Allows the user to view debugging and analysis reports.
+  * Enables clicking on individual log reports to open their content.
 
 
 
