@@ -92,6 +92,8 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
 │       ├── point_cloud/
 │       ├── processed/
 │       └── analysis/
+├── gap_detection/ # Forest gap detection modules
+│   └── gap_detection_demo.py # Demo implementation of canopy gap detection
 ├── logs/ # Log files
 ├── src/ # Source code for automated workflows
 │   ├── preprocessing/ # Scripts for UAV image preprocessing
@@ -103,12 +105,26 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
 │   │   ├── __init__.py
 │   │   ├── cloud_processor.py
 │   │   ├── environment_params.py
-│   │   └── webodm_client.py
+│   │   ├── webodm_client.py
+│   │   └── debug.py # Debugging utilities for point cloud generation
 │   ├── geospatial/ # Scripts for geospatial analysis
 │   │   ├── __init__.py
 │   │   ├── canopy_analysis.py
 │   │   ├── qgis_analyzer.py
 │   │   └── terrain_analysis.py
+│   ├── front_end/ # User interface components
+│   │   ├── __init__.py
+│   │   ├── client_window.py
+│   │   ├── drag_drop_widget.py
+│   │   ├── pipeline_worker.py
+│   │   ├── progress_bar.py
+│   │   ├── result_dialog.py
+│   │   ├── settings_window.py
+│   │   └── styles.py
+│   ├── gap_detection/ # Gap detection algorithms
+│   │   ├── __init__.py
+│   │   ├── gap_detection_demo.py
+│   │   └── requirements_gap.txt
 │   └── utils/ # Utility scripts
 │       ├── __init__.py
 │       ├── config_loader.py
@@ -117,8 +133,23 @@ Gaps Work As Integral Parts Of Hinting At The Health Conditions Of A Forest And 
 │       ├── pdf_parser.py
 │       └── report_metadata.py
 ├── tests/ # Unit and integration tests
+│   ├── __init__.py # Test package initialization
+│   ├── conftest.py # Pytest fixtures and configuration
+│   ├── pytest.ini # Pytest configuration file
+│   ├── data/ # Test data files
+│   │   ├── configs/ # Test configuration files
+│   │   │   └── test_config.yaml
+│   │   └── images/ # Test image files
+│   └── unit/ # Unit tests
+│       ├── test_webodm.py # Tests for WebODM client
+│       ├── test_client_window.py # Tests for main client window
+│       ├── test_config_loader.py # Tests for configuration loading
+│       ├── test_settings_window.py # Tests for settings UI
+│       ├── test_batch_processor.py # Tests for batch processing
+│       └── test_logger_setup.py # Tests for logging system
 └── config/ # Configuration files
-    └── config.yaml
+    ├── config.yaml # Active configuration
+    └── default_config.yaml # Default configuration template
 ```
 
 
@@ -233,47 +264,85 @@ After That, You Should Be Able To Call The Pipeline Properly Through The UI.
 
 <h3 id="ui-functionality">📱 UI Functionality</h3>
 
+<h4 id="ui-main-window">Main Window Interface</h4>
 
-<h4 id="ui-drag-and-drop">Drag And Drop Region</h4>
+* **Drag and Drop Area**: Central area for dropping folders containing drone images
+* **Launch Pipeline Button**: Initiates the processing pipeline with selected images
+* **View Results Button**: Opens the results viewer to explore processed data
+* **Settings Button**: Opens the configuration window for adjusting pipeline parameters
 
-* For folders containing digital aerial images to use in point cloud generation (the user can also select multiple files instead of a folder).
-* A `Launch Pipeline` button which initiates the pipeline with the provided image set.
+<h4 id="ui-pipeline-progress">Pipeline Progress Display</h4>
 
+* Real-time progress tracking with percentage complete
+* Current stage and detailed status updates
+* Cancel button to terminate ongoing processing
+* Results dialog upon completion showing success/failure status
 
-<h4 id="ui-settings-button">Settings Button</h4>
+<h4 id="ui-settings-window">Settings Configuration</h4>
 
-* Opens a pop-up window displaying all user-configurable parameters for the pipeline.
-* Contains 4 main tabs:
+<h5 id="ui-preprocessing-tab">Preprocessing Tab</h5>
 
+* **Supported Formats**: Add/remove supported image formats (.jpg, .tif, etc.)
+* **Minimum Resolution**: Configure width and height requirements for images
+* **Processing Settings**: 
+  * Blur threshold for image validation
+  * Min/max brightness range for image validation
+  * Max worker threads for parallel processing
 
-  <h5 id="ui-preprocessing-tab">Preprocessing Tab</h5>
+<h5 id="ui-pointcloud-tab">Point Cloud Tab</h5>
+
+* **WebODM Connection**: Configure host, port, credentials and timeout
+* **Environment Settings**: Separate tabs for different conditions (sunny, rainy, foggy, night)
+  * Feature quality (ultra, high, medium, low)
+  * Minimum feature count for extraction
+  * Matcher type selection (flann, bfmatcher)
+  * Point cloud quality settings
+  * Mesh quality options
+  * Processing concurrency controls
+  * Environment-specific options (e.g., ignore GSD for foggy conditions)
+
+<h5 id="ui-geospatial-tab">Geospatial Tab</h5>
+
+* **Output Path**: Directory location for analysis results
+* **Analysis Settings**:
+  * Minimum tree height detection threshold
+  * Canopy detection threshold
+* **Terrain Settings**:
+  * Slope threshold (degrees)
+  * Roughness threshold
+* **Output Settings**:
+  * Output formats (geotiff, shapefile)
+  * Resolution settings (meters/pixel)
+
+<h5 id="ui-logs-tab">Logs Tab</h5>
+
+* List of log files with timestamps
+* Log content viewer with scroll capability
+* Refresh button to update log list
+* Option to delete all logs
+
+<h4 id="ui-results-viewer">Results Viewer</h4>
+
+* **Task Navigation**: Browse timestamped processing sessions
+* **File Browser**: View available output files with descriptions and sizes:
+  * Digital Surface Models (DSM)
+  * Digital Terrain Models (DTM)
+  * Canopy Height Models (CHM)
+  * Orthophotos
+  * Reports (PDF)
+  * Point clouds (PLY/LAZ formats)
+
+* **Visualization Tools**:
+  * Interactive TIF viewer with elevation color mapping
+  * Customizable colormap selection (viridis, plasma, inferno, etc.)
+  * Contour line control with adjustable density
+  * Fullscreen view with zoom and pan capabilities
+  * Detailed metadata display (elevation ranges, resolution)
   
-  * Provides configurability for the initial preprocessing of the image-set before point cloud generation.
-  * Allows configuration of supported formats, minimum resolution, and processing settings (e.g., blur threshold, min/max brightness, and max workers).
-
-
-  <h5 id="ui-pointcloud-tab">Point Cloud Tab</h5>
-  
-  * Enables configuration of the WebODM connection settings (host, port, username, password, and timeout).
-
-
-  <h5 id="ui-weather-tab">Weather Conditions Tab</h5>
-  
-  * Allows the user to select/create presets for different weather conditions which impact point cloud generation.
-  * Includes settings for feature extraction (quality, min features, matcher) and quality/mesh settings, plus max concurrency for processing.
-
-
-  <h5 id="ui-geospatial-tab">Geospatial Tab</h5>
-  
-  * Provides configurable downstream stages of the pipeline.
-  * Includes output settings and analysis settings (min tree height, canopy threshold, slope threshold), plus terrain analysis (roughness threshold).
-
-
-  <h5 id="ui-logs-tab">Logs Tab</h5>
-  
-  * Allows the user to view debugging and analysis reports.
-  * Enables clicking on individual log reports to open their content.
-
+* **File Operations**:
+  * Export button for saving results elsewhere
+  * Open in external viewer option for specialized formats
+  * Back navigation to main pipeline window
 
 
 <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> 
