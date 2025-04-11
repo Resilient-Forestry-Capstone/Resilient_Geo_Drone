@@ -335,6 +335,10 @@ At The End, All Necesary Data Is Packaged Into A New _**YAML**_ File Which Conta
 <h6>Home Window Running Pipeline:</h6>
 <img src="https://github.com/user-attachments/assets/f5320b6a-9a64-44eb-9868-1658ce3c9ad3">
 
+<h6>Home Window Completed Pipeline:</h6>
+<img src="https://github.com/user-attachments/assets/a9b35483-5c80-4205-972e-aabfb1202380">
+
+
 
 
 <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> 
