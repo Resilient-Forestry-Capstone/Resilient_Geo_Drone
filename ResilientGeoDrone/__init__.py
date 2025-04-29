@@ -5,8 +5,11 @@ A three-stage pipeline for processing aerial drone imagery into analyzed point c
 
 from . import src
 from .src.utils import ConfigLoader, FileHandler, LoggerSetup
-from .src.point_cloud import WebODMClient, CloudProcessor
+from .src.point_cloud import WebODMClient
 from .src.preprocessing import BatchProcessor
+from .src.front_end import PipelineWorker, MainClientWindow, DragDropWidget, ProgressWidget, PipelineWorker
+
+
 
 
 # Package metadata
@@ -22,7 +25,11 @@ __all__ = [
     'LoggerSetup',
     'WebODMClient',
     'CloudProcessor',
-    'BatchProcessor'
+    'BatchProcessor',
+    'PipelineWorker',
+    'MainClientWindow',
+    'DragDropWidget',
+    'ProgressWidget'
 ]
 
 # Package level constants

@@ -104,28 +104,3 @@ class QualityMetrics:
         # Calculate Mean Brightness
         brightness = np.mean(gray)
         return self.brightness_range[0] <= brightness <= self.brightness_range[1]
-
-
-    """
-    
-        Desc: This Function Takes In img And Checks The Image Contrast
-        Against A Minimum Contrast Threshold. The Function Returns True
-        If The Image Contrast Is Greater Than The Minimum Contrast Threshold
-        And False Otherwise.
-
-        Preconditions:
-            1. img: NumPy Array Representing Image
-
-        Postconditions:
-            1. Check Image Contrast
-            2. Returns True If Image Contrast Is Greater Than Minimum Contrast Threshold
-            3. Returns False Otherwise
-    
-    """
-    def check_contrast(self, img: np.ndarray) -> bool:
-        # Convert Image To Grayscale
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        # Calculate Image Contrast
-        contrast = np.std(gray)
-        return contrast > 20  # Minimum contrast threshold

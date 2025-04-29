@@ -2,6 +2,8 @@ import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional
 
+from .logger import LoggerSetup
+
 
 
 """
@@ -29,10 +31,14 @@ class ConfigLoader:
     
     """
     def __init__(self, config_path: str = "config/config.yaml"):
+        self.logger = LoggerSetup().get_logger()
+        self.logger.info(f"ConfigLoader ID: {self}  -  Initializing Config Loader...")
         self.config_path = Path(config_path)
-        if not self.config_path.exists():
-            raise FileNotFoundError(f"Configuration file not found: {self.config_path}")
+        if not self.config_path.is_file() or not self.config_path.suffix == '.yaml':
+            self.logger.error(f"ConfigLoader ID: {self}  -  Config Loader Initialization Failed: Failed To Provide A Valid Config File.")
+            raise FileNotFoundError(f"Configuration File Not Found: {self.config_path}")
         self.config: Optional[Dict[str, Any]] = None
+        self.logger.info(f"ConfigLoader ID: {self}  -  Config Loader Initialized.")
         
 
     """
@@ -51,17 +57,22 @@ class ConfigLoader:
     
     """
     def load(self) -> Dict[str, Any]:
-        # If Our File Is Invalid
-        if not self.config_path.exists():
-            raise FileNotFoundError(f"Configuration file not found: {self.config_path}")
-            
-        # If We Haven't Loaded Our config, Load It In
-        if self.config is None:
-            with open(self.config_path, 'r') as f:
-                self.config = yaml.safe_load(f)
-                self._validate_config()
-        
-        return self.config
+        try:
+          self.logger.info(f"ConfigLoader ID: {self}  -  Loading Configuration File...")
+          # If Our File Is Invalid (If It's Been Deleted Or Moved During Runtime)
+          if not self.config_path.exists():
+              raise FileNotFoundError(f"Configuration File Not Found: {self.config_path}")
+              
+          # If We Haven't Loaded Our config, Load It In
+          if self.config is None:
+              with open(self.config_path, 'r') as f:
+                  self.config = yaml.safe_load(f)
+                  self._validate_config()
+          self.logger.info(f"ConfigLoader ID: {self}  -  Configuration Loaded.")
+          return self.config
+        except Exception as e:
+            self.logger.error(f"ConfigLoader ID: {self}  -  Configuration Loading Failed: {str(e)}.")
+            raise
     
 
     """
@@ -79,13 +90,19 @@ class ConfigLoader:
     
     """
     def _validate_config(self) -> None:
-        # Get For Required Sections
-        required_sections = ['preprocessing', 'point_cloud', 'geospatial']
+        try:
+          self.logger.info(f"ConfigLoader ID: {self}  -  Validating Configuration...")
+          # Get For Required Sections
+          required_sections = ['preprocessing', 'point_cloud', 'geospatial']
 
-        # Check If Required Sections Are Present
-        for section in required_sections:
-            if section not in self.config:
-                raise ValueError(f"Missing required configuration section: {section}")
+          # Check If Required Sections Are Present
+          for section in required_sections:
+              if section not in self.config:
+                  raise ValueError(f"Missing Required Configuration Section: {section}")
+          self.logger.info(f"ConfigLoader ID: {self}  -  Configuration Validated.")
+        except Exception as e:
+            self.logger.error(f"ConfigLoader ID: {self}  -  Configuration Validation Failed: {str(e)}.")
+            raise
     
 
     """
@@ -104,7 +121,12 @@ class ConfigLoader:
     
     """
     def get_preprocessing_config(self) -> Dict[str, Any]:
-        return self.load()['preprocessing']
+        self.logger.info(f"ConfigLoader ID: {self}  -  Getting Preprocessing Configuration...")
+
+        result = self.load()['preprocessing']
+
+        self.logger.info(f"ConfigLoader ID: {self}  -  Preprocessing Configuration Retrieved.")
+        return result
     
 
     """
@@ -123,7 +145,13 @@ class ConfigLoader:
     
     """
     def get_point_cloud_config(self) -> Dict[str, Any]:
-        return self.load()['point_cloud']
+        self.logger.info(f"ConfigLoader ID: {self}  -  Getting Point Cloud Configuration...")
+
+        result = self.load()['point_cloud']
+
+        self.logger.info(f"ConfigLoader ID: {self}  -  Point Cloud Configuration Retrieved.")
+
+        return result
     
 
     """
@@ -142,7 +170,13 @@ class ConfigLoader:
     
     """
     def get_geospatial_config(self) -> Dict[str, Any]:
-        return self.load()['geospatial']
+        self.logger.info(f"ConfigLoader ID: {self}  -  Getting Geospatial Configuration...")
+
+        result =  self.load()['geospatial']
+
+        self.logger.info(f"ConfigLoader ID: {self}  -  Geospatial Configuration Retrieved.")
+
+        return result
     
 
     """
@@ -163,10 +197,72 @@ class ConfigLoader:
     
     """
     def get_environment_params(self, environment: str) -> Dict[str, Any]:
-        # Get Environment Parameters
-        environments = self.load()['point_cloud']['webodm']['environments']
+        try:
+          self.logger.info(f"ConfigLoader ID: {self}  -  Getting Environment Parameters...")
+          # Get Environment Parameters
+          environments = self.load()['point_cloud']['webodm']['environments']
 
-        # Check If Environment Is Valid
-        if environment not in environments:
-            raise ValueError(f"Invalid environment: {environment}")
-        return environments[environment]
+          # Check If Environment Is Valid
+          if environment not in environments:
+              raise ValueError(f"Invalid Environment: {environment}")
+          self.logger.info(f"ConfigLoader ID: {self}  -  Environment Parameters Retrieved.")
+          return environments[environment]
+        except Exception as e:
+            self.logger.error(f"ConfigLoader ID: {self}  -  Environment Parameters Retrieval Failed: {str(e)}.")
+            raise
+
+
+    def get_webodm_params(self, environment: str) -> list:
+        """
+        Gets all WebODM parameters in the format expected by the WebODM API.
+        Returns a list of dictionaries with 'name' and 'value' keys.
+        """
+        try:
+            self.logger.info(f"WebODM ID: {self}  -  Getting WebODM Parameters...")
+            
+            config = self.load()
+            env_params = self.get_environment_params(environment)
+            
+            # Track parameters we've already added to avoid duplicates
+            processed_params = set()
+            
+            # Start with our standard outputs we always want
+            options = []
+            
+            # Iterate through all parameters in the environment config
+            for param_name, param_value in env_params.items():
+                # Skip empty or None values
+                if param_value is None or (isinstance(param_value, str) and param_value == "") or param_name in ('sm-cluster', 'sm-no-align'):
+                    continue
+                
+                # Skip duplicate parameters (if we've already added a kebab-case version)
+                base_name = param_name.replace('_', '-')
+                if base_name in processed_params:
+                    continue
+                
+                # Only use kebab-case names (with hyphens)
+                kebab_name = param_name.replace('_', '-')
+                processed_params.add(kebab_name)
+                
+                # Convert all values to strings as required by WebODM API
+                if isinstance(param_value, bool):
+                    # Convert Python booleans to JSON booleans (no quotes)
+                    value = "true" if param_value else "false"
+                elif isinstance(param_value, (int, float)):
+                    value = str(param_value)  # Convert numbers to strings
+                elif param_value == "None":
+                    value = ""  # Replace "None" string with empty string
+                else:
+                    # Convert other values to strings
+                    value = param_value
+                
+                # Add the parameter in WebODM API format
+                options.append({"name": kebab_name, "value": value})
+            
+            self.logger.info(f"ConfigLoader ID: {self}  -  WebODM options generated successfully with {len(options)} parameters.")
+            
+            return options
+            
+        except Exception as e:
+            self.logger.error(f"ConfigLoader ID: {self}  -  Failed to generate WebODM options: {str(e)}.")
+            raise

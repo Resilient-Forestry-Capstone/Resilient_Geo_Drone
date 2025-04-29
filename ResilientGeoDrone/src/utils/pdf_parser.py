@@ -2,7 +2,7 @@ import fitz
 import numpy as np
 from pathlib import Path
 from typing import Dict, List, Any
-import logging
+from .logger import LoggerSetup
 
 
 
@@ -32,9 +32,16 @@ class PDFParser:
     
     """
     def __init__(self, pdf_path: Path):
-        self.pdf_path = pdf_path
-        self.doc = fitz.open(str(pdf_path))
-        self.logger = logging.getLogger(__name__)
+        self.logger = LoggerSetup().getLogger()
+        self.logger.info(f"PDF Parser ID: {self}  -  Initializing PDF Parser...")
+        try:
+          self.pdf_path = pdf_path
+          self.doc = fitz.open(str(pdf_path))
+          self.logger.info(f"PDF Parser ID: {self}  -  PDF Parser Initialized.")
+        except Exception as e:
+            self.logger.error(f"PDF Parser ID: {self}  -  PDF Parser Initialization Failed: {str(e)}.")
+            raise
+        
         
 
     """
@@ -54,12 +61,20 @@ class PDFParser:
     
     """
     def extract_text(self) -> str:
-        text = []
-        for page in self.doc:
-            text.append(page.get_text())
+        self.logger.info(f"PDF Parser ID: {self}  -  Extracting Text From PDF Report...")
+        try:
+          text = []
+          for page in self.doc:
+              text.append(page.get_text())
 
-        # Return Text Content As Single String With Newlines For Pages
-        return "\n".join(text)
+          result = "\n".join(text)
+          self.logger.info(f"PDF Parser ID: {self}  -  Text Extracted From PDF Report.")
+
+          # Return Text Content As Single String With Newlines For Pages
+          return result
+        except Exception as e:
+            self.logger.error(f"PDF Parser ID: {self}  -  Failed To Extract Text From PDF Report: {str(e)}.")
+            return ""
     
     """
     
@@ -80,6 +95,7 @@ class PDFParser:
     
     """
     def extract_images(self, output_dir: Path) -> List[Dict[str, Any]]:
+        self.logger.info(f"PDF Parser ID: {self}  -  Extracting Images From PDF Report...")
         # Create Output Direcotry If It Does Not Exist
         output_dir.mkdir(parents=True, exist_ok=True)
         image_data = []
@@ -118,9 +134,10 @@ class PDFParser:
 
                 # Goto Next Image If Failed To Extract   
                 except Exception as e:
-                    self.logger.error(f"Failed to extract image {img_idx} from page {page_num}: {str(e)}")
+                    self.logger.error(f"Failed To Extract Image {img_idx} From Page {page_num}: {str(e)}")
                     continue
 
+        self.logger.info(f"PDF Parser ID: {self}  -  Images Extracted From PDF Report.")
         # Return Image Metadata      
         return image_data
     
@@ -140,8 +157,12 @@ class PDFParser:
 
     """
     def close(self):
+        self.logger.info(f"PDF Parser ID: {self}  -  Closing PDF Document...")
         if self.doc:
             self.doc.close()
+            self.logger.info(f"PDF Parser ID: {self}  -  PDF Document Closed.")
+        else:
+            self.logger.warning(f"PDF Parser ID: {self}  -  PDF Document Already Closed.")
     
 
     """

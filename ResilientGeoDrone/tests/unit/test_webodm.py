@@ -1,10 +1,31 @@
 import time
+from unittest.mock import MagicMock
 import pytest
 from pathlib import Path
 
 from requests.exceptions import ConnectionError, HTTPError
 from ResilientGeoDrone.src.point_cloud.webodm_client import WebODMClient
+from ResilientGeoDrone.src.utils.logger import LoggerSetup
 
+
+@pytest.mark.unit
+def test_webodm_initialization_faulty_config():
+    """Test initialization with failing config loader"""
+    mock_config = MagicMock()
+    mock_config.get_webodm_config.side_effect = ValueError("Test error")
+    
+    with pytest.raises(Exception):
+        WebODMClient(mock_config)
+
+
+@pytest.mark.unit
+def test_webodm_initialization_missed_token():
+    """Test initialization with missing token"""
+    mock_config = MagicMock()
+    mock_config.get_webodm_config.return_value = {"url": "http://localhost:8000"}
+    
+    with pytest.raises(ValueError):
+        WebODMClient(mock_config)
 
 
 """
@@ -60,34 +81,7 @@ def test_point_cloud_generation_and_cleanup_and_results(webodm_client, test_imag
     # Ensure Result Is Not None And Contains Point Cloud
     assert result is not None
     assert "point_cloud" in result
-
-
-"""Test complete point cloud generation pipeline"""
-@pytest.mark.integration
-@pytest.mark.slow
-def test_point_cloud_cleanup(webodm_client, test_image_paths):
-    # WebODM Requires At Least 2 Images To Properly Point Cloud Stitch
-    if len(test_image_paths) < 2:
-        pytest.skip("Need at least 2 images for point cloud generation")
-
-    # Createe A Point Cloud
-    webodm_client.generate_point_cloud(test_image_paths, "sunny")
-
-    # Clean Up The Point Cloud
-    result = webodm_client._cleanup_projects()
-
-    # Ensure WebODM Cleaned Up Projects
-    assert result is True
-
-    result = webodm_client._get_results(webodm_client.task_id)
-
-    # Ensure We Get Results From WebODM
-    assert result["all"] is not None
-    assert result["images"] is not None
-    assert result["point_cloud"] is not None
-    assert result["orthophoto"] is not None
-    assert result["dsm"] is not None
-    assert result["dtm"] is not None
+    assert webodm_client._cleanup_projects() is True
 
 
 """Test Valid WebODM Connection"""

@@ -34,9 +34,15 @@ class BatchProcessor:
     
     """
     def __init__(self, config_loader):
-        self.logger = LoggerSetup(__name__).get_logger()
-        self.config = config_loader.get_preprocessing_config()
-        self.validator = ImageValidator(config_loader)
+        try:
+          self.logger = LoggerSetup().get_logger()
+          self.logger.info(f"Batch Processor ID: {self}  -  Initializing Batch Processor...")
+          self.config = config_loader.get_preprocessing_config()
+          self.validator = ImageValidator(config_loader)
+          self.logger.info(f"BatchProcessor ID: {self}  -  Batch Processor Initialized.")
+        except Exception as e:
+          self.logger.error(f"BatchProcessor ID: {self}  -  Batch Processor Initialization Failed: {str(e)}.")
+          raise
         
 
     """
@@ -58,28 +64,36 @@ class BatchProcessor:
     
     """
     def process_batch(self, image_paths: List[Path], max_workers: int = 4) -> Dict[str, List[Path]]:
+        
+        self.logger.info(f"Batch Processor ID: {self}  -  Processing Batch Of Images...")
+
         # Results Dictionary
         results = {'valid': [], 'invalid': []}
         
-        # Send Out Multiple Workers To Process Images Concurrently
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            # Submit Image Validation Tasks
-            future_to_path = {
-                executor.submit(self.validator.validate_image, path): path 
-                for path in image_paths
-            }
-            
-            # Process Results As They Come In
-            for future in as_completed(future_to_path):
-                path = future_to_path[future]
-                try:
-                    if future.result():
-                        results['valid'].append(path)
-                    else:
-                        results['invalid'].append(path)
-                except Exception as e:
-                    self.logger.error(f"Error processing {path}: {str(e)}")
-                    results['invalid'].append(path)
+        try:
+          # Send Out Multiple Workers To Process Images Concurrently
+          with ThreadPoolExecutor(max_workers=max_workers) as executor:
+              # Submit Image Validation Tasks
+              future_to_path = {
+                  executor.submit(self.validator.validate_image, path): path 
+                  for path in image_paths
+              }
+              
+              # Process Results As They Come In
+              for future in as_completed(future_to_path):
+                  path = future_to_path[future]
+                  try:
+                      if future.result():
+                          results['valid'].append(path)
+                      else:
+                          results['invalid'].append(path)
+                  except Exception as e:
+                      self.logger.error(f"Error processing {path}: {str(e)}")
+                      results['invalid'].append(path)
 
-        # Return Results Of Valid Or Invalidated Images       
-        return results
+          # Return Results Of Valid Or Invalidated Images     
+          self.logger.info(f"Batch Processor ID: {self}  -  Batch Processing Complete.")  
+          return results
+        except Exception as e:
+          self.logger.error(f"Batch Processor ID: {self}  -  Batch Processing Failed: {str(e)}.")
+          raise

@@ -8,7 +8,7 @@ class QGISAnalyzer:
     """QGIS Integration and Analysis Controller"""
     
     def __init__(self, config_loader):
-        self.logger = LoggerSetup(__name__).get_logger()
+        self.logger = LoggerSetup().get_logger()
         self.config = config_loader.get_geospatial_config()
         self.canopy_analyzer = CanopyAnalyzer(config_loader)
         self.terrain_analyzer = TerrainAnalyzer(config_loader)

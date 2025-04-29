@@ -1,26 +1,27 @@
 from pathlib import Path
 import argparse
+import sys
 from src.preprocessing.batch_processor import BatchProcessor
 from src.point_cloud.webodm_client import WebODMClient
-from src.point_cloud.cloud_processor import CloudProcessor
-from src.geospatial.qgis_analyzer import QGISAnalyzer
 from src.utils.config_loader import ConfigLoader
 from src.utils.logger import LoggerSetup
 from src.utils.file_handler import FileHandler
+from src.front_end.pipeline_worker import PipelineWorker
+from src.front_end.client_window import MainClientWindow
+from src.front_end.drag_drop_widget import DragDropWidget
+from PyQt5.QtWidgets import QApplication
 
 class Pipeline:
     """Main Pipeline Controller"""
     
     def __init__(self, config_path: str):
-        self.logger = LoggerSetup(__name__).get_logger()
+        self.logger = LoggerSetup().get_logger()
         self.config_loader = ConfigLoader(config_path)
         self.file_handler = FileHandler(self.config_loader)
         
         # Initialize pipeline components
         self.batch_processor = BatchProcessor(self.config_loader)
         self.webodm_client = WebODMClient(self.config_loader)
-        self.cloud_processor = CloudProcessor(self.config_loader)
-        self.qgis_analyzer = QGISAnalyzer(self.config_loader)
         
     def run(self, input_dir: str, output_dir: str, environment: str) -> dict:
         """Execute full pipeline"""
@@ -79,6 +80,18 @@ class Pipeline:
             raise
 
 def main():
+    
+    if True:
+        # Initialize The Application
+        app = QApplication(sys.argv)
+
+        # Create Our Main Client Window
+        window = MainClientWindow()
+        window.show()
+
+        # Execute The Application And Wait For Exit
+        sys.exit(app.exec_())
+    """
     parser = argparse.ArgumentParser(description='Drone Image Processing Pipeline')
     parser.add_argument('--input', '-i', required=True, help='Input directory')
     parser.add_argument('--output', '-o', required=True, help='Output directory')
@@ -97,6 +110,6 @@ def main():
     except Exception as e:
         print(f"Error: {str(e)}")
         exit(1)
-
+    """
 if __name__ == "__main__":
     main()

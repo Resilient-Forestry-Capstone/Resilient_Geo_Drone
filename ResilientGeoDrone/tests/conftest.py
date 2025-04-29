@@ -1,5 +1,8 @@
 from pathlib import Path
 import pytest
+import sys
+
+from ResilientGeoDrone.src.utils.logger import LoggerSetup
 from ResilientGeoDrone.src.utils.config_loader import ConfigLoader
 from ResilientGeoDrone.src.point_cloud.webodm_client import WebODMClient
 from ResilientGeoDrone.src.preprocessing.batch_processor import BatchProcessor

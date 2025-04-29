@@ -34,9 +34,16 @@ class ImageValidator:
 
     """
     def __init__(self, config_loader):
-        self.logger = LoggerSetup(__name__).get_logger()
-        self.config = config_loader.get_preprocessing_config()
-        self.metrics = QualityMetrics(self.config)
+        self.logger = LoggerSetup().get_logger()
+
+        try:
+          self.logger.info(f"Image Validator ID: {self}  -  Initializing Image Validator...")
+          self.config = config_loader.get_preprocessing_config()
+          self.metrics = QualityMetrics(self.config)
+          self.logger.info(f"ImageValidator ID: {self}  -  Image Validator Initialized.")
+        except Exception as e:
+          self.logger.error(f"ImageValidator ID: {self}  -  Image Validator Initialization Failed: {str(e)}.")
+          raise
 
 
     """
@@ -57,24 +64,27 @@ class ImageValidator:
     def validate_image(self, image_path: Path) -> bool:
         # Attempt To Load Image And Check Quality Metrics
         try:
+            self.logger.info(f"ImageValidator ID: {self}  -  Validating Image {image_path}...")
             # Load Image
             img = cv2.imread(str(image_path))
             if img is None:
-                self.logger.warning(f"Failed to load {image_path}")
+                self.logger.warning(f"ImageValidator ID: {self}  -  Failed To Load {image_path}")
                 return False
                 
             # Check Image Quality Metrics
-            checks = [
+            checks = all([
                 self.metrics.check_resolution(img),
                 self.metrics.check_blur(img),
                 self.metrics.check_brightness(img),
                 self.metrics.check_contrast(img)
-            ]
+            ])
             
+            self.logger.info(f"ImageValidator ID: {self}  -  Image {image_path} Validation Results: {checks}")
+
             # Return True If All Checks Pass
-            return all(checks)
+            return checks
             
         # Log Errors And Return False If Validation Fails
         except Exception as e:
-            self.logger.error(f"Validation failed for {image_path}: {str(e)}")
+            self.logger.error(f"ImageValidator ID: {self}  -  Validation Failed For {image_path}: {str(e)}")
             return False
