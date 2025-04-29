@@ -12,9 +12,12 @@ Classes:
     LoggerSetup: Custom logging configuration
 """
 
+
 from .config_loader import ConfigLoader
 from .file_handler import FileHandler
 from .logger import LoggerSetup
+from .pdf_parser import PDFParser
+
 
 # Package metadata
 __version__ = '0.1.0'
@@ -27,6 +30,7 @@ __all__ = [
     'ConfigLoader',
     'FileHandler',
     'LoggerSetup',
+    'PDFParser'
 ]
 
 # Package level constants

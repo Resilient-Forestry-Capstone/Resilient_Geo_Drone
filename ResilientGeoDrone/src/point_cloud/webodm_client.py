@@ -1,86 +1,731 @@
+from datetime import datetime
+import json
+import time
 import requests
+from PyQt5.QtCore import pyqtSignal, QThread
 from pathlib import Path
 from typing import List, Dict, Any
-from .environment_params import EnvironmentConfig
 from ..utils.logger import LoggerSetup
 
+
+
+
+"""
+
+    Desc: This Module Provides A WebODM Client Interface For API Access For Environment-Specific
+    Point Cloud Generation. The Module Utilizes A Configuration Loader To Load
+    Point Cloud Configuration Parameters. The WebODM Client Utilizes A Session
+    To Communicate With The WebODM API And Generate Point Clouds. The Client
+    Utilizes JWT Token Authentication For Security. The Client Also Utilizes
+    Environment Configuration To Generate Point Clouds With Specific Parameters.
+
+"""
 class WebODMClient:
-    """WebODM interface for environment-specific point cloud generation"""
     
+    """
+    
+        Desc: Initializes Our WebODM Client With A Config Loader (config_loader)
+        To Load Point Cloud Configuration Parameters. The Client Utilizes A Logger
+        To Write Logs. The Client Also Initializes Our WebODM API Base URL
+        And Session For API Communication. The Client Also Utilizes JWT Token
+        Authentication For Security.
+
+        Preconditions:
+            1. config_loader: ConfigLoader Object
+
+        Postconditions:
+            1. Set Our logger 
+            2. Load Point Cloud Configuration Parameters
+            3. Initialize WebODM API Base URL
+            4. Initialize Session For API Communication
+            5. Utilize JWT Token Authentication
+    
+    """
     def __init__(self, config_loader):
-        self.logger = LoggerSetup(__name__).get_logger()
-        self.config = config_loader.get_point_cloud_config()
-        self.base_url = f"http://{self.config['webodm']['host']}:{self.config['webodm']['port']}"
-        self.session = requests.Session()
-
-    def generate_point_cloud(self, image_paths: List[Path], environment: str) -> Dict[str, Any]:
-        """Generate point cloud with environment-specific parameters"""
         try:
-            # Get environment configuration
-            env_config = EnvironmentConfig.get_environment(environment)
-            if not env_config:
-                raise ValueError(f"Invalid environment type: {environment}")
+          self.logger = LoggerSetup().get_logger()
 
-            # Create WebODM project and task
-            project_id = self._create_project()
-            task_id = self._upload_images(project_id, image_paths)
-            
-            # Configure and process
-            self._configure_task(task_id, env_config)
-            results = self._process_task(task_id)
-            
-            return results
+          self.logger.info(f"WebODM ID: {self}  -  WebODM Client Initializing...")
 
+          self.config = config_loader
+          
+          tmpConfig = self.config.load()
+
+          self.base_url = f"http://{tmpConfig['point_cloud']['webodm']['host']}:{tmpConfig['point_cloud']['webodm']['port']}"
+          self.session = requests.Session()
+          
+          # Should Use JWT Token Authentication Instead Of Basic Auth
+          self.api_key = self._get_token()
+          self.session.headers.update({'Authorization': f'JWT {self.api_key}'})
+          self.output_dir = Path(tmpConfig['geospatial']['output_path'])
+          self.logger.info(f"WebODM ID: {self}  -  WebODM Client Initialized.")
         except Exception as e:
-            self.logger.error(f"Point cloud generation failed: {str(e)}")
+            self.logger.error(f"WebODM ID: {self}  -  WebODM Client Initialization Failed: {str(e)}.")
+            raise
+        
+
+    """
+    
+        Desc: This Function Utilizes Our base_url As Well As config To
+        Authenticate Our WebODM Client. The Function Returns A JWT Token Header
+        For Authentication For API Calls.
+
+        Preconditions:
+            1. base_url: WebODM API Base URL
+            2. config: Point Cloud Configuration Parameters
+
+        Postconditions:
+            1. Authenticate WebODM Client
+            2. Return JWT Token Header For Authentication
+    
+    """
+    def _get_token(self):
+        try:
+          self.logger.info(f"WebODM ID: {self}  -  Getting Token For WebODM...")
+          tmpConfig = self.config.load()
+          # Ask WebODM For A Token
+          response = requests.post(f"{self.base_url}/api/token-auth/",
+                                data={
+                                    'username': tmpConfig['point_cloud']['webodm']['username'],
+                                    'password': tmpConfig['point_cloud']['webodm']['password']
+                                })
+          
+          # Look For Token In Response
+          response.raise_for_status()
+
+          result = response.json()['token']
+
+          self.logger.info(f"WebODM ID: {self}  -  Token Received For WebODM.")
+          return result
+        except Exception as e:
+            self.logger.error(f"WebODM ID: {self}  -  Failed To Get Token: {str(e)}.")
+            raise
+    
+
+    """
+    
+        Desc: This Function Cleans Up All Projects In WebODM With The "Generated By ResilientGeoDrone" Descriptor.
+        The Function Removes All Projects Generated By ResilientGeoDrone. The Function
+        Returns True If All Projects Are Cleaned Up And False Otherwise. 
+
+        Preconditions:
+            1. base_url: WebODM API Base URL
+        
+        Postconditions:
+            1. Remove All Projects With Description Of "Generated By ResilientGeoDrone"
+            2. Return True If All Projects Are Cleaned Up And False Otherwise
+    
+    """
+    def _cleanup_projects(self) -> None:
+        try:
+          self.logger.info(f"WebODM ID: {self}  -  Cleaning Up Projects...")
+          # Grab All Our Projects
+          response = self.session.get(f"{self.base_url}/api/projects/")
+          response.raise_for_status()
+          
+          # Loop Through Projects To Find Non-ResilientGeoDrone Ones
+          for project in response.json():
+              project_id = project['id']
+              if project['description'] == "Generated by ResilientGeoDrone":
+                  response = self.session.delete(f"{self.base_url}/api/projects/{project_id}/")
+                  response.raise_for_status()
+
+          # Grab Our Projects Again
+          response = self.session.get(f"{self.base_url}/api/projects/")
+          response.raise_for_status()
+          
+          # Loop Through And Look To Ensure All Projects Are Cleaned Up
+          for project in response.json():
+              if project['description'] == "Generated by ResilientGeoDrone":
+                  raise Exception("Detected Projects Not Cleaned Up With Description 'Generated by ResilientGeoDrone'") 
+          
+          self.logger.info(f"WebODM ID: {self}  -  Projects Cleaned Up.")
+
+          return True
+        except Exception as e:
+            self.logger.error(f"WebODM ID: {self}  -  Failed To Cleanup Projects: {str(e)}.")
+            return False
+
+
+    """
+    
+        Desc: This Function Generates A Point Cloud With Environment-Specific
+        Parameters From A Specified Image-Set (image_paths). The Function Utilizes
+        Environment Configuration (environment) To Generate Point Clouds With Specific
+        Parameters. The Function Returns The Point Cloud As A Dictionary.
+
+        Preconditions:
+            1. image_paths: List Of Image Paths
+            2. environment: Environment Configuration Type
+            3. image_paths And environment Must Be Valid
+
+        Postconditions:
+            1. Generate Point Cloud With Environment-Specific Parameters
+            2. Return Point Cloud As A Dictionary
+    
+    """
+    def generate_point_cloud(self, image_paths: List[Path], environment: str) -> Dict[str, Any]:
+        # Attempt To Generate Point Cloud
+        try:
+            self.logger.info(f"WebODM ID: {self}  -  Generating Point Cloud With {environment} Environment Conditions...")
+        
+            # Create A Project
+            project_id = self._create_project()
+            
+            # Create A Task With Environment-Specific Parameters
+            task_data = {
+                'name': f"Task_{int(time.time())}",
+                'auto_processing': 'true',
+            }
+
+            # Upload Images To Create A New Task
+            files = [('images', (path.name, open(path, 'rb'), 'image/jpeg')) 
+                    for path in image_paths]
+            
+            response = self.session.post(
+                f"{self.base_url}/api/projects/{project_id}/tasks/",
+                files=files
+            )
+            response.raise_for_status()
+
+            # Get Task ID
+            self.task_id = response.json()['id']
+
+            result = self._wait_for_completion(self.task_id, project_id)
+
+            self.logger.info(f"WebODM ID: {self}  -  Point Cloud Generated With {environment} Environment Conditions.")
+
+            # Wait For Our Generation To Complete
+            return result
+        # If Generation Fails, Log Error And Raise Exception
+        except ValueError as e:
+            self.logger.error(f"WebODM ID: {self}  -  Point Cloud Generation Failed: {str(e)}.")
+            raise
+        except Exception as e:
+            self.logger.error(f"WebODM ID: {self}  -  Point Cloud Generation Failed: {str(e)}.")
             raise
 
-    def _create_project(self) -> int:
-        """Create new WebODM project"""
-        response = self.session.post(f"{self.base_url}/api/projects/")
-        response.raise_for_status()
-        return response.json()['id']
 
-    def _upload_images(self, project_id: int, image_paths: List[Path]) -> int:
-        """Upload images to WebODM"""
-        files = [('images', open(str(path), 'rb')) for path in image_paths]
-        response = self.session.post(
-            f"{self.base_url}/api/projects/{project_id}/tasks/",
-            files=files
-        )
-        response.raise_for_status()
-        return response.json()['id']
+    """"
 
-    def _configure_task(self, task_id: int, env_config: EnvironmentConfig) -> None:
-        """Configure task with environment-specific parameters"""
-        response = self.session.patch(
-            f"{self.base_url}/api/tasks/{task_id}/",
-            json=env_config.to_webodm_options()
-        )
-        response.raise_for_status()
+      Desc: This Function Generates A Point Cloud With Environment-Specific
+      Parameters From A Specified Image-Set (image_paths). The Function Utilizes
+      Environment Configuration (environment) To Generate Point Clouds With Specific
+      Parameters. The Function Returns The Point Cloud As A Dictionary.
 
-    def _process_task(self, task_id: int) -> Dict[str, Any]:
-        """Process task and return results"""
-        response = self.session.post(f"{self.base_url}/api/tasks/{task_id}/commit/")
-        response.raise_for_status()
-        return self._wait_for_completion(task_id)
+      Preconditions:
+          1. image_paths: List Of Image Paths
+          2. environment: Environment Configuration Type
+          3. image_paths And environment Must Be Valid
 
-    def _wait_for_completion(self, task_id: int) -> Dict[str, Any]:
-        """Wait for task completion and return results"""
-        while True:
-            response = self.session.get(f"{self.base_url}/api/tasks/{task_id}/")
-            status = response.json()['status']
+      Postconditions:
+          1. Generate Point Cloud With Environment-Specific Parameters
+          2. Return Point Cloud As A Dictionary
+
+    """
+    def generate_point_cloud_signal(self, image_paths: List[Path], environment: str, signal : pyqtSignal) -> Dict[str, Any]:
+        # Attempt To Generate Point Cloud
+
+        #res = self.session.get(f"{self.base_url}/api/processingnodes/options/")
+        #res.raise_for_status()
+        #print(res.json())
+
+        signal.emit(0, 'Packaging Point Cloud', 'Getting Environment Config...')
+        try:
+            self.logger.info(f"WebODM ID: {self}  -  Generating Point Cloud With {environment} Environment Conditions...")
+
+            signal.emit(16.67, 'Packaging Point Cloud', 'Creating Point Cloud Project...')
+
+            # Create A Project
+            project_id = self._create_project()
             
-            if status == 'completed':
-                return self._get_results(task_id)
-            elif status in ['failed', 'canceled']:
-                raise Exception(f"Task failed with status: {status}")
+            signal.emit(33.33334, 'Packaging Point Cloud', 'Packaging Task Data...')
 
-    def _get_results(self, task_id: int) -> Dict[str, Any]:
-        """Get processing results"""
-        return {
-            'point_cloud': f"{self.base_url}/api/tasks/{task_id}/download/pointcloud",
-            'orthophoto': f"{self.base_url}/api/tasks/{task_id}/download/orthophoto",
-            'dsm': f"{self.base_url}/api/tasks/{task_id}/download/dsm",
-            'dtm': f"{self.base_url}/api/tasks/{task_id}/download/dtm"
+
+            signal.emit(50.01, 'Packaging Point Cloud', 'Packaging Image-Set Data...')
+            # Upload Images To Create A New Task
+            files = [('images', (path.name, open(path, 'rb'), 'image/jpeg')) 
+                    for path in image_paths]
+            
+            signal.emit(66.66668, 'Packaging Point Cloud', 'Sending Task To WebODM API...')
+
+            retep = self.config.get_webodm_params(environment)
+
+            response = self.session.post(
+                f"{self.base_url}/api/projects/{project_id}/tasks/",
+                files=files,
+                data={
+                    "options": json.dumps(retep),
+
+
+                }
+            )
+            response.raise_for_status()
+
+            signal.emit(83.35, 'Packaging Point Cloud', 'Extracting Task From WebODM API...')
+            # Get Task ID
+            self.task_id = response.json()['id']
+
+            signal.emit(100.00, 'Packaging Point Cloud', 'Point Cloud Packaged Successfully.')
+
+            result = self._wait_for_completion_signal(self.task_id, project_id, signal)
+
+            signal.emit(100.00, 'Generating Point Clouds', 'Point Clouds Generated Successfully.')
+            self.logger.info(f"WebODM ID: {self}  -  Point Cloud Generated With {environment} Environment Conditions.")
+
+            # Wait For Our Generation To Complete
+            return result
+        # If Generation Fails, Log Error And Raise Exception
+        except ValueError as e:
+            self.logger.error(f"WebODM ID: {self}  -  Point Cloud Generation Failed: {str(e)}.")
+            raise
+        except Exception as e:
+            self.logger.error(f"WebODM ID: {self}  -  Point Cloud Generation Failed: {str(e)}.")
+            raise
+
+
+    def getDTM(self):
+        return self._get_results(self.task_id)['dtm']
+
+
+    """
+    
+        Desc: This Function Creates A New WebODM Project. The Function
+        Generates A Unique Name For The Project Using A Timestamp. The
+        Function Returns The Project ID As An Integer.
+
+        Preconditions:
+            1. base_url: WebODM API Base URL
+        
+        Postconditions:
+            1. Create New WebODM Project With Description "Generated By ResilientGeoDrone"
+            2. Return Project ID As An Integer
+    
+    """
+    def _create_project(self) -> int:
+        
+        self.logger.info(f"WebODM ID: {self}  -  Creating New Project...")
+
+        # Create A New Project
+        project_data = {
+            "name": f"Project_{int(time.time())}",  # Generate Unique Name Using Timestamp
+            "description": "Generated by ResilientGeoDrone"  # Description For Our Project
         }
+        
+        # Pass Over Our Project To WebODM For Creation
+        response = self.session.post(
+            f"{self.base_url}/api/projects/",
+            json=project_data
+        )
+        
+        # Check Status Of Project Creation
+        try:
+            response.raise_for_status()
+        # If Project Creation Fails, Log Error And Raise Exception
+        except requests.exceptions.HTTPError as e:
+            self.logger.error(f"WebODM ID: {self}  -  Failed To Create Project: {response.text}.")
+            raise
+
+        result = response.json()['id']
+
+        self.logger.info(f"WebODM ID: {self}  -  New Project Created.")
+
+        # Return Project ID If Successful
+        return result
+    
+
+    """
+    
+        Desc: This Function Tests The WebODM Connection. The Function
+        Sends A GET Request To The WebODM API To Test The Connection.
+        The Function Returns True If The Connection Is Successful And
+        False Otherwise.
+
+        Preconditions:
+            1. base_url: WebODM API Base URL
+
+        Postconditions:
+            1. Test WebODM Connection
+            2. Return True If Connection Is Successful And False Otherwise (Soft Failure)
+    
+    """
+    def _test_connection(self) -> bool:
+        try:
+          self.logger.info(f"WebODM ID: {self}  -  Testing Connection To WebODM...")
+          # Test Connection To WebODM By Getting API
+          response = self.session.get(f"{self.base_url}/api/")
+          response.raise_for_status()
+          self.logger.info(f"WebODM ID: {self}  -  Connection To WebODM Successful.")
+          return True
+        except Exception as e:
+            self.logger.error(f"WebODM ID: {self}  -  Failed To Test Connection: {str(e)}.")
+            return False
+
+
+    """
+    
+        Desc: This Function Uploads Images (Provided In image_paths) To Create
+        A New Task On A Given Project, project_id. The Function Initializes A New
+        Task And Uploads Images In Chunks. The Function Commits The Task And 
+        Returns The Task ID As A String.
+
+        Preconditions:
+            1. project_id: Project ID As An Integer
+            2. image_paths: List Of Image Paths
+            3. project_id And image_paths Must Be Valid
+
+        Postconditions:
+            1. Upload Images To Create A New Task
+            2. Return Task ID As A String
+    
+    """
+    def _upload_images(self, project_id: int, image_paths: List[Path]) -> str:
+        # Attempt To Upload Images
+        try:
+            self.logger.info(f"WebODM ID: {self}  -  Uploading Images To Create New Task...")
+            # Initialize A New Task
+            init_response = self.session.post(
+                f"{self.base_url}/api/task/new/init",
+                data={
+                    "name": f"Task_{int(time.time())}"
+                    
+                }
+            )
+            init_response.raise_for_status()
+            # Get Task ID
+            task_id = init_response.json()['uuid']
+
+            # Upload Images In Chunks
+            for path in image_paths:
+                if path.exists() and path.is_file():
+                    with open(path, 'rb') as f:
+                        upload_response = self.session.post(
+                            f"{self.base_url}/api/task/new/upload/{task_id}",
+                            files={'images': (path.name, f, 'image/jpeg')}
+                        )
+                        upload_response.raise_for_status()
+
+            # Commit The Task After Image Upload
+            commit_response = self.session.post(
+                f"{self.base_url}/api/task/new/commit/{task_id}"
+            )
+            commit_response.raise_for_status()
+            
+            self.logger.info(f"WebODM ID: {self}  -  Images Uploaded To Create New Task With Task ID {task_id}.")
+
+            # Return Task ID If Successful
+            return task_id
+        # If Image Upload Fails, Log Error And Raise Exception
+        except requests.exceptions.HTTPError as e:
+            self.logger.error(f"WebODM ID: {self}  -  Failed to upload images: {e.response.text if hasattr(e, 'response') else str(e)}.")
+            raise
+
+
+    """
+    
+        Desc: This Function Waits For Task Completion And Returns Results On The Task, task_id;
+        On A Given Project, project_id. The Function Waits For The Task To Complete And Returns
+        The Results. The Function Returns The Results As A Dictionary.
+
+        Preconditions:
+            1. task_id: Task ID As A String
+            2. project_id: Project ID As An Integer
+            3. task_id And project_id Must Be Valid
+            4. task_id And project_id Must Relate To The Same Project
+
+        Postconditions:
+            1. Wait For Task Completion And Return Results
+            2. Return Results As A Dictionary
+    
+    """
+    def _wait_for_completion(self, task_id: str, project_id) -> Dict[str, Any]:
+        # Lazy Loop To Wait For Task Completion
+        self.logger.info(f"WebODM ID: {self}  -  Waiting For Task Completion...")
+        while True:
+            # Get Task Status
+            response = self.session.get(
+                f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/")
+            response.raise_for_status()
+            
+            responseJson = response.json()
+            status = responseJson['status']
+
+            # Check Task Status
+            self.logger.info(f"WebODM ID: {self}  -   Generating Model: {responseJson['running_progress'] * 100.0}%")
+            print(f"WebODM ID: {id(self)}  -   Generating Model: {responseJson['running_progress'] * 100.0}%")
+            if status == 40:  # COMPLETED
+                self.logger.info(f"WebODM ID: {self}  -  Task ({task_id}) Completed On Project ({project_id}).")
+                return self._get_results(task_id)
+            elif status in [30, 50]:  # FAILED or CANCELED
+                self.logger.error(f"WebODM ID: {self}  -  Task ({task_id}) Failed Or Was Canceled On Project ({project_id}).")
+                raise Exception(f"Task Failed Or Was Canceled")
+            
+            # Wait For 15 Seconds Before Checking Again
+            time.sleep(15)
+
+
+    def _wait_for_completion_signal(self, task_id: str, project_id, signal : pyqtSignal) -> Dict[str, Any]:
+      # Lazy Loop To Wait For Task Completion
+      signal.emit(0, 'Generating Point Clouds', 'Generating Point Cloud In Progress...')
+      self.logger.info(f"WebODM ID: {self}  -  Waiting For Task Completion...")
+      while QThread.currentThread().is_canceled is False:
+          # Get Task Status
+          response = self.session.get(
+              f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/")
+          response.raise_for_status()
+          
+          responseJson = response.json()
+          status = responseJson['status']
+
+          percent = responseJson['running_progress'] * 100.00
+          signal.emit(percent, 'Generating Point Clouds', 'Generating Point Cloud In Progress...')
+
+          # Check Task Status
+          self.logger.info(f"WebODM ID: {self}  -   Generating Model: {percent}%")
+          print(f"WebODM ID: {id(self)}  -   Generating Model: {percent}%")
+          if status == 40:  # COMPLETED
+              self.logger.info(f"WebODM ID: {self}  -  Task ({task_id}) Completed On Project ({project_id}).")
+              print("RETURN RESPONSE: ", responseJson, "\n\n\n\n\n")
+              return self._get_results(task_id, project_id)
+          elif status == 50: # CANCELED
+                self.logger.error(f"WebODM ID: {self}  -  Task ({task_id}) Canceled On Project ({project_id}).")
+                raise Exception(f"Task Canceled")
+          elif status == 30:  # FAILED
+                self.logger.error(f"WebODM ID: {self}  -  Task ({task_id}) Failed On Project ({project_id}).")
+                raise Exception(f"Task Failed")
+          
+          
+          
+          # Wait For 15 Seconds Before Checking Again
+          print(responseJson, "\n\n\n\n\n")
+          time.sleep(15)
+      signal.emit(100, 'Generating Point Clouds', 'Generating Point Cloud Canceled.')
+      self.logger.info(f"WebODM ID: {self}  -  Task ({task_id}) Canceled On Project ({project_id}).")
+      raise Exception(f"Task Canceled")
+
+
+    """
+    
+        Desc: This Function Gets Processing Results On A Given Task, task_id.
+        The Function Returns The Processing Results As A Dictionary.
+
+        Preconditions:
+            1. task_id: Task ID As A String
+        
+        Postconditions:
+            1. Get Processing Results
+            2. Return Processing Results As A Dictionary
+    
+    """
+    def _get_results(self, task_id: str, project_id : str) -> Dict[str, Any]:
+        # Get Processing Results
+        self.logger.info(f"WebODM ID: {self}  -  Downloading Assets For Task ({task_id})...")
+        output_dir = self.output_dir / "output" / "point_cloud" / f"{datetime.now().strftime("%Y%m%d_%H%M%S")}"
+
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        try:
+            # Get Asset Locale
+            response = self.session.get(
+                f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/"
+            )
+            response.raise_for_status()
+
+            task_info = response.json()
+
+            # Place All Our Assets In Given JSON
+            assets = {}
+
+            # Download Report PDF If Available
+            if 'report.pdf' in task_info['available_assets']:
+                report_url = f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/download/report.pdf"
+                report_path = output_dir / f"report_{task_id}.pdf"
+                self._download_asset(report_url, report_path)
+                assets['report'] = report_path
+            else:
+                raise Exception("Report Not Available")
+
+            # If DSM Is Available, Download It
+            if 'dsm.tif' in task_info['available_assets']:
+                dsm_url = f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/download/dsm.tif"
+                dsm_path = output_dir / f"dsm_{task_id}.tif"
+                self._download_asset(dsm_url, dsm_path)
+                assets['dsm'] = dsm_path
+            else:
+                print("DSM Not Available")
+
+            # Download DTM If Available
+            if 'dtm.tif' in task_info['available_assets']:
+                dtm_url = f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/download/dtm.tif"
+                dtm_path = output_dir / f"dtm_{task_id}.tif"
+                self._download_asset(dtm_url, dtm_path)
+                assets['dtm'] = dtm_path
+            else:
+                print("DTM Not Available")
+
+            # Download Orthophoto If Available
+            if 'orthophoto.tif' in task_info['available_assets']:
+                orthophoto_url = f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/download/orthophoto.tif"
+                orthophoto_path = output_dir / f"orthophoto_{task_id}.tif"
+                self._download_asset(orthophoto_url, orthophoto_path)
+                assets['orthophoto'] = orthophoto_path
+            else:
+                print("Orthophoto Not Available")
+
+            if 'dsm' in assets and 'dtm' in assets:
+                self.logger.info(f"WebODM ID: {self}  -  Generating Canopy Height Model...")
+
+                # Generate Canopy Height Model (CHM) Using DSM And DTM
+                import rasterio
+                from rasterio.warp import reproject, Resampling
+                import numpy as np
+                with rasterio.open(assets['dsm']) as dsm_src, rasterio.open(assets['dtm']) as dtm_src:
+                    self.logger.info(f"WebODM ID: {self}  -  Reading In Digital Surface Model Data.")
+                    dsm_data = dsm_src.read(1)
+                    self.logger.info(f"WebODM ID: {self}  -  Reading In Digital Terrain Model Data.")
+                    dtm_data = dtm_src.read(1)
+
+                    self.logger.info(f"WebODM ID: {self}  -  Checking If DSM And DTM Are Same Shape...")
+                    if dsm_data.shape != dtm_data.shape:
+                        self.logger.info(f"WebODM ID: {self}  -  DSM And DTM Shape Are Not Same.")
+                        self.logger.info(f"WebODM ID: {self}  -  Resampling DTM To Match DSM Shape...")
+                        dtm_resampled = np.zeros_like(dsm_data)
+
+                        reproject(
+                            source=dtm_data,
+                            destination=dtm_resampled,
+                            src_transform=dtm_src.transform,
+                            src_crs=dtm_src.crs,
+                            dst_transform=dsm_src.transform,
+                            dst_crs=dsm_src.crs,
+                            resampling=Resampling.bilinear
+                        )
+
+                        self.logger.info(f"WebODM ID: {self}  -  Resampling DTM To Match DSM Shape Complete.")
+                        dtm_data = dtm_resampled
+                    else:
+                        self.logger.info(f"WebODM ID: {self}  -  DSM And DTM Shape Are The Same.")
+
+
+                    self.logger.info(f"WebODM ID: {self}  -  Creating Canopy Height Model...")
+
+                    # Get NoData values from both rasters
+                    dsm_nodata = dsm_src.nodata
+                    dtm_nodata = dtm_src.nodata
+
+                    # Convert NoData values to NaNs in both datasets
+                    if dsm_nodata is not None:
+                        dsm_data = np.where(dsm_data == dsm_nodata, np.nan, dsm_data)
+                    if dtm_nodata is not None:
+                        dtm_data = np.where(dtm_data == dtm_nodata, np.nan, dtm_data)
+
+                    chm_data = dsm_data - dtm_data
+                    
+                    self.logger.info(f"WebODM ID: {self}  -  Canopy Height Model Created.")
+
+                    chm_path = output_dir / f"chm_{task_id}.tif"
+                    self.logger.info(f"WebODM ID: {self}  -  Saving Canopy Height Model (Dest: {chm_path})...")
+
+                    profile = dsm_src.profile
+
+                    with rasterio.open(chm_path, 'w', **profile) as chm_dst:
+                        chm_dst.write(chm_data, 1)
+
+                    assets['chm'] = chm_path
+                    self.logger.info(f"WebODM ID: {self}  -  Canopy Height Model Generated And Saved (Dest: {chm_path}).")
+
+    
+            self.logger.info(f"WebODM ID: {self}  -  Assets Downloaded For Task ({task_id}).")
+            return assets
+        except Exception as e:
+            self.logger.error(f"WebODM ID: {self}  -  Failed To Download Assets For Task ({task_id}): {str(e)}.")
+            raise
+
+    def _download_asset(self, url, path):
+        with self.session.get(url, stream=True) as response:
+            response.raise_for_status()
+            with open(path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+          
+
+
+    """
+    
+        Desc: This Function Configures A Task With Environment-Specific Parameters
+        On A Given Task, task_id. The Function Configures The Task With Environment-Specific
+        Parameters. The Function Returns None.
+
+        Preconditions:
+            1. task_id: Task ID As An Integer
+            2. env_config: Environment Configuration Type
+
+        Postconditions:
+            1. Configure Task With Environment-Specific Parameters
+            2. Return None
+    
+    """
+    def _configure_task(self, task_id: int) -> None:
+        try:
+          self.logger.info(f"WebODM ID: {self}  -  Configuring Task ({task_id}) With Environment-Specific Parameters...")
+          # Configure Task With Environment-Specific Parameters
+          response = self.session.patch(
+              f"{self.base_url}/api/projects/tasks/{task_id}/commit/",
+          )
+          response.raise_for_status()
+          self.logger.info(f"WebODM ID: {self}  -  Task ({task_id}) Configured With Environment-Specific Parameters.")
+        except Exception as e:
+            self.logger.error(f"WebODM ID: {self}  -  Failed To Configure Task ({task_id}): {str(e)}")
+
+
+    """
+    
+        Desc: This Function Processes A Task, task_id, And Returns Results.
+        The Function Processes The Task And Returns Results As A Dictionary.
+
+        Preconditions:
+            1. task_id: Task ID As An Integer
+
+        Postconditions:
+            1. Process Task And Return Results
+            2. Return Results As A Dictionary
+    
+    """
+    def _process_task(self, task_id: int) -> Dict[str, Any]:
+        try:
+          self.logger.info(f"WebODM ID: {self}  -  Processing Task ({task_id})...")
+          # Process Task And Return Results
+          response = self.session.post(f"{self.base_url}/api/tasks/{task_id}/commit/")
+          response.raise_for_status()
+
+          result = self._wait_for_completion(task_id)
+
+          self.logger.info(f"WebODM ID: {self}  -  Task ({task_id}) Processed.")
+
+          return result
+        except Exception as e:
+            self.logger.error(f"WebODM ID: {self}  -  Failed To Process Task ({task_id}): {str(e)}.")
+            raise
+      
+
+    """
+    
+        Desc: This Function Cleans Up All Projects In WebODM With The "Generated By ResilientGeoDrone" Descriptor.
+        The Function Removes All Projects Generated By ResilientGeoDrone. The Function Returns True If
+        All Projects Are Cleaned Up And False Otherwise. It Also Closes Out Our Session Used To Talk to WebODM API.
+
+        Preconditions:
+            1. None
+
+        Postconditions:
+            1. Remove All Projects With Description Of "Generated By ResilientGeoDrone"
+            2. Return True If All Projects Are Cleaned Up And False Otherwise
+            3. Close Out Session Used To Talk To WebODM API
+    
+    """
+    def __del__(self):
+
+        # Cleanup, Then Close Session
+        #self._cleanup_projects()
+        self.session.close()
+        self.logger.info(f"WebODM ID: {self}  -  WebODM Client Closed.")

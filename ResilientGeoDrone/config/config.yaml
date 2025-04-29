@@ -1,57 +1,335 @@
-preprocessing:
-  supported_formats:
-    - .jpg
-    - .jpeg
-    - .tif
-    - .tiff
-  min_resolution:
-    - 1920  # width
-    - 1080  # height
-  blur_threshold: 100
-  brightness_range:
-    - 40    # min
-    - 220   # max
-  max_workers: 4
-
-point_cloud:
-  webodm:
-    host: "localhost"
-    port: 8000
-    timeout: 3600
-    environments:
-      sunny:
-        feature_quality: "ultra"
-        min_num_features: 8000
-        matcher_type: "bfmatcher"
-        point_cloud_quality: "high"
-        mesh_quality: "high"
-        max_concurrency: 4
-      rainy:
-        feature_quality: "high"
-        min_num_features: 6000
-        matcher_type: "flann"
-        point_cloud_quality: "medium"
-        mesh_quality: "medium"
-        max_concurrency: 2
-      foggy:
-        feature_quality: "medium"
-        min_num_features: 4000
-        matcher_type: "flann"
-        point_cloud_quality: "low"
-        mesh_quality: "low"
-        max_concurrency: 1
-        ignore_gsd: true
-
 geospatial:
-  qgis_path: "C:\\Program Files\\QGIS 3.40.1"
   analysis:
-    min_tree_height: 2.0
     canopy_threshold: 0.5
+    min_tree_height: 0.0
     terrain:
-      slope_threshold: 30
       roughness_threshold: 0.5
+      slope_threshold: 30.0
   output:
     formats:
-      - geotiff
-      - shapefile
-    resolution: 0.1  # meters per pixel
+    - geotiff
+    - shapefile
+    resolution: 0.1
+  output_path: C:\Users\bensp\OneDrive\Desktop\Code Box Two\Python\GeoDrone\ResilientRepo\Resilient_Geo_Drone\data
+point_cloud:
+  webodm:
+    environments:
+      foggy:
+        3d-tiles: false
+        auto-boundary: false
+        auto-boundary-distance: 0.0
+        bg-removal: false
+        boundary: ''
+        camera-lens: auto
+        cameras: ''
+        crop: 3.0
+        dem-decimation: 1
+        dem-euclidean-map: false
+        dem-gapfill-steps: 3
+        dem-resolution: 5.0
+        dsm: true
+        dtm: true
+        end-with: odm_postprocess
+        fast-orthophoto: false
+        feature-quality: high
+        feature-type: dspsift
+        feature_quality: high
+        force-gps: false
+        gps-accuracy: 3.0
+        matcher-neighbors: 0
+        matcher-order: 0
+        matcher-type: flann
+        matcher_type: flann
+        max-concurrency: 16
+        max_concurrency: 16
+        merge: all
+        mesh-octree-depth: 11
+        mesh-quality: 200000
+        mesh-size: 200000
+        mesh_quality: 200000
+        min-num-features: 10000
+        no-gpu: false
+        optimize-disk-space: false
+        orthophoto-cutline: false
+        orthophoto-resolution: 5.0
+        pc-classify: false
+        pc-filter: 5.0
+        pc-quality: medium
+        pc-rectify: false
+        pc-sample: 0.0
+        pc-skip-geometric: false
+        point-cloud-quality: medium
+        primary-band: auto
+        radiometric-calibration: none
+        rerun-from: dataset
+        rolling-shutter: false
+        rolling-shutter-readout: 0
+        sfm-algorithm: incremental
+        sfm-no-partial: false
+        skip-3dmodel: false
+        skip-band-alignment: false
+        skip-orthophoto: false
+        skip-report: false
+        sky-removal: false
+        sm-cluster: None
+        sm-no-align: false
+        smrf-scalar: 1.25
+        smrf-slope: 0.15
+        smrf-threshold: 0.5
+        smrf-window: 18.0
+        split: 999999
+        split-overlap: 150
+        texturing-keep-unseen-faces: false
+        texturing-single-material: false
+        texturing-skip-global-seam-leveling: false
+        tiles: false
+        use-3dmesh: false
+        use-exif: true
+        use-fixed-camera-params: false
+        use-hybrid-bundle-adjustment: false
+        video-limit: 500
+        video-resolution: 4000
+      night:
+        3d-tiles: false
+        auto-boundary: false
+        auto-boundary-distance: 0.0
+        bg-removal: false
+        boundary: ''
+        camera-lens: auto
+        cameras: ''
+        crop: 3.0
+        dem-decimation: 1
+        dem-euclidean-map: false
+        dem-gapfill-steps: 3
+        dem-resolution: 5.0
+        dsm: true
+        dtm: true
+        end-with: odm_postprocess
+        fast-orthophoto: false
+        feature-quality: high
+        feature-type: dspsift
+        force-gps: false
+        gps-accuracy: 3.0
+        matcher-neighbors: 0
+        matcher-order: 0
+        matcher-type: flann
+        max-concurrency: 16
+        merge: all
+        mesh-octree-depth: 11
+        mesh-quality: 200000
+        mesh-size: 200000
+        min-num-features: 10000
+        no-gpu: false
+        optimize-disk-space: false
+        orthophoto-cutline: false
+        orthophoto-resolution: 5.0
+        pc-classify: false
+        pc-filter: 5.0
+        pc-quality: medium
+        pc-rectify: false
+        pc-sample: 0.0
+        pc-skip-geometric: false
+        point-cloud-quality: medium
+        primary-band: auto
+        radiometric-calibration: none
+        rerun-from: dataset
+        rolling-shutter: false
+        rolling-shutter-readout: 0
+        sfm-algorithm: incremental
+        sfm-no-partial: false
+        skip-3dmodel: false
+        skip-band-alignment: false
+        skip-orthophoto: false
+        skip-report: false
+        sky-removal: false
+        sm-cluster: None
+        sm-no-align: false
+        smrf-scalar: 1.25
+        smrf-slope: 0.15
+        smrf-threshold: 0.5
+        smrf-window: 18.0
+        split: 999999
+        split-overlap: 150
+        texturing-keep-unseen-faces: false
+        texturing-single-material: false
+        texturing-skip-global-seam-leveling: false
+        tiles: false
+        use-3dmesh: false
+        use-exif: true
+        use-fixed-camera-params: false
+        use-hybrid-bundle-adjustment: false
+        video-limit: 500
+        video-resolution: 4000
+      rainy:
+        3d-tiles: false
+        auto-boundary: false
+        auto-boundary-distance: 0.0
+        bg-removal: false
+        boundary: ''
+        camera-lens: auto
+        cameras: ''
+        crop: 3.0
+        dem-decimation: 1
+        dem-euclidean-map: false
+        dem-gapfill-steps: 3
+        dem-resolution: 5.0
+        dsm: true
+        dtm: true
+        end-with: odm_postprocess
+        fast-orthophoto: false
+        feature-quality: high
+        feature-type: dspsift
+        feature_quality: high
+        force-gps: false
+        gps-accuracy: 3.0
+        matcher-neighbors: 0
+        matcher-order: 0
+        matcher-type: flann
+        matcher_type: flann
+        max-concurrency: 16
+        max_concurrency: 16
+        merge: all
+        mesh-octree-depth: 11
+        mesh-quality: 200000
+        mesh-size: 200000
+        mesh_quality: 200000
+        min-num-features: 10000
+        min_num_features: 10000
+        no-gpu: false
+        optimize-disk-space: false
+        orthophoto-cutline: false
+        orthophoto-resolution: 5.0
+        pc-classify: false
+        pc-filter: 5.0
+        pc-quality: medium
+        pc-rectify: false
+        pc-sample: 0.0
+        pc-skip-geometric: false
+        point-cloud-quality: medium
+        point_cloud_quality: medium
+        primary-band: auto
+        radiometric-calibration: none
+        rerun-from: dataset
+        rolling-shutter: false
+        rolling-shutter-readout: 0
+        sfm-algorithm: incremental
+        sfm-no-partial: false
+        skip-3dmodel: false
+        skip-band-alignment: false
+        skip-orthophoto: false
+        skip-report: false
+        sky-removal: false
+        sm-cluster: None
+        sm-no-align: false
+        smrf-scalar: 1.25
+        smrf-slope: 0.15
+        smrf-threshold: 0.5
+        smrf-window: 18.0
+        split: 999999
+        split-overlap: 150
+        texturing-keep-unseen-faces: false
+        texturing-single-material: false
+        texturing-skip-global-seam-leveling: false
+        tiles: false
+        use-3dmesh: false
+        use-exif: true
+        use-fixed-camera-params: false
+        use-hybrid-bundle-adjustment: false
+        video-limit: 500
+        video-resolution: 4000
+      sunny:
+        3d-tiles: false
+        auto-boundary: true
+        auto-boundary-distance: 0.0
+        bg-removal: false
+        boundary: ''
+        camera-lens: auto
+        cameras: ''
+        crop: 3.0
+        dem-decimation: 1
+        dem-euclidean-map: true
+        dem-gapfill-steps: 3
+        dem-resolution: 5.0
+        dsm: true
+        dtm: true
+        end-with: odm_postprocess
+        fast-orthophoto: false
+        feature-quality: high
+        feature-type: dspsift
+        feature_quality: high
+        force-gps: false
+        gps-accuracy: 3.0
+        matcher-neighbors: 0
+        matcher-order: 0
+        matcher-type: flann
+        matcher_type: flann
+        max-concurrency: 16
+        max_concurrency: 16
+        merge: all
+        mesh-octree-depth: 11
+        mesh-quality: 20000
+        mesh-size: 20000
+        mesh_quality: 200000
+        min-num-features: 10001
+        min_num_features: 10000
+        no-gpu: false
+        optimize-disk-space: false
+        orthophoto-cutline: false
+        orthophoto-resolution: 5.0
+        pc-classify: false
+        pc-filter: 5.0
+        pc-quality: low
+        pc-rectify: false
+        pc-sample: 0.0
+        pc-skip-geometric: false
+        point-cloud-quality: low
+        point_cloud_quality: medium
+        primary-band: auto
+        radiometric-calibration: none
+        rerun-from: dataset
+        rolling-shutter: false
+        rolling-shutter-readout: 0
+        sfm-algorithm: incremental
+        sfm-no-partial: false
+        skip-3dmodel: false
+        skip-band-alignment: false
+        skip-orthophoto: false
+        skip-report: false
+        sky-removal: false
+        sm-cluster: None
+        sm-no-align: false
+        smrf-scalar: 1.25
+        smrf-slope: 0.15
+        smrf-threshold: 0.5
+        smrf-window: 18.0
+        split: 999999
+        split-overlap: 150
+        texturing-keep-unseen-faces: false
+        texturing-single-material: false
+        texturing-skip-global-seam-leveling: false
+        tiles: false
+        use-3dmesh: true
+        use-exif: false
+        use-fixed-camera-params: false
+        use-hybrid-bundle-adjustment: false
+        video-limit: 500
+        video-resolution: 4000
+    host: localhost
+    password: admin
+    port: 8000
+    timeout: 3600
+    username: kingerthanu
+preprocessing:
+  blur_threshold: 100
+  brightness_range:
+  - 40
+  - 220
+  max_workers: 4
+  min_resolution:
+  - 2920
+  - 1080
+  supported_formats:
+  - .jpg
+  - .jpeg
+  - .tif
+  - .tiff
