@@ -1,8 +1,7 @@
 # ResilientGeoDrone - A Point Cloud Forestry Analysis Tool
 3-Staged Python Script Which Utilizes Provided Digital Aerial Photogrammetry To Create High Quality Point Clouds For Use In Geospatial Analysis Of Forest Canopies.
 
-Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For The Point Cloud And Geospatial Analysis. Because Of The External Dependency To Interface With The _**QGIS**_ API We Utilize `Window`'s .bat Files For Linking.
-
+The ResilientGeoDrone Project Aims To Provide Ecologists And Environmental Researchers With A User-Friendly, Automated Geospatial Analysis Tool For Drone Imagery Processing. Its Core Goal Is To Streamline The Complex Workflow From Raw Aerial Imagery To Actionable Ecological Insights Through A Three-Stage Pipeline: Image Preprocessing For Quality Assurance, Point Cloud Generation Via ___WebODM___ Integration, And Advanced Geospatial Analysis Focusing On Forest Canopy Structure And Gap Detection. By Automating These Technically Complex Processes Behind An Intuitive Drag-And-Drop Interface, The Project Enables Researchers Without Extensive GIS Expertise To Generate High-Quality Canopy Height Models (CHMs), Detect Forest Gaps, And Analyze Ecological Patterns With Minimal Manual Intervention, Ultimately Accelerating Environmental Research And Conservation Efforts.
 
 ----------------------------------------------
 
