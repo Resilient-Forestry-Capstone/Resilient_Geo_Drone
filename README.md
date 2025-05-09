@@ -10,7 +10,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 <h3>📑 Table of Contents</h3>
 
 
-7. [🔍 The Breakdown](#the-breakdown)
+1. [🔍 The Breakdown](#the-breakdown)
    - [Architecture Diagram](#architecture-diagram)
    - [Core Components](#core-components)
    - [Stage-Specific Components](#stage-specific-components)
@@ -18,10 +18,17 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
    - [Stage 2: WebODM Point-Cloud Generation](#stage-2-webodm-point-cloud-generation)
    - [Stage 3: QGIS Geospatial Analysis](#stage-3-qgis-geospatial-analysis)
    - [Stage 4: Output Packaging](#stage-4-output-packaging)
-8. [🌟 Features](#features)
+2. [🌟 Features](#features)
 
 
 
+
+----------------------------------------------
+
+<h3>🏗️ Additional Architecture:</h3>
+
+<h5>User Manual</h5>
+<a href="https://colab.research.google.com/drive/1jcTHM3HCaJ1qFnkUvrGkAXTe_YUrozMf?usp=sharing">User Manual</a>
 
 ----------------------------------------------
 
