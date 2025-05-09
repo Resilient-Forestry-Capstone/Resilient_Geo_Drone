@@ -14,10 +14,6 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
    - [Architecture Diagram](#architecture-diagram)
    - [Core Components](#core-components)
    - [Stage-Specific Components](#stage-specific-components)
-   - [Stage 1: Preprocessing Digital Aerial Photographs](#stage-1-preprocessing-digital-aerial-photographs)
-   - [Stage 2: WebODM Point-Cloud Generation](#stage-2-webodm-point-cloud-generation)
-   - [Stage 3: QGIS Geospatial Analysis](#stage-3-qgis-geospatial-analysis)
-   - [Stage 4: Output Packaging](#stage-4-output-packaging)
 2. [🌟 Features](#features)
 3. [🏗️ Additional Documents](#additionalDocuments)
 
