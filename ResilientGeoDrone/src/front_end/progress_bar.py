@@ -66,6 +66,8 @@ class ProgressWidget(QWidget):
     # Control Buttons Horizontally
     button_layout = QHBoxLayout()
 
+    button_layout.addStretch()
+
     # Cancellation Button
     self.cancel_button = QPushButton("Cancel", objectName="cancelButton")
     self.cancel_button.clicked.connect(self.cancel_request.emit)
