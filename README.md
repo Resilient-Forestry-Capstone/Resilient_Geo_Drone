@@ -22,6 +22,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
    - [Stage 3: QGIS Geospatial Analysis](#stage-3-qgis-geospatial-analysis)
    - [Stage 4: Output Packaging](#stage-4-output-packaging)
 4. [🌟 Features](#-features)
+5. [🏗️ Additional Documentation](#documentation)
 
 
 ----------------------------------------------
@@ -31,48 +32,85 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 
 ```plaintext
-. 
+.
 ├── README.md # Project overview and team introduction
 ├── run_qgis_setup.bat # Batch script for setting up QGIS environment
 ├── setup.py # Setup script for the project
-├── setup_env.py # Script for setting up the environment
 ├── requirements.txt # Project dependencies
-├── main.py # Main pipeline script
-├── data/ # UAV imagery and ground truth datasets
-│   ├── raw/ # Raw UAV image data
-│   │   └── Image-Set/ # Sample File Containing Images
-│   ├── processed/ # Processed and georeferenced data
-│   └── output/ # Output data
-│       ├── point_cloud/
-│       ├── processed/
-│       └── analysis/
-├── logs/ # Log files
-├── src/ # Source code for automated workflows
+├── main.py # Main application script (likely launches the GUI)
+├── .gitignore # Specifies intentionally untracked files
+├── config/ # Configuration files
+│   ├── config.yaml # Main configuration for the pipeline
+│   └── default_config.yaml # Default configuration settings
+├── data/ # UAV imagery and output datasets
+│   ├── raw/ # Placeholder for raw UAV image data (user-provided)
+│   ├── processed/ # Intermediate processed data (e.g., validated images, temporary files)
+│   │   └── (timestamped_subfolders_during_processing)/
+│   └── output/ # Final output data from pipeline runs
+│       ├── point_cloud/ # Point cloud related outputs (DSM, DTM, Orthophotos, CHM, reports from WebODM)
+│       │   └── (timestamped_task_subfolders)/ # Each subfolder for a processing task
+│       │       ├── dsm.tif
+│       │       ├── dtm.tif
+│       │       ├── orthophoto.tif
+│       │       ├── chm.tif
+│       │       └── report.pdf 
+│       └── analysis/ # Geospatial analysis outputs (gap polygons, statistics)
+│           └── (timestamped_task_subfolders)/
+│               ├── gaps.geojson
+│               └── gap_analysis_report.txt
+├── logs/ # Log files from application runs
+│   └── resilient_geodrone.log # Main log file
+├── src/ # Source code for the application
+│   ├── __init__.py
+│   ├── front_end/ # PyQt5 GUI components
+│   │   ├── __init__.py
+│   │   ├── client_window.py # Main application window
+│   │   ├── drag_drop_widget.py # Widget for image input
+│   │   ├── pipeline_worker.py # QThread for running pipeline tasks
+│   │   ├── progress_bar.py # Custom progress bar widget
+│   │   ├── result_dialog.py # Dialog for showing results (likely obsolete or integrated)
+│   │   ├── result_viewer.py # Widget for viewing pipeline outputs
+│   │   └── settings_window.py # Window for application settings
 │   ├── preprocessing/ # Scripts for UAV image preprocessing
 │   │   ├── __init__.py
-│   │   ├── batch_processor.py
-│   │   ├── image_validator.py
-│   │   └── quality_metrics.py
-│   ├── point_cloud/ # Scripts for point cloud generation and analysis
+│   │   ├── batch_processor.py # Processes batches of images
+│   │   ├── image_validator.py # Validates image properties
+│   │   └── quality_metrics.py # Calculates image quality metrics
+│   ├── point_cloud/ # Scripts for point cloud generation
 │   │   ├── __init__.py
-│   │   ├── cloud_processor.py
-│   │   ├── environment_params.py
-│   │   └── webodm_client.py
+│   │   ├── cloud_processor.py # Processes outputs from WebODM (CHM generation etc.)
+│   │   └── webodm_client.py # Client for interacting with WebODM API
 │   ├── geospatial/ # Scripts for geospatial analysis
 │   │   ├── __init__.py
-│   │   ├── canopy_analysis.py
-│   │   ├── qgis_analyzer.py
-│   │   └── terrain_analysis.py
+│   │   └── gap_detector.py # Performs gap detection analysis
 │   └── utils/ # Utility scripts
 │       ├── __init__.py
-│       ├── config_loader.py
-│       ├── file_handler.py
-│       ├── logger.py
-│       ├── pdf_parser.py
-│       └── report_metadata.py
+│       ├── config_loader.py # Loads and manages YAML configuration
+│       ├── file_handler.py # Handles file and directory operations
+│       └── logger.py # Sets up and provides logging services
 ├── tests/ # Unit and integration tests
-└── config/ # Configuration files
-    └── config.yaml
+│   ├── __init__.py
+│   ├── conftest.py # Pytest fixtures and configuration
+│   ├── pytest.ini # Pytest configuration file
+│   ├── data/ # Test data (e.g., sample images, mock config files)
+│   │   └── (various_test_files_and_folders)/
+│   └── unit/ # Unit tests for individual modules
+│       ├── __init__.py
+│       ├── test_batch_processor.py
+│       ├── test_config_loader.py
+│       ├── test_file_handler.py
+│       ├── test_gap_detector.py
+│       ├── test_image_validator.py
+│       ├── test_logger.py
+│       ├── test_pipeline_worker.py
+│       ├── test_quality_metrics.py
+│       ├── test_result_viewer.py
+│       ├── test_settings_window.py
+│       └── test_webodm.py
+└── gap_detection/ # Standalone or experimental gap detection scripts (separate from src/geospatial)
+    ├── gap_detection_demo.py
+    ├── gap_renderer.py
+    └── requirements_gap.txt
 ```
 
 
@@ -184,6 +222,45 @@ At The End, All Necesary Data Is Packaged Into A New _**YAML**_ File Which Conta
 
 <h3>🌟 Features:</h3>
 
+<h4>Main View:</h4>
+<img src="https://github.com/user-attachments/assets/61f53aa5-64c9-4eb8-a6a3-c5e122686955">
+
+<h4>Main View (Pipeline Progress):</h4>
+<img src="https://github.com/user-attachments/assets/eccac15c-cf8e-4855-9367-89f722e01f45">
+
+<h4>Results Viewer (Low Contour):</h4>
+<img src="https://github.com/user-attachments/assets/b39f87e5-30e2-4e81-9916-e600fba52714">
+
+<h4>Results Viewer (High Contour):</h4>
+<img src="https://github.com/user-attachments/assets/53160292-e889-46b2-8467-93f607e373b0">
+
+<h4>Settings Window (Preprocessing Tab):</h4>
+<img src="https://github.com/user-attachments/assets/7da2fef9-6195-4942-a78c-0cdde40cb011">
+
+<h4>Settings Window (Logs Tab):</h4>
+<img src="https://github.com/user-attachments/assets/aaf0b765-a8ac-46e4-8a08-7acb440e4598">
+
+<h4>Settings Window (Point Cloud Tab):</h4>
+<img src="https://github.com/user-attachments/assets/78297b2f-0fc7-4414-828e-f433aadec029">
+
+<h4>Settings Window (Geospatial Tab):</h4>
+<img src=https://github.com/user-attachments/assets/b1d45f73-a5ff-4501-a085-5d137a0acdf5>
+
 
 <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> <img src="https://github.com/user-attachments/assets/8d00db25-670b-4312-85ac-ee926787047b" alt="Cornstarch <3" width="55" height="59"> 
 
+--------------------------------------------------------
+
+<h3 id="documentation">🏗️ Additional Documentation:</h3>
+
+<h4>Project Documents (<b>.docx</b>):</h4>
+<a href="https://docs.google.com/document/d/1Bqws8frZD-5I0rI0Xwkueb98Aeva9kvB/edit?usp=sharing&ouid=113497198781082727325&rtpof=true&sd=true">Project Document</a><br>
+<a href="https://docs.google.com/document/d/1ZxcAY7KImUwXDi1PurcVOaRES5GLi2UW/edit?usp=sharing&ouid=113497198781082727325&rtpof=true&sd=true">Scope Document</a><br>
+<a href="https://docs.google.com/document/d/1nacwGeTUOO5oRy9UE1OUEOxUP9ydSuve/edit?usp=sharing&ouid=113497198781082727325&rtpof=true&sd=true">Design Document</a><br><br>
+
+<h4>Architecture/Codebase Documents (<b>.ipynb</b>):</h4>
+<a href="https://colab.research.google.com/drive/1jNO7_kG1UmCKrqQNBmvPGhgTCfkMYllN?usp=sharing">ResilientGeoDrone User Manual</a><br>
+<a href="https://colab.research.google.com/drive/1jcTHM3HCaJ1qFnkUvrGkAXTe_YUrozMf?usp=sharing">ResilientGeoDrone Documentation</a><br><br>
+
+<h4>Workflow Diagram Document (<b>.drawio</b>):</h4>
+<a href="https://drive.google.com/file/d/1wZVwqdxwkLVvG8hE8RgRAt65EdRGJXSt/view?usp=sharing">ResilientGeoDrone Flow Diagram</a><br>
