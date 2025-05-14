@@ -14,5 +14,5 @@ setup(
             "drone-pipeline=src.main:main",
         ],
     },
-    python_requires='>=3.9,<=3.13',  # QGIS 3.28 requires Python 3.13
+    python_requires='>=3.9',
 )

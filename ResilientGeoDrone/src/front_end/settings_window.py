@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTabWidget, QFormLayout,
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor
 import yaml
-import os
 from datetime import datetime
+
 
 
 """
@@ -69,7 +69,6 @@ class SettingsWindow(QWidget):
         tabs = QTabWidget()
         self.add_preprocessing_tab(tabs)
         self.add_point_cloud_tab(tabs)
-        #self.add_advanced_webodm_tab(tabs)
         self.add_geospatial_tab(tabs)
         self.add_logs_tab(tabs)
         layout.addWidget(tabs)
@@ -405,6 +404,7 @@ class SettingsWindow(QWidget):
             'sfm-algorithm': ['incremental', 'planar', 'triangulation']
         }
 
+        # Create A Tab For Each Environment
         for env in ['sunny', 'rainy', 'foggy', 'night']:
 
             # Add Dictionary Element
@@ -461,6 +461,7 @@ class SettingsWindow(QWidget):
                 else:
                     general_layout.addRow(option, checkbox)
 
+            # Create Spin Boxes For Float Options
             for option, (default, min_val, max_val, step) in float_options.items():
                 spinbox = QDoubleSpinBox()
                 spinbox.setRange(min_val, max_val)
@@ -469,7 +470,7 @@ class SettingsWindow(QWidget):
                 spinbox.setToolTip(tooltips.get(option, ""))
                 self.env_widgets[env][option] = spinbox
                 
-                # Add to appropriate group
+                # Add To Appropriate Group
                 if option in ['dem-resolution', 'orthophoto-resolution']:
                     dem_layout.addRow(option, spinbox)
                 elif option.startswith('smrf-'):
@@ -479,6 +480,7 @@ class SettingsWindow(QWidget):
                 else:
                     general_layout.addRow(option, spinbox)
             
+            # Spin Boxes For Integer Options
             for option, (default, min_val, max_val) in int_options.items():
                 spinbox = QSpinBox()
                 spinbox.setRange(min_val, max_val)
@@ -486,7 +488,7 @@ class SettingsWindow(QWidget):
                 spinbox.setToolTip(tooltips.get(option, ""))
                 self.env_widgets[env][option] = spinbox
                 
-                # Add to appropriate group
+                # Add To Appropriate Group
                 if option in ['dem-decimation', 'dem-gapfill-steps']:
                     dem_layout.addRow(option, spinbox)
                 elif option in ['mesh-octree-depth', 'mesh-size']:
@@ -496,6 +498,7 @@ class SettingsWindow(QWidget):
                 else:
                     general_layout.addRow(option, spinbox)
             
+            # Dropdown Options
             for option, values in dropdown_options.items():
                 dropdown = QComboBox()
                 dropdown.addItems(values)
@@ -506,7 +509,7 @@ class SettingsWindow(QWidget):
                 dropdown.setToolTip(tooltips.get(option, ""))
                 self.env_widgets[env][option] = dropdown
                 
-                # Add to appropriate group
+                # Add To Appropriate Group
                 if option in ['feature-quality', 'feature-type', 'sfm-algorithm']:
                     SfM_layout.addRow(option, dropdown)
                 elif option in ['pc-quality']:
@@ -516,21 +519,23 @@ class SettingsWindow(QWidget):
                 else:
                     general_layout.addRow(option, dropdown)
 
-            # String field options
+            # String Field Options
             string_options = {
                 'primary-band': 'auto',
                 'sm-cluster': 'None'
             }
             
+            # Create String Fields For String Options
             for option, default in string_options.items():
                 text_field = QLineEdit(adv_config.get(option, default))
                 self.env_widgets[env][option] = text_field
                 text_field.setToolTip(tooltips.get(option, ""))
                 general_layout.addRow(option, text_field)
             
-            # File chooser options
+            # File Chooser Options
             file_options = ['boundary', 'cameras']
 
+            # Create File Chooser For File Options
             for option in file_options:
                 file_layout = QHBoxLayout()
                 text_field = QLineEdit(adv_config.get(option, ''))
@@ -538,7 +543,7 @@ class SettingsWindow(QWidget):
 
                 browse_btn.setToolTip(tooltips.get(option, ""))
                 
-                # Connect browse button to file dialog
+                # Connect Browse Button To File Dialog
                 def make_browse_function(field, opt):
                     def browse_file():
                         path, _ = QFileDialog.getOpenFileName(self, f"Select {opt} JSON file", "", "JSON Files (*.json)")
@@ -555,26 +560,26 @@ class SettingsWindow(QWidget):
                 general_layout.addRow(f"{option} (json)", file_layout)
 
             
-            # Set layouts for all groups
+            # Set Layouts For All Groups
             general_group.setLayout(general_layout)
             mesh_group.setLayout(mesh_layout)
             dem_group.setLayout(dem_layout)
             point_cloud_group.setLayout(point_cloud_layout)
             SfM_group.setLayout(SfM_layout)
             
-            # Add all groups to the scroll layout
+            # Add All Groups To The Scroll Layout
             scroll_layout.addWidget(general_group)
             scroll_layout.addWidget(SfM_group)
             scroll_layout.addWidget(point_cloud_group)
             scroll_layout.addWidget(dem_group)
             scroll_layout.addWidget(mesh_group)
             
-            # Add scroll area to main layout
+            # Add Scroll Area To Main Layout
             main_layout.addWidget(scroll)
             
-            # Add a note about these being advanced settings
+            # Add A Note About These Being Advanced Settings
             note_label = QLabel("Note: These are advanced WebODM processing options. Incorrect settings may cause processing to fail.")
-            note_label.setStyleSheet("color: #FFA500;") # Orange warning color
+            note_label.setStyleSheet("color: #FFA500;") # Orange Warning Color
             main_layout.addWidget(note_label)
 
             # Add The Tab To The Environment Tabs
@@ -589,6 +594,23 @@ class SettingsWindow(QWidget):
         tabs.addTab(tab, "Point Cloud")
 
 
+    """
+    
+        Desc: Function Adds A Tab For Logs. The Tab Will Allow The User
+        To View The Log Files And Their Content. The Tab Will Allow The
+        Content To Be Scrolled And Will Allow The User To Delete All Logs.
+        The Tab Will Also Allow The User To Refresh The List Of Log Files.
+
+        Preconditions:
+            1. tabs Should Be A QTabWidget Object
+
+        Postconditions:
+            1. Add A Tab For Logs To The Tab Widget
+            2. Add A List Of Log Files And Their Content To The Tab
+            3. Add A Button To Delete All Logs
+            4. Add A Button To Refresh The List Of Log Files
+    
+    """
     def add_logs_tab(self, tabs):
         # Create A Tab Widget And Main Layout
         tab = QWidget()
@@ -651,6 +673,25 @@ class SettingsWindow(QWidget):
         tabs.addTab(tab, "Logs")
 
 
+    """
+    
+        Desc: Function Refreshes The List Of Log Files. It Will Clear
+        The List And Then Get All Log Files In The Logs Directory. It Will
+        Sort The Log Files By Date And Add Each Log File To The List.
+        It Will Also Display The Size Of Each Log File In KB And The
+        Modification Time Of Each Log File.
+
+        Preconditions:
+            1. logs_dir Should Be The Path To The Logs Directory
+
+        Postconditions:
+            1. The List Of Log Files Will Be Cleared
+            2. The List Of Log Files Will Be Refreshed
+            3. The List Of Log Files Will Be Sorted By Date
+            4. The Size Of Each Log File Will Be Displayed In KB
+            5. The Modification Time Of Each Log File Will Be Displayed
+    
+    """
     def refresh_logs_list(self):
         # Refresh The List Of Log Files
         self.logs_list.clear()
@@ -674,6 +715,25 @@ class SettingsWindow(QWidget):
             item.setData(Qt.UserRole, str(log_file))
             self.logs_list.addItem(item)
 
+
+    """
+    
+        Desc: Function Displays The Content Of The Selected Log File.
+        It Will Read The Log File And Display The Content In The Text Edit.
+        It Will Also Scroll To The End Of The Text Edit. If No Log File
+        Is Selected, It Will Clear The Text Edit.
+
+        Preconditions:
+            1. logs_list Should Be A QListWidget Object
+            2. log_content Should Be A QTextEdit Object
+        
+        Postconditions:
+            1. The Content Of The Selected Log File Will Be Displayed
+            2. The Text Edit Will Scroll To The End
+            3. If No Log File Is Selected, The Text Edit Will Be Cleared
+            4. If The Log File Cannot Be Read, An Error Message Will Be Displayed
+    
+    """
     def display_log_content(self):
         #  Check For Selected Item
         selected = self.logs_list.selectedItems()
@@ -700,6 +760,22 @@ class SettingsWindow(QWidget):
         except Exception as e:
             self.log_content.setText(f"Error Reading Log File: {str(e)}")
 
+    """
+    
+        Desc: Function Deletes All Log Files In The Logs Directory.
+        It Will Prompt The User For Confirmation Before Deleting The Files.
+
+        Preconditions:
+            1. logs_dir Should Be The Path To The Logs Directory
+
+        Postconditions:
+            1. All Log Files In The Logs Directory Will Be Deleted
+            2. The List Of Log Files Will Be Refreshed
+            3. The Text Edit Will Be Cleared
+            4. A Success Message Will Be Displayed
+            5. If The Deletion Fails, An Error Message Will Be Displayed
+    
+    """
     def delete_all_logs(self):
         # Confirm They Want To Delete
         reply = QMessageBox.question(
@@ -779,7 +855,7 @@ class SettingsWindow(QWidget):
         self.tree_height = QDoubleSpinBox()
         self.tree_height.setRange(0, 100)
 
-        self.tree_height.setValue(self.config['geospatial']['analysis']['min_tree_height'])
+        self.tree_height.setValue(self.config['geospatial']['gap_detection']['min_tree_height'])
 
         # Create A Double Spin Box For The Canopy Threshold
         analysis_layout.addRow("Min Tree Height (m):", self.tree_height)
@@ -788,34 +864,8 @@ class SettingsWindow(QWidget):
         self.canopy.setRange(0, 1)
         self.canopy.setSingleStep(0.1)
 
-        self.canopy.setValue(self.config['geospatial']['analysis']['canopy_threshold'])
+        self.canopy.setValue(self.config['geospatial']['gap_detection']['max_tree_height'])
         analysis_layout.addRow("Canopy Threshold:", self.canopy)
-
-        # Set-Up Terrain Settings Group
-        terrain_group = QGroupBox("Terrain Analysis")
-        terrain_layout = QFormLayout()
-
-        # Set-Up Slope And Roughness Thresholds
-        self.slope = QDoubleSpinBox()
-        self.slope.setRange(0, 90)
-
-        self.slope.setValue(self.config['geospatial']['analysis']['terrain']['slope_threshold'])
-
-        # Create A Double Spin Box For The Roughness Threshold
-        analysis_layout.addRow("Slope Threshold (°):", self.slope)
-
-        self.roughness = QDoubleSpinBox()
-        self.roughness.setRange(0, 1)
-        self.roughness.setSingleStep(0.1)
-
-        self.roughness.setValue(self.config['geospatial']['analysis']['terrain']['roughness_threshold'])
-
-        # Add The Roughness Threshold To The Layout
-        terrain_layout.addRow("Roughness Threshold:", self.roughness)
-
-        # Add The Terrain Layout To The Group
-        terrain_group.setLayout(terrain_layout)
-        analysis_layout.addRow(terrain_group)
 
         # Add The Analysis Layout To The Group
         analysis_group.setLayout(analysis_layout)
@@ -927,85 +977,140 @@ class SettingsWindow(QWidget):
     """
     def save_settings(self, silent: bool = True):
         try:
-            # Update Preprocessing Settings (unchanged)
-            self.config['preprocessing']['supported_formats'] = [
+            # Ensure top-level keys exist, matching the structure of your new config
+            # This helps if starting from a minimal or partially formed self.config
+            if 'preprocessing' not in self.config:
+                self.config['preprocessing'] = {}
+            if 'point_cloud' not in self.config:
+                self.config['point_cloud'] = {}
+            if 'webodm' not in self.config['point_cloud']:
+                self.config['point_cloud']['webodm'] = {}
+            if 'environments' not in self.config['point_cloud']['webodm']:
+                self.config['point_cloud']['webodm']['environments'] = {}
+            if 'geospatial' not in self.config:
+                self.config['geospatial'] = {}
+            if 'gap_detection' not in self.config['geospatial']:
+                self.config['geospatial']['gap_detection'] = {}
+            if 'output' not in self.config['geospatial']:
+                self.config['geospatial']['output'] = {}
+
+            # Update Preprocessing Settings
+            preprocessing_config = self.config['preprocessing']
+            preprocessing_config['supported_formats'] = [
                 self.formats_list.item(i).text() 
                 for i in range(self.formats_list.count())
             ]
-            self.config['preprocessing']['min_resolution'] = [
+            preprocessing_config['min_resolution'] = [
                 self.width.value(),
                 self.height.value()
             ]
-            self.config['preprocessing']['blur_threshold'] = self.blur.value()
-            self.config['preprocessing']['brightness_range'] = [
+            preprocessing_config['blur_threshold'] = self.blur.value()
+            preprocessing_config['brightness_range'] = [
                 self.bright_min.value(),
                 self.bright_max.value()
             ]
-            self.config['preprocessing']['max_workers'] = self.max_workers.value()
+            preprocessing_config['max_workers'] = self.max_workers.value()
 
-            # Update Point Cloud Settings
-            webodm = self.config['point_cloud']['webodm']
-            webodm['host'] = self.host.text()
-            webodm['port'] = self.port.value()
-            webodm['username'] = self.username.text()
-            webodm['password'] = self.password.text()
-            webodm['timeout'] = self.timeout.value()
+            # Update Point Cloud Settings - WebODM Connection
+            webodm_base_config = self.config['point_cloud']['webodm']
+            webodm_base_config['host'] = self.host.text()
+            webodm_base_config['port'] = self.port.value()
+            webodm_base_config['username'] = self.username.text()
+            webodm_base_config['password'] = self.password.text()
+            webodm_base_config['timeout'] = self.timeout.value()
 
-            # Update Environment Settings
-            for env in ['sunny', 'rainy', 'foggy', 'night']:                
-                env_config = webodm['environments'][env]
+            # Update Point Cloud Settings - WebODM Environment Settings
+            for env_name in ['sunny', 'rainy', 'foggy', 'night']:
+                if env_name not in webodm_base_config['environments']: # Ensure environment key exists
+                    webodm_base_config['environments'][env_name] = {}
                 
-                # Save all WebODM settings directly to the environment config
-                for option in self.env_widgets[env]:
-                    widget = self.env_widgets[env][option]
-                    
-                    # Get the proper value from the widget based on its type
-                    if isinstance(widget, QCheckBox):
-                        value = widget.isChecked()
-                    elif isinstance(widget, QSpinBox) or isinstance(widget, QDoubleSpinBox):
-                        value = widget.value()
-                    elif isinstance(widget, QComboBox):
-                        value = widget.currentText()
-                    elif isinstance(widget, QLineEdit):
-                        value = widget.text()
-                    else:
-                        continue  # Skip if widget type isn't supported
-                    
-                    # Save kebab-case option directly to config (matches config format)
-                    env_config[option] = value
-                    
-                    # Also save to traditional keys for backward compatibility
-                    # with ConfigLoader.get_webodm_params method
-                    if option == 'feature-quality':
-                        env_config['feature-quality'] = value
-                    elif option == 'min-num-features':
-                        env_config['min-num-features'] = value  
-                    elif option == 'matcher-type':
-                        env_config['matcher-type'] = value
-                    elif option == 'pc-quality':
-                        env_config['point-cloud-quality'] = value
-                    elif option == 'mesh-size':
-                        env_config['mesh-quality'] = value
-                    elif option == 'max-concurrency':
-                        env_config['max-concurrency'] = value
-                    elif env == 'foggy' and option == 'ignore-gsd':
-                        env_config['ignore-gsd'] = value
-                    
-                # Update Geospatial Settings (unchanged)
-                self.config['geospatial']['output_path'] = self.output_path.text()
-                self.config['geospatial']['analysis']['min_tree_height'] = self.tree_height.value()
-                self.config['geospatial']['analysis']['canopy_threshold'] = self.canopy.value()
-                self.config['geospatial']['analysis']['terrain']['slope_threshold'] = self.slope.value()
-                self.config['geospatial']['analysis']['terrain']['roughness_threshold'] = self.roughness.value()
-                self.config['geospatial']['output']['formats'] = [
-                    self.geo_formats_list.item(i).text() 
-                    for i in range(self.geo_formats_list.count())
-                ]
-                self.config['geospatial']['output']['resolution'] = self.resolution.value()
+                env_specific_config = webodm_base_config['environments'][env_name]
+                
+                if env_name in self.env_widgets: # Check if UI widgets for this environment were initialized
+                    for option_key, widget in self.env_widgets[env_name].items():
+                        value = None
+                        if isinstance(widget, QCheckBox):
+                            value = widget.isChecked()
+                        elif isinstance(widget, QSpinBox) or isinstance(widget, QDoubleSpinBox):
+                            value = widget.value()
+                        elif isinstance(widget, QComboBox):
+                            value = widget.currentText()
+                        elif isinstance(widget, QLineEdit):
+                            value = widget.text()
+                        else:
+                            continue # Skip unsupported widget types
+                        
+                        # Save to the primary kebab-case key (which matches the widget key)
+                        env_specific_config[option_key] = value
+                        
+                        # Handle cases where the new YAML has both kebab-case and snake_case
+                        # or specific remappings for conceptual duplicates.
+                        # Update the snake_case version if it exists in the loaded config for that environment.
+                        if option_key == 'feature-quality' and 'feature_quality' in env_specific_config:
+                            env_specific_config['feature_quality'] = value
+                        elif option_key == 'min-num-features' and 'min_num_features' in env_specific_config:
+                            env_specific_config['min_num_features'] = value
+                        elif option_key == 'matcher-type' and 'matcher_type' in env_specific_config:
+                            env_specific_config['matcher_type'] = value
+                        elif option_key == 'max-concurrency' and 'max_concurrency' in env_specific_config:
+                            env_specific_config['max_concurrency'] = value
+                        elif option_key == 'pc-quality':
+                            if 'point-cloud-quality' in env_specific_config: # kebab-case conceptual equivalent
+                                env_specific_config['point-cloud-quality'] = value
+                            if 'point_cloud_quality' in env_specific_config: # snake_case conceptual equivalent
+                                env_specific_config['point_cloud_quality'] = value
+                        elif option_key == 'mesh-size': # widget key
+                            if 'mesh-quality' in env_specific_config: # kebab-case conceptual equivalent
+                                env_specific_config['mesh-quality'] = value
+                            if 'mesh_quality' in env_specific_config: # snake_case conceptual equivalent
+                                env_specific_config['mesh_quality'] = value
+                        # Note: 'ignore-gsd' was in the old logic but is not a standard WebODM param
+                        # and not in the provided new YAML structure for environments.
+                        # If it were, it would be handled like other boolean options by `env_specific_config[option_key] = value`.
+
+            # Update Geospatial Settings (Moved outside the environment loop)
+            geospatial_config = self.config['geospatial']
+            
+            geospatial_config['output_path'] = self.output_path.text()
+
+            # Gap Detection settings
+            gap_detection_config = geospatial_config['gap_detection']
+            # Save values from existing UI widgets
+            gap_detection_config['min_tree_height'] = self.tree_height.value() # From self.tree_height widget
+            gap_detection_config['max_tree_height'] = self.canopy.value()    # From self.canopy widget
+
+            # For other gap_detection parameters present in your new YAML:
+            # (min_area, max_area, pixel_size, threshold_type, manual_threshold,
+            #  apply_dilation, dilation_size, apply_erosion, erosion_size,
+            #  apply_smoothing, smoothing_sigma)
+            # Since no UI widgets (e.g., self.min_area_widget, self.pixel_size_widget etc.)
+            # are defined for these in the `add_geospatial_tab` method you've shown,
+            # this `save_settings` function cannot get new values for them from the UI.
+            # Their existing values in `self.config['geospatial']['gap_detection']`
+            # (loaded from the YAML file) will be preserved when the config is saved.
+            # If you add UI widgets for these parameters later, you would add lines here to save them, e.g.:
+            # if hasattr(self, 'min_area_widget'):
+            #     gap_detection_config['min_area'] = self.min_area_widget.value()
+            # ...and so on for other parameters if their widgets are added.
+
+            # Geospatial Output settings
+            geospatial_output_config = geospatial_config['output']
+            geospatial_output_config['formats'] = [
+                self.geo_formats_list.item(i).text() 
+                for i in range(self.geo_formats_list.count())
+            ]
+            geospatial_output_config['resolution'] = self.resolution.value()
+
+            # Clean up old 'analysis' structure if it exists from a previous config version
+            if 'analysis' in geospatial_config:
+                del geospatial_config['analysis']
+                if 'terrain' in geospatial_config.get('analysis', {}): # defensive
+                    del geospatial_config['analysis']['terrain']
+
 
             # Save To File
             with open(self.config_path, 'w') as f:
-                yaml.safe_dump(self.config, f, default_flow_style=False)
+                yaml.safe_dump(self.config, f, default_flow_style=False, sort_keys=False)
 
             if not silent:
                 QMessageBox.information(self, "Success", "Settings saved successfully!")

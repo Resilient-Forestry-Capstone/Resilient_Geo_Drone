@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import (QDialog, QLabel, QPushButton, QVBoxLayout,
 
 from .styles import STYLE_SHEET
 
+
+
 """
 
   Desc: This Class Is Utilized To Create A Result Dialog That
@@ -20,12 +22,19 @@ class ResultDialog(QDialog):
     Be Styled In The Forest Theme Of The Overall Application.
 
     Preconditions:
-        1. None
+      1. title Is The Title Of The Dialog Prompt
+      2. message Is The Message To Display
+      3. details Is The Details Of The Result To Display
+      4. success Is A Boolean To Indicate If The Result Was Successful
+      5. parent Is The Parent Widget Of The Dialog (Optional)
 
     Postconditions:
+      1. Create A Result Dialog Popup Window
+      2. Display The Result Information
+      3. Style The Result Dialog With Stylesheet
   
   """
-  def __init__(self, title, message, details, success=True, parent=None):
+  def __init__(self, title : str, message : str, details : str, success : bool = True, parent = None):
     # Initialize Our Dialog With Our Parent
     super().__init__(parent)
 
@@ -38,25 +47,19 @@ class ResultDialog(QDialog):
     layout = QVBoxLayout(self)
 
     # Frame For Progress Bar
-    frame = QFrame()
-    frame.setObjectName("resultFrame")
-    frame.setFrameShape(QFrame.StyledPanel)
+    frame = QFrame(objectName="resultFrame", frameShape=QFrame.StyledPanel)
     frame_layout = QVBoxLayout(frame)
 
     # Create Our Status Update
-    status_label = QLabel("✓ Success" if success else "❌ Error")
-    status_label.setObjectName("statusLabelSuccess")
+    status_label = QLabel("✓ Success" if success else "❌ Error", objectName="statusLabelSuccess")
     frame_layout.addWidget(status_label)
 
     # Message
-    msg_label = QLabel(message)
-    msg_label.setObjectName("resultMessage")
-    msg_label.setWordWrap(True)
+    msg_label = QLabel(message, objectName="resultMessage", wordWrap=True)
     frame_layout.addWidget(msg_label)
 
     # Details In Text Edit
-    details_label = QTextEdit()
-    details_label.setObjectName("resultDetails")
+    details_label = QTextEdit(objectName="resultDetails")
     details_label.setReadOnly(True)
     details_label.setPlainText(details)
     frame_layout.addWidget(details_label)
@@ -71,8 +74,7 @@ class ResultDialog(QDialog):
     button_layout.addStretch()
 
     # Close Button
-    close_button = QPushButton("Close")
-    close_button.setObjectName("closeButton")
+    close_button = QPushButton("Close", objectName="closeButton")
     close_button.clicked.connect(self.accept)
     button_layout.addWidget(close_button)
 
@@ -82,5 +84,3 @@ class ResultDialog(QDialog):
     # Set Our Style Sheet
     self.setStyleSheet(STYLE_SHEET)
     self.setLayout(layout)
-  
-    

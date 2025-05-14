@@ -523,25 +523,18 @@ def create_canopy_height_model(dsm_path, dtm_path, output_path=None):
         raise
 
 
-if __name__ == "__main__":
-    # Example usage
-    chm_path = r"C:\Users\bensp\OneDrive\Desktop\Code Box Two\Python\GeoDrone\ResilientRepo\Resilient_Geo_Drone\data\output\point_cloud\20250410_173750\chm.tif"
-    orthophoto_path = r"C:\Users\bensp\OneDrive\Desktop\Code Box Two\Python\GeoDrone\ResilientRepo\Resilient_Geo_Drone\data\output\point_cloud\20250410_173750\odm_orthophoto.tif"
-    
-    # Run the gap analysis
-    gaps = perform_gap_analysis(chm_path, orthophoto_path)
-    
-    print("Gap analysis completed successfully!")
-
-
-  
-
-
 def createCHM():
   # Example usage
   dsm_file = r"C:\Users\bensp\OneDrive\Desktop\Code Box Two\Python\GeoDrone\ResilientRepo\Resilient_Geo_Drone\data\output\point_cloud\20250410_173750\dsm.tif"
   dtm_file = r"C:\Users\bensp\OneDrive\Desktop\Code Box Two\Python\GeoDrone\ResilientRepo\Resilient_Geo_Drone\data\output\point_cloud\20250410_173750\dtm.tif"
-  output_file = r"C:\Users\bensp\OneDrive\Desktop\Code Box Two\Python\GeoDrone\ResilientRepo\Resilient_Geo_Drone\data\output\point_cloud\20250410_173750\chm.tif"
+  output_file = r"C:\Users\bensp\OneDrive\Desktop\Code Box Two\Python\GeoDrone\ResilientRepo\Resilient_Geo_Drone\data\output\four_seventy_chm.tif"
 
   # Create CHM with custom output path
   chm_path = create_canopy_height_model(dsm_file, dtm_file, output_file)
+
+
+
+if __name__ == "__main__":
+    
+    createCHM()
+

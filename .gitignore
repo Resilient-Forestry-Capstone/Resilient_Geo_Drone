@@ -9,6 +9,7 @@ ResilientGeoDrone\logs\
 
 # Point cloud intermediate files
 **/point_cloud/**/
+
 # Timestamped output directories
 **/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]_[0-9][0-9][0-9][0-9][0-9][0-9]/
 
@@ -21,7 +22,7 @@ ResilientGeoDrone\logs\
 *.tiff
 *.bmp
 *.webp
-data/raw/Image-Set/
+data/raw/
 data/processed/
 data/output/
 

@@ -23,7 +23,7 @@ class DragDropWidget(QFrame):
         Box Layout That Its Set In As Well As Aligns It In The Center OF Our Screen.
 
         Preconditions:
-            1. None
+            1. config Is The To Be Used To Load Configuration Parameters
         
         Postconditions:
             1. Set Our Object Name
@@ -67,7 +67,6 @@ class DragDropWidget(QFrame):
             event.accept()
         else:
             event.ignore()
-            
 
     
     """
@@ -92,12 +91,12 @@ class DragDropWidget(QFrame):
         # Copy Our Folder Directory(s) To A List
         folders = [u.toLocalFile() for u in event.mimeData().urls()]
 
-        #  If We Have Multiple Folders
-        if len(folders) != 0 and (os.path.isdir(file) for file in folders):
+        #  If We Have Multiple Folders, Make Sure All Are Directories
+        if len(folders) != 0 and all((os.path.isdir(file)) for file in folders):
 
             for folder in folders:
                 self.label.setText(f"Processing Folder Selected: {os.path.basename(folders[0])}")
                 self.image_paths = self.file_handler.get_image_files(folder)
         else:
             # Else If User Provided Us With A File Or No Folder
-            self.label.setText("Please Drop A Single Folder")
+            self.label.setText("Please Drop One Or More Folders")

@@ -1,16 +1,24 @@
 geospatial:
-  analysis:
-    canopy_threshold: 0.5
-    min_tree_height: 0.0
-    terrain:
-      roughness_threshold: 0.5
-      slope_threshold: 30.0
+  gap_detection:
+    min_area: 50
+    max_area: 8000
+    pixel_size: 0.062322187689440
+    threshold_type: "manual"
+    manual_threshold: 12.0
+    apply_dilation: true
+    dilation_size: 0
+    apply_erosion: true
+    erosion_size: 10
+    apply_smoothing: true
+    smoothing_sigma: 1.0
+    min_tree_height: 10.0
+    max_tree_height: 100.0
   output:
     formats:
     - geotiff
     - shapefile
     resolution: 0.1
-  output_path: C:\Users\bensp\OneDrive\Desktop\Code Box Two\Python\GeoDrone\ResilientRepo\Resilient_Geo_Drone\data
+  output_path: ..\data
 point_cloud:
   webodm:
     environments:
@@ -320,13 +328,13 @@ point_cloud:
     timeout: 3600
     username: kingerthanu
 preprocessing:
-  blur_threshold: 100
+  blur_threshold: 300
   brightness_range:
-  - 40
-  - 220
+  - 0
+  - 320
   max_workers: 4
   min_resolution:
-  - 2920
+  - 1080
   - 1080
   supported_formats:
   - .jpg

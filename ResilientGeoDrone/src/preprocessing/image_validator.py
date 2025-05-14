@@ -67,8 +67,7 @@ class ImageValidator:
             checks = [
                 self.metrics.check_resolution(img),
                 self.metrics.check_blur(img),
-                self.metrics.check_brightness(img),
-                self.metrics.check_contrast(img)
+                self.metrics.check_brightness(img)
             ]
             
             # Return True If All Checks Pass
@@ -77,4 +76,4 @@ class ImageValidator:
         # Log Errors And Return False If Validation Fails
         except Exception as e:
             self.logger.error(f"Validation failed for {image_path}: {str(e)}")
-            return False
+            raise e

@@ -14,6 +14,8 @@ from PyQt5.QtCore import pyqtSignal
 
 """
 class ProgressWidget(QWidget):
+
+  # Define A Signal For Canceling The Request (Goes Up To The Parent Worker)
   cancel_request = pyqtSignal()
 
   """
@@ -34,37 +36,29 @@ class ProgressWidget(QWidget):
 
   """
   def __init__(self):
-    super().__init__()
+    super().__init__(objectName="progressWidget")
     
     # Create Our Main Layout
-    self.setObjectName("progressWidget")
     mainLayout = QVBoxLayout(self)
 
     # Create A Bordered Frame
-    self.frame = QFrame()
-    self.frame.setObjectName("progressFrame")
-    self.frame.setFrameShape(QFrame.StyledPanel)
+    self.frame = QFrame(objectName="progressFrame", frameShape=QFrame.StyledPanel)
     frame_layout = QVBoxLayout(self.frame)
 
     # Progress Title Header
-    self.title_label = QLabel("Pipeline Progress")
-    self.title_label.setObjectName("progressTitle")
+    self.title_label = QLabel("Pipeline Progress", objectName="progressTitle")
     frame_layout.addWidget(self.title_label)
 
     # Status
-    self.status_label = QLabel("Initializing Pipeline...")
-    self.status_label.setObjectName("statusLabel")
+    self.status_label = QLabel("Initializing Pipeline...", objectName="statusLabel")
     frame_layout.addWidget(self.status_label)
 
     # Detail Message
-    self.detail_label = QLabel("Loading Configuration...")
-    self.detail_label.setObjectName("detailLabel")
-    self.detail_label.setWordWrap(True)
+    self.detail_label = QLabel("Loading Configuration...", objectName="detailLabel", wordWrap=True)
     frame_layout.addWidget(self.detail_label)
 
     # Progress Bar
-    self.progress_bar = QProgressBar()
-    self.progress_bar.setObjectName("progressBar")
+    self.progress_bar = QProgressBar(objectName="progressBar")
     self.progress_bar.setRange(0, 100)
     self.progress_bar.setValue(0)
     frame_layout.addWidget(self.progress_bar)
@@ -72,12 +66,8 @@ class ProgressWidget(QWidget):
     # Control Buttons Horizontally
     button_layout = QHBoxLayout()
 
-    # Spacer For Push Button To Right
-    button_layout.addStretch()
-
     # Cancellation Button
-    self.cancel_button = QPushButton("Cancel")
-    self.cancel_button.setObjectName("cancelButton")
+    self.cancel_button = QPushButton("Cancel", objectName="cancelButton")
     self.cancel_button.clicked.connect(self.cancel_request.emit)
     button_layout.addWidget(self.cancel_button)
 
@@ -106,11 +96,16 @@ class ProgressWidget(QWidget):
         3. Update Detail Message
   
   """
-  def update_progress(self, progress: float, status: str, detail: str):
+  def update_progress(self, progress : int, status : str, detail : str):
+    # Normalize Progress To 0-100 Range
+    if progress < 0:
+      progress = 0
+    elif progress > 100:
+      progress = 100
+
     self.progress_bar.setValue(int(progress))
     self.status_label.setText(status)
     self.detail_label.setText(detail)
-
 
 
   """
@@ -127,5 +122,3 @@ class ProgressWidget(QWidget):
   """
   def set_title(self, title: str):
     self.title_label.setText(title)
-
-    

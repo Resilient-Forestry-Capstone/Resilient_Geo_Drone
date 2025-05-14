@@ -80,7 +80,12 @@ def test_point_cloud_generation_and_cleanup_and_results(webodm_client, test_imag
 
     # Ensure Result Is Not None And Contains Point Cloud
     assert result is not None
-    assert "point_cloud" in result
+
+    assert "orthophoto" in result
+    assert "chm" in result
+    assert "dtm" in result
+    assert "dsm" in result
+    
     assert webodm_client._cleanup_projects() is True
 
 
@@ -116,14 +121,16 @@ def test_point_cloud_get_token_valid(webodm_client):
 def test_point_cloud_get_token_invalid(webodm_client):
     # With Invalid Credentials, We Expect No Token
     try:
-      prevUser = webodm_client.config["webodm"]["username"]
-      prevPass = webodm_client.config["webodm"]["password"]
-      webodm_client.config["webodm"]["username"] = "invalid"
-      webodm_client.config["webodm"]["password"] = "invalid"
+      # Grab Config 
+      test_config = webodm_client.config.load()
+      prevUser = test_config["point_cloud"]["webodm"]["username"]
+      prevPass = test_config["point_cloud"]["webodm"]["password"]
+      test_config["point_cloud"]["webodm"]["username"] = "invalid"
+      test_config["point_cloud"]["webodm"]["password"] = "invalid"
       # Ensure We Don't Get A Token From WebODM
       webodm_client._get_token() is None
     # Session Will Throw HTTP (400) Error With Invalid Credentials
     except HTTPError:
-      webodm_client.config["webodm"]["username"] = prevUser
-      webodm_client.config["webodm"]["password"] = prevPass
+      test_config["point_cloud"]["webodm"]["username"] = prevUser
+      test_config["point_cloud"]["webodm"]["password"] = prevPass
       assert True

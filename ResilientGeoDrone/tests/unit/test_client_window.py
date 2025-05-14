@@ -7,7 +7,16 @@ from PyQt5.QtWidgets import QMainWindow, QPushButton
 from PyQt5.Qt import Qt
 import pytest
 
+from ResilientGeoDrone.src.front_end.progress_bar import ProgressWidget
 
+
+"""
+
+    Desc: Top-Level Fixture For A Consistent Client Window Object
+    For Usage In Tests. This Will Be Used To Create A Client Window
+    And Connect It To A Agent.
+
+"""
 @pytest.fixture
 def client_window(qtbot):
     window = MainClientWindow()
@@ -28,10 +37,22 @@ def test_client_window_init(client_window):
     assert isinstance(client_window, QMainWindow)
     
     # Find Drag & Drop Widget
-    assert client_window.findChild(DragDropWidget, "dragDrop")
+    assert client_window.findChild(DragDropWidget, "dragdrop")
     
     # Find Settings Button
     assert client_window.findChild(QPushButton, "settingsButton")
+
+    # Find Launch Button
+    assert client_window.findChild(QPushButton, "launchButton")
+
+    # Find Progress Widget
+    assert client_window.findChild(ProgressWidget, "progressWidget")
+
+    # Find Status Bar
+    assert client_window.statusBar() is not None
+
+    # Find Viewer Button
+    assert client_window.findChild(QPushButton, "viewResultsButton")
 
 
 """
@@ -52,7 +73,7 @@ def test_drag_drop_connection(client_window, qtbot, monkeypatch):
     assert image_folder.exists(), f"Test image folder not found: {image_folder}"
     
     # Find the drag & drop widget
-    drag_drop = client_window.findChild(DragDropWidget, "dragDrop")
+    drag_drop = client_window.findChild(DragDropWidget, "dragdrop")
     
     # Create mime data with the folder URL
     mime_data = QMimeData()
@@ -160,3 +181,45 @@ def test_launch_pipeline_no_images(client_window, qtbot, monkeypatch):
     
     # Verify pipeline was not launched
     mock_status_bar.showMessage.assert_called_once_with("No Images To Process")
+
+
+@pytest.mark.unit
+def test_launch_pipeline_with_invalid_images(client_window, qtbot, monkeypatch):
+    # Mock drag_drop Widget With Invalid Images
+    client_window.drag_drop = MagicMock()
+    client_window.drag_drop.image_paths = ["invalid_image_path.jpg"]
+    
+    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtCore import QTimer
+    
+    # Now Find Launch Button And Launch
+    launch_button = client_window.findChild(QPushButton, "launchButton")
+    assert launch_button is not None
+    
+    # Add a callback to handle the dialog when it appears
+    def handle_dialog():
+        # Find the dialog - it's the active modal widget
+        dialog = QApplication.activeModalWidget()
+        if dialog:
+            # Find the close button in the dialog
+            close_button = dialog.findChild(QPushButton, "closeButton")
+            if close_button:
+                qtbot.mouseClick(close_button, Qt.LeftButton)
+    
+    # Use a timer to check for the dialog after a short delay
+    QTimer.singleShot(1500, handle_dialog)
+    
+    # Launch the pipeline
+    qtbot.mouseClick(launch_button, Qt.LeftButton)
+
+    # Verify That We Launched A Pipeline Worker Instance
+    assert client_window.pipeline_worker
+
+    # Wait for status bar to show Pipeline Failed
+    qtbot.waitUntil(
+        lambda: client_window.statusBar().currentMessage() == "Pipeline Failed",
+        timeout=5000
+    )
+
+    # Verify That We Failed To Launch The Pipeline
+    assert client_window.statusBar().currentMessage() == "Pipeline Failed"

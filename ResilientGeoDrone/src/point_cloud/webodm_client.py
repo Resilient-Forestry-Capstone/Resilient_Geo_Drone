@@ -9,7 +9,6 @@ from ..utils.logger import LoggerSetup
 
 
 
-
 """
 
     Desc: This Module Provides A WebODM Client Interface For API Access For Environment-Specific
@@ -182,10 +181,18 @@ class WebODMClient:
             files = [('images', (path.name, open(path, 'rb'), 'image/jpeg')) 
                     for path in image_paths]
             
+            retep = self.config.get_webodm_params(environment)
+
             response = self.session.post(
                 f"{self.base_url}/api/projects/{project_id}/tasks/",
-                files=files
+                files=files,
+                data={
+                    "options": json.dumps(retep),
+
+
+                }
             )
+            
             response.raise_for_status()
 
             # Get Task ID
@@ -225,11 +232,6 @@ class WebODMClient:
     """
     def generate_point_cloud_signal(self, image_paths: List[Path], environment: str, signal : pyqtSignal) -> Dict[str, Any]:
         # Attempt To Generate Point Cloud
-
-        #res = self.session.get(f"{self.base_url}/api/processingnodes/options/")
-        #res.raise_for_status()
-        #print(res.json())
-
         signal.emit(0, 'Packaging Point Cloud', 'Getting Environment Config...')
         try:
             self.logger.info(f"WebODM ID: {self}  -  Generating Point Cloud With {environment} Environment Conditions...")
@@ -282,10 +284,6 @@ class WebODMClient:
         except Exception as e:
             self.logger.error(f"WebODM ID: {self}  -  Point Cloud Generation Failed: {str(e)}.")
             raise
-
-
-    def getDTM(self):
-        return self._get_results(self.task_id)['dtm']
 
 
     """
@@ -455,7 +453,7 @@ class WebODMClient:
             print(f"WebODM ID: {id(self)}  -   Generating Model: {responseJson['running_progress'] * 100.0}%")
             if status == 40:  # COMPLETED
                 self.logger.info(f"WebODM ID: {self}  -  Task ({task_id}) Completed On Project ({project_id}).")
-                return self._get_results(task_id)
+                return self._get_results(task_id, project_id)
             elif status in [30, 50]:  # FAILED or CANCELED
                 self.logger.error(f"WebODM ID: {self}  -  Task ({task_id}) Failed Or Was Canceled On Project ({project_id}).")
                 raise Exception(f"Task Failed Or Was Canceled")
@@ -464,6 +462,25 @@ class WebODMClient:
             time.sleep(15)
 
 
+
+    """
+    
+        Desc: This Function Waits For Task Completion And Returns Results On The Task, task_id;
+        On A Given Project, project_id. The Function Waits For The Task To Complete And Returns
+        The Results. The Function Returns The Results As A Dictionary. It Works With The UI
+        Signal To Update The Progress Bar To Notify The User Of The Progress.
+
+        Preconditions:
+            1. task_id: Task ID As A String
+            2. project_id: Project ID As An Integer
+            3. task_id And project_id Must Be Valid For WebODM API
+            4. task_id And project_id Must Relate To The Same Project
+
+        Postconditions:
+            1. Wait For Task Completion And Return Results
+            2. Return Results As A Dictionary
+
+    """
     def _wait_for_completion_signal(self, task_id: str, project_id, signal : pyqtSignal) -> Dict[str, Any]:
       # Lazy Loop To Wait For Task Completion
       signal.emit(0, 'Generating Point Clouds', 'Generating Point Cloud In Progress...')
@@ -520,9 +537,9 @@ class WebODMClient:
     def _get_results(self, task_id: str, project_id : str) -> Dict[str, Any]:
         # Get Processing Results
         self.logger.info(f"WebODM ID: {self}  -  Downloading Assets For Task ({task_id})...")
-        output_dir = self.output_dir / "output" / "point_cloud" / f"{datetime.now().strftime("%Y%m%d_%H%M%S")}"
+        self.output_dir = self.output_dir / "output" / "point_cloud" / f"{datetime.now().strftime("%Y%m%d_%H%M%S")}"
 
-        output_dir.mkdir(parents=True, exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
         try:
             # Get Asset Locale
@@ -539,7 +556,7 @@ class WebODMClient:
             # Download Report PDF If Available
             if 'report.pdf' in task_info['available_assets']:
                 report_url = f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/download/report.pdf"
-                report_path = output_dir / f"report_{task_id}.pdf"
+                report_path = self.output_dir / f"report_{task_id}.pdf"
                 self._download_asset(report_url, report_path)
                 assets['report'] = report_path
             else:
@@ -548,7 +565,7 @@ class WebODMClient:
             # If DSM Is Available, Download It
             if 'dsm.tif' in task_info['available_assets']:
                 dsm_url = f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/download/dsm.tif"
-                dsm_path = output_dir / f"dsm_{task_id}.tif"
+                dsm_path = self.output_dir / f"dsm_{task_id}.tif"
                 self._download_asset(dsm_url, dsm_path)
                 assets['dsm'] = dsm_path
             else:
@@ -557,7 +574,7 @@ class WebODMClient:
             # Download DTM If Available
             if 'dtm.tif' in task_info['available_assets']:
                 dtm_url = f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/download/dtm.tif"
-                dtm_path = output_dir / f"dtm_{task_id}.tif"
+                dtm_path = self.output_dir / f"dtm_{task_id}.tif"
                 self._download_asset(dtm_url, dtm_path)
                 assets['dtm'] = dtm_path
             else:
@@ -566,7 +583,7 @@ class WebODMClient:
             # Download Orthophoto If Available
             if 'orthophoto.tif' in task_info['available_assets']:
                 orthophoto_url = f"{self.base_url}/api/projects/{project_id}/tasks/{task_id}/download/orthophoto.tif"
-                orthophoto_path = output_dir / f"orthophoto_{task_id}.tif"
+                orthophoto_path = self.output_dir / f"orthophoto_{task_id}.tif"
                 self._download_asset(orthophoto_url, orthophoto_path)
                 assets['orthophoto'] = orthophoto_path
             else:
@@ -623,7 +640,7 @@ class WebODMClient:
                     
                     self.logger.info(f"WebODM ID: {self}  -  Canopy Height Model Created.")
 
-                    chm_path = output_dir / f"chm_{task_id}.tif"
+                    chm_path = self.output_dir / f"chm_{task_id}.tif"
                     self.logger.info(f"WebODM ID: {self}  -  Saving Canopy Height Model (Dest: {chm_path})...")
 
                     profile = dsm_src.profile
@@ -641,6 +658,23 @@ class WebODMClient:
             self.logger.error(f"WebODM ID: {self}  -  Failed To Download Assets For Task ({task_id}): {str(e)}.")
             raise
 
+
+    """
+    
+        Desc: This Function Downloads An Asset From The WebODM API.
+        The Function Takes In A URL And A Path To Save The Asset.
+        The Function Downloads The Asset In Chunks And Saves It To The
+        Specified Path.
+
+        Preconditions:
+            1. url: URL Of The Asset To Download
+            2. path: Path To Save The Asset
+
+        Postconditions:
+            1. Download Asset From WebODM API
+            2. Save Asset To Specified Path
+    
+    """
     def _download_asset(self, url, path):
         with self.session.get(url, stream=True) as response:
             response.raise_for_status()
@@ -648,7 +682,6 @@ class WebODMClient:
                 for chunk in response.iter_content(chunk_size=8192):
                     f.write(chunk)
           
-
 
     """
     
@@ -724,8 +757,7 @@ class WebODMClient:
     
     """
     def __del__(self):
-
         # Cleanup, Then Close Session
-        #self._cleanup_projects()
+        self._cleanup_projects()
         self.session.close()
         self.logger.info(f"WebODM ID: {self}  -  WebODM Client Closed.")
