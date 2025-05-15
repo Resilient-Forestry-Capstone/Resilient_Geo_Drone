@@ -10,9 +10,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 <h3>📑 Table of Contents</h3>
 
 1. [📂 Directory Structure](#-directory-structure)
-2. [🛠️ Setup](#-setup)
-   - [Before Initialization](#before-initialization)
-   - [Initialization](#initialization)
+2. [🏃 Quick Start](#quick-start)
 3. [🔍 The Breakdown](#-the-breakdown)
    - <a href="#architecture-diagram">Architecture Diagram</a>
    - <a href="#core-components">Core Components</a>
@@ -122,7 +120,7 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 
 
-# 🏃 Quick Start
+<h3 id="quick-start">🏃 Quick Start</h3>
 
 <ol>
   <li>
