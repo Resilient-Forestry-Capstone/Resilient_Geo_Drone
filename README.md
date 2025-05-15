@@ -169,31 +169,42 @@ The Process Will Be Initialized With A Raw Digital Aerial Image-Set As One Of Th
 
 The System Can Be Accessed Through Either CLI Or Our Modern PyQt5-Based GUI Interface. The GUI Provides Drag-and-Drop Functionality For Image Sets, Real-Time Progress Visualization, Environment Selection, And Parameter Customization Through An Intuitive Settings Interface.
 
-After The Setup Script Initializes The Environment, Our main.py Launches The GUI Interface Or Pipeline Backend Based On The Context. The PipelineWorker Class (A QThread Subclass) Manages The Execution Of Our 3-Stage Pipeline. In Our Architecture, There Are Several Key Components:
+After The Setup Script Initializes The Environment, Our `main.py` Launches The GUI Interface Or Pipeline Backend Based On The Context. The `PipelineWorker` Class (A QThread Subclass) Manages The Execution Of Our 3-Stage Pipeline. In Our Architecture, There Are Several Key Components:
 
 <h6>Core Components</h6>
-A Logger Class (LoggerSetup): Provides Detailed, Timestamped Logs Across All Pipeline Stages. Allows Users And Developers To Know Who, What, Where, And Why Specific Operations Are Going On.
-A Config Loader (ConfigLoader): For Our Tunable Parameters For Our User Through A YAML-Formatted Settings File. Applied To Allow Users Freedom To Change Specific Parameters Throughout Codebase's Lifetime.
-A File Handler (FileHandler): Orchestrates File Operations And Directory Management Throughout Runtime. Mainly Being Utilized To Allow A More Modifiable, Debuggable, And Dynamic Means Of File Management Than Simple Operations In-Line.
-<h6>Stage-Specific Components</h6>
-A Batch Image Processor (BatchProcessor): Preprocesses And Validates Raw Drone Imagery For Usage In Point-Cloud Generation With Multiple Worker Threads. Performs Quality Control Checks Including Resolution, Blur Detection, And Brightness Assessment.
-A API Interfacer With WebODM (WebODMClient): Interfaces With WebODM For Our Point-Cloud Generation, Including Adaptive Parameter Tuning Based On Environmental Conditions. Manages The Asynchronous Processing Of Image Sets Through A REST API And Provides Progress Monitoring.
-A Point-Cloud Processor (CloudProcessor): Post-Processes WebODM Point-Cloud Outputs To Generate Canopy Height Models (CHMs) By Computing The Difference Between Digital Surface Models (DSMs) And Digital Terrain Models (DTMs). This Layer Converts Raw Point-Cloud Data Into Forest-Specific Metrics.
-A Gap Detector (GapDetector): Analyzes The Canopy Height Models To Automatically Identify, Measure, And Characterize Forest Gaps. The Gap Detection Algorithm Uses Configurable Height Thresholds And Morphological Operations To Create Vector Polygons Of Gap Areas With Associated Metrics.
-<h6>Stage 1: Preprocessing Digital Aerial Photographs</h6>
-The Pipeline Begins By Creating Timestamped Output Directories Through The FileHandler. In Stage 1, The System Collects All Digital Aerial Photographs From The Input Directory And Passes Them Through The BatchProcessor. This Component:
 
+A Logger Class `LoggerSetup`: Provides Detailed, Timestamped Logs Across All Pipeline Stages. Allows Users And Developers To Know Who, What, Where, And Why Specific Operations Are Going On.
+
+A Config Loader `ConfigLoader`: For Our Tunable Parameters For Our User Through A YAML-Formatted Settings File. Applied To Allow Users Freedom To Change Specific Parameters Throughout Codebase's Lifetime.
+
+A File Handler `FileHandler`: Orchestrates File Operations And Directory Management Throughout Runtime. Mainly Being Utilized To Allow A More Modifiable, Debuggable, And Dynamic Means Of File Management Than Simple Operations In-Line.
+
+<h6>Stage-Specific Components</h6>
+A Batch Image Processor `BatchProcessor`: Preprocesses And Validates Raw Drone Imagery For Usage In Point-Cloud Generation With Multiple Worker Threads. Performs Quality Control Checks Including Resolution, Blur Detection, And Brightness Assessment.
+
+A API Interfacer With WebODM `WebODMClient`: Interfaces With WebODM For Our Point-Cloud Generation, Including Adaptive Parameter Tuning Based On Environmental Conditions. Manages The Asynchronous Processing Of Image Sets Through A REST API And Provides Progress Monitoring. As Well As Post-Processes WebODM Point-Cloud Outputs To Generate Canopy Height Models (CHMs) By Computing The Difference Between Digital Surface Models (DSMs) And Digital Terrain Models (DTMs). This Layer Converts Raw Point-Cloud Data Into Forest-Specific Metrics.
+
+A Gap Detector `GapDetector`: Analyzes The Canopy Height Models To Automatically Identify, Measure, And Characterize Forest Gaps. The Gap Detection Algorithm Uses Configurable Height Thresholds And Morphological Operations To Create Vector Polygons Of Gap Areas With Associated Metrics.
+
+<h6>Stage 1: Preprocessing Digital Aerial Photographs</h6>
+
+The Pipeline Begins By Creating Timestamped Output Directories Through The `FileHandler`. In Stage 1, The System Collects All Digital Aerial Photographs From The Input Directory And Passes Them Through The `BatchProcessor`. This Component:
+
+```
 Validates Image Formats Against User-Configured Acceptable Types
 Checks Resolution Against Minimum Requirements
 Applies Blur Detection Algorithms To Filter Out Blurry Images
 Assesses Image Brightness To Ensure Adequate Lighting
 Processes Images In Parallel Using Multiple Worker Threads For Efficiency
 Outputs A Collection Of Valid Images Ready For Point Cloud Generation
+```
+
 The GUI Displays Real-Time Progress During This Stage And Indicates Any Issues With Specific Images.
 
 <h6>Stage 2: WebODM Point-Cloud Generation</h6>
-With A Valid Image Set, The Pipeline Proceeds To WebODM Processing. The WebODMClient Component:
+With A Valid Image Set, The Pipeline Proceeds To WebODM Processing. The `WebODMClient` Component:
 
+```
 Establishes A Connection With The Running WebODM Instance
 Creates A Project And Task With Environment-Specific Parameters (Sunny, Rainy, Foggy, Night)
 Uploads Images And Initializes Processing With Optimized Settings
@@ -201,11 +212,16 @@ Asynchronously Polls The WebODM API For Task Status And Progress
 Downloads Generated Assets Including DSM, DTM And Orthophoto Files
 Generates A Canopy Height Model (CHM) By Computing DSM-DTM Difference
 Creates Timestamped Output Directories For All WebODM Products
+```
+
 This Stage Features Robust Error Handling And Progress Updates, With The GUI Reflecting The Real-Time Status Of The WebODM Processing Tasks.
 
-<h6>Stage 3: Gap Detection and Geospatial Analysis</h6>
-Once The Point Cloud And CHM Are Generated, The GapDetector Module Performs Advanced Analysis:
 
+<h6>Stage 3: Gap Detection and Geospatial Analysis</h6>
+
+Once The Point Cloud And CHM Are Generated, The `GapDetector` Module Performs Advanced Analysis:
+
+```
 Loads And Processes The CHM To Identify Areas Below User-Specified Tree Height Thresholds
 Applies Configurable Morphological Operations (Dilation, Erosion, Smoothing) To Refine Gap Identification
 Filters Gaps By Size Parameters To Focus On Ecologically Significant Openings
@@ -214,16 +230,22 @@ Calculates Gap Metrics Including Area, Perimeter, And Shape Characteristics
 Creates Visualizations Of Gaps Overlaid On The CHM Or Orthophoto
 Exports Results To GIS-Compatible Formats (GeoJSON, Shapefiles)
 Generates Statistical Summaries Of Gap Distribution And Characteristics
+```
+
 The GUI Shows Progress During This Stage And Visualizes Results Upon Completion.
+
 
 <h6>Stage 4: Output Packaging</h6>
 In The Final Stage, The Pipeline Organizes All Outputs Into A Structured Format:
 
+```
 Creates A Comprehensive Results Package In The Designated Output Directory
 Generates A Summary YAML File With Pipeline Statistics And Metadata
 Provides Direct Access To Vector Layers For Further GIS Analysis
 Includes Quality Reports And Visualizations For Quick Assessment
 All Results Are Accessible Through The Result Viewer In The GUI
+```
+
 The Output Is Organized In Timestamped Folders For Clear Tracking Of Different Processing Runs.
 
 
