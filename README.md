@@ -1,8 +1,7 @@
 # ResilientGeoDrone
 3-Staged Python Script Which Utilizes Provided Digital Aerial Photogrammetry To Create High Quality Point Clouds For Use In Geospatial Analysis Of Forest Canopies.
 
-Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For The Point Cloud And Geospatial Analysis. Because Of The External Dependency To Interface With The _**QGIS**_ API We Utilize `Window`'s .bat Files For Linking.
-
+Program Uses `WebODM` As The Main Software Facilitator For Point Cloud Generation, With Custom Python-Based Gap Detection Algorithms For Advanced Forestry Analysis. The End-To-End Pipeline Processes Raw UAV Imagery Into Actionable Ecological Insights Through An Intuitive PyQt5 GUI Or Command Line Interface
 
 ----------------------------------------------
 
