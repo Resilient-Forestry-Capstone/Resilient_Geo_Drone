@@ -188,63 +188,60 @@ A Gap Detector `GapDetector`: Analyzes The Canopy Height Models To Automatically
 
 <h6>Stage 1: Preprocessing Digital Aerial Photographs</h6>
 
-The Pipeline Begins By Creating Timestamped Output Directories Through The `FileHandler`. In Stage 1, The System Collects All Digital Aerial Photographs From The Input Directory And Passes Them Through The `BatchProcessor`. This Component:
+The Pipeline Begins By Creating Timestamped Output Directories Through The `FileHandler`. In Stage 1, The System Collects All Digital Aerial Photographs From The Input Directory And Passes Them Through The `BatchProcessor`. This Component: <br>
 
-```
-Validates Image Formats Against User-Configured Acceptable Types
-Checks Resolution Against Minimum Requirements
-Applies Blur Detection Algorithms To Filter Out Blurry Images
-Assesses Image Brightness To Ensure Adequate Lighting
-Processes Images In Parallel Using Multiple Worker Threads For Efficiency
-Outputs A Collection Of Valid Images Ready For Point Cloud Generation
-```
+
+* Validates Image Formats Against User-Configured Acceptable Types<br>
+* Checks Resolution Against Minimum Requirements<br>
+* Applies Blur Detection Algorithms To Filter Out Blurry Images<br>
+* Assesses Image Brightness To Ensure Adequate Lighting<br>
+* Processes Images In Parallel Using Multiple Worker Threads For Efficiency<br>
+* Outputs A Collection Of Valid Images Ready For Point Cloud Generation<br>
+
 
 The GUI Displays Real-Time Progress During This Stage And Indicates Any Issues With Specific Images.
 
 <h6>Stage 2: WebODM Point-Cloud Generation</h6>
-With A Valid Image Set, The Pipeline Proceeds To WebODM Processing. The `WebODMClient` Component:
 
-```
-Establishes A Connection With The Running WebODM Instance
-Creates A Project And Task With Environment-Specific Parameters (Sunny, Rainy, Foggy, Night)
-Uploads Images And Initializes Processing With Optimized Settings
-Asynchronously Polls The WebODM API For Task Status And Progress
-Downloads Generated Assets Including DSM, DTM And Orthophoto Files
-Generates A Canopy Height Model (CHM) By Computing DSM-DTM Difference
-Creates Timestamped Output Directories For All WebODM Products
-```
+With A Valid Image Set, The Pipeline Proceeds To WebODM Processing. The `WebODMClient` Component: <br>
+
+* Establishes A Connection With The Running WebODM Instance<br>
+* Creates A Project And Task With Environment-Specific Parameters (Sunny, Rainy, Foggy, Night)<br>
+* Uploads Images And Initializes Processing With Optimized Settings<br>
+* Asynchronously Polls The WebODM API For Task Status And Progress<br>
+* Downloads Generated Assets Including DSM, DTM And Orthophoto Files<br>
+* Generates A Canopy Height Model (CHM) By Computing DSM-DTM Difference<br>
+* Creates Timestamped Output Directories For All WebODM Products<br>
+
 
 This Stage Features Robust Error Handling And Progress Updates, With The GUI Reflecting The Real-Time Status Of The WebODM Processing Tasks.
 
 
 <h6>Stage 3: Gap Detection and Geospatial Analysis</h6>
 
-Once The Point Cloud And CHM Are Generated, The `GapDetector` Module Performs Advanced Analysis:
+Once The Point Cloud And CHM Are Generated, The `GapDetector` Module Performs Advanced Analysis:<br>
 
-```
-Loads And Processes The CHM To Identify Areas Below User-Specified Tree Height Thresholds
-Applies Configurable Morphological Operations (Dilation, Erosion, Smoothing) To Refine Gap Identification
-Filters Gaps By Size Parameters To Focus On Ecologically Significant Openings
-Generates Vector Polygons For Each Identified Gap With Rich Metadata
-Calculates Gap Metrics Including Area, Perimeter, And Shape Characteristics
-Creates Visualizations Of Gaps Overlaid On The CHM Or Orthophoto
-Exports Results To GIS-Compatible Formats (GeoJSON, Shapefiles)
-Generates Statistical Summaries Of Gap Distribution And Characteristics
-```
+* Loads And Processes The CHM To Identify Areas Below User-Specified Tree Height Thresholds<br>
+* Applies Configurable Morphological Operations (Dilation, Erosion, Smoothing) To Refine Gap Identification<br>
+* Filters Gaps By Size Parameters To Focus On Ecologically Significant Openings<br>
+* Generates Vector Polygons For Each Identified Gap With Rich Metadata<br>
+* Calculates Gap Metrics Including Area, Perimeter, And Shape Characteristics<br>
+* Creates Visualizations Of Gaps Overlaid On The CHM Or Orthophoto<br>
+* Exports Results To GIS-Compatible Formats (GeoJSON, Shapefiles)<br>
+* Generates Statistical Summaries Of Gap Distribution And Characteristics<br>
 
 The GUI Shows Progress During This Stage And Visualizes Results Upon Completion.
 
 
 <h6>Stage 4: Output Packaging</h6>
-In The Final Stage, The Pipeline Organizes All Outputs Into A Structured Format:
+In The Final Stage, The Pipeline Organizes All Outputs Into A Structured Format:<br>
 
-```
-Creates A Comprehensive Results Package In The Designated Output Directory
-Generates A Summary YAML File With Pipeline Statistics And Metadata
-Provides Direct Access To Vector Layers For Further GIS Analysis
-Includes Quality Reports And Visualizations For Quick Assessment
-All Results Are Accessible Through The Result Viewer In The GUI
-```
+* Creates A Comprehensive Results Package In The Designated Output Directory<br>
+* Generates A Summary YAML File With Pipeline Statistics And Metadata<br>
+* Provides Direct Access To Vector Layers For Further GIS Analysis<br>
+* Includes Quality Reports And Visualizations For Quick Assessment<br>
+* All Results Are Accessible Through The Result Viewer In The GUI<br>
+
 
 The Output Is Organized In Timestamped Folders For Clear Tracking Of Different Processing Runs.
 
