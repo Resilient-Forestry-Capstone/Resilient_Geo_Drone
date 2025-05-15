@@ -165,7 +165,7 @@ Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**
 
 <h3>🔍 The Breakdown:</h3> <h4>Architecture Diagram</h4>
 
-<img alt="image" src="https://github.com/user-attachments/assets/d0317c73-e922-4c31-a642-918dcdaec78a"><br>
+<img alt="image" src="https://github.com/user-attachments/assets/5a408b2e-bc16-40a5-8da3-4df83a013cdc"><br>
 
 The Process Will Be Initialized With A Raw Digital Aerial Image-Set As One Of The Main Inputted Arguments--With The Other Being A Provided Environmental Tag For Fine-Tuning Of Parameters For The WebODM Software.
 
