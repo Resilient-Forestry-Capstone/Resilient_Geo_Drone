@@ -164,7 +164,9 @@ Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**
 
 
 <h3>🔍 The Breakdown:</h3> <h4>Architecture Diagram</h4>
-<img alt="image" src="https://github.com/user-attachments/assets/45cb664f-aa24-4c66-8da9-68a81582e6f4">
+
+<img alt="image" src="https://github.com/user-attachments/assets/d0317c73-e922-4c31-a642-918dcdaec78a"><br>
+
 The Process Will Be Initialized With A Raw Digital Aerial Image-Set As One Of The Main Inputted Arguments--With The Other Being A Provided Environmental Tag For Fine-Tuning Of Parameters For The WebODM Software.
 
 The System Can Be Accessed Through Either CLI Or Our Modern PyQt5-Based GUI Interface. The GUI Provides Drag-and-Drop Functionality For Image Sets, Real-Time Progress Visualization, Environment Selection, And Parameter Customization Through An Intuitive Settings Interface.
