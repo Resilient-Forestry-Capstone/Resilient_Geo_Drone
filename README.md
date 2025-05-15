@@ -121,36 +121,70 @@ Program Uses _**QGIS**_ And _**WebODM**_ As Two Main Software Facillitators For 
 
 
 
-<h3>🛠️ Setup:</h3>
 
-<h6>Before Initialization</h6>
+# 🏃 Quick Start
 
-Before Starting Up The Scripts There Are 3 Main Things That Need To Be Done:
+<ol>
+  <li>
+    <strong>Clone &amp; enter the repo:</strong><br>
+    <pre><code>git clone https://github.com/Resilient-Forestry-Capstone/Resilient_Geo_Drone.git
+cd ResilientGeoDrone</code></pre>
+  </li>
 
-* WebODM Is Currently Being Hosted Locally On Your System Under The Default, `http://localhost:8000`.
-* QGIS Is Installed On The System Under It's Standard Location, `C:\Program Files\...`
-* You Are Running The Program Through A Windows OS **_(Or A Windows Virtual-Machine)_**
+  <li>
+    <strong>Create &amp; activate a virtual environment:</strong><br>
+    <pre><code><!-- Windows -->python -m venv venv
+venv\Scripts\activate
+<!-- macOS / Linux -->
+python3 -m venv venv
+source venv/bin/activate</code></pre>
+  </li>
+
+  <li>
+    <strong>Install Python dependencies:</strong><br>
+    <pre><code>pip install -r requirements.txt</code></pre>
+  </li>
+
+  <li>
+    <strong>Start WebODM:</strong>
+    <ul>
+      <li>Install Docker Desktop: <a href="https://docs.docker.com/desktop/">https://docs.docker.com/desktop/</a></li>
+      <li>Open a Docker-enabled shell and run:
+        <pre><code>git clone https://github.com/OpenDroneMap/WebODM \
+  --config core.autocrlf=input --depth 1
+cd WebODM
+./webodm.sh start</code></pre>
+      </li>
+      <li>Point your browser at <a href="http://localhost:8000">http://localhost:8000</a> and create your WebODM account.</li>
+    </ul>
+  </li>
+
+  <li>
+    <strong>Configure the pipeline:</strong><br>
+    <pre><code>cp config/config.example.yaml config/config.yaml</code></pre>
+    Edit <code>config/config.yaml</code> to set your WebODM <code>host</code>, <code>port</code>, <code>username</code>, and <code>password</code>.
+  </li>
+
+  <li>
+    <strong>Launch ResilientGeoDrone:</strong>
+    <ul>
+      <li>GUI mode:
+        <pre><code>python -m resilientgeodrone.gui</code></pre>
+      </li>
+      <li>CLI mode:
+        <pre><code>python main.py --images /path/to/your/image/folder</code></pre>
+      </li>
+    </ul>
+  </li>
+
+  <li>
+    <strong>View results:</strong><br>
+    In GUI: click <em>View Results</em>. <br>
+    In CLI: inspect outputs under <code>data/output/point_cloud</code> (DSM, DTM, CHM, point-cloud, PDF).
+  </li>
+</ol>
 
 
-<h6>Initialization</h6>
-
-To Run The Program Properly With All Dependencies Linked, You Must Call The `run_qgis_setup.bat` File Which Will Call The Linking .bat For QGIS And Pip Install All Python Library Dependencies In A Python Virtual Environment.
-
-When Running `run_qgis_setup.bat`, You Will Be Stopped At A Python Script:
-
-```Python Terminal
-
-Starting QGIS Environment Setup...
-  Checking Python Edition...
-    Python Version: 312 
-  Creating Python Virtual Environment...
-    Virtual Environment Created And Activated.
-  Initializing QGIS Dependency Linker .bat...
-Python 3.12.7 (main, Oct 25 2024, 11:18:09) [MSC v.1938 64 bit (AMD64)] on win32
-Type "help", "copyright", "credits" or "license" for more information.
->>> ^Z
-
-```
 
 Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**_ Needs To Call Python To Load In Everything For Python Before We Execute).
 
