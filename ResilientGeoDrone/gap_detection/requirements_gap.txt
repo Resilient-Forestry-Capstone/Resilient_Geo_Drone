@@ -1,8 +1,8 @@
-numpy
-rasterio
-geojson
-opencv-python-headless
-pillow
-transformers
-torch
-matplotlib
+rasterio>=1.0
+numpy>=1.18
+matplotlib>=3.0
+scikit-image>=0.17
+matplotlib-scalebar>=0.7
+geopandas>=0.10
+shapely>=1.7
+pytest>=6.0

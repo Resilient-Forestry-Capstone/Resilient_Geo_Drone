@@ -1,0 +1,35 @@
+chm_file: "data/output/point_cloud/chm.tif"
+plot_filename: "data/output/analysis/canopy_gaps_visualization.pdf"
+data_filename: "data/output/analysis/canopy_gaps_data.csv"
+vector_filename: "data/output/analysis/canopy_gaps.gpkg"
+
+threshold_type: "otsu"  # "manual" or "otsu"
+manual_threshold: 2.5   # Used if threshold_type is "manual" or as fallback
+
+min_area: 10.0          # Minimum gap area in square meters
+max_area: 1000.0        # Maximum gap area in square meters
+
+# Morphological operations
+apply_erosion: true
+erosion_size: 1         # Disk radius for erosion
+apply_dilation: false
+dilation_size: 1        # Disk radius for dilation
+apply_smoothing: true
+smoothing_sigma: 0.5    # Sigma for Gaussian smoothing
+
+# Plotting options
+outline_gaps_only: true # If true, gaps are shown as outlines; if false, filled with semi-transparent color
+
+# Area classification bins (in square meters) for the classified plot
+# Gaps will be colored based on which bin their area falls into.
+# Example: [50, 100, 250, 500] will create bins:
+#   - Bin 1: <= 50 m^2
+#   - Bin 2: > 50 m^2 and <= 100 m^2
+#   - Bin 3: > 100 m^2 and <= 250 m^2
+#   - Bin 4: > 250 m^2 and <= 500 m^2
+#   - Bin 5: > 500 m^2
+area_classification_bins_sqm:
+  - 50
+  - 100
+  - 250
+  - 500
