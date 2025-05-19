@@ -97,7 +97,6 @@ class RasterData:
 
 class GapAnalyzer:
     """Performs classification, morphology, and gap identification."""
-    # (Code identical to the previous version - assigns area_bin_index)
     def __init__(self, config):
         self.config = config; self.binary_mask = None; self.labeled_image = None
         self.processed_mask = None; self.gaps = {}; self.actual_threshold = None
@@ -149,7 +148,6 @@ class GapAnalyzer:
 
 class ReportGenerator:
     """Generates the CSV data report with area classification index."""
-    # (Code identical to the previous version - uses area_bin_index)
     def __init__(self, config):
         self.config = config
     def generate_csv(self, output_filename, raster_data, analyzer_results):
@@ -210,7 +208,6 @@ class PlotGenerator:
 
     def _plot_common_elements(self, ax, raster_data, im):
         """Adds common elements like axes labels, scale bar (in METERS) to an axes object."""
-        # (Code identical to the previous version - scale bar uses METERS)
         axis_unit_label = raster_data.units_name
         if 'foot' in raster_data.units_name.lower(): axis_unit_label = 'ft'
         elif 'meter' in raster_data.units_name.lower(): axis_unit_label = 'm'
@@ -253,7 +250,7 @@ class PlotGenerator:
         try: fig.tight_layout()
         except ValueError: print("Warn: tight_layout failed for plot 1.")
         return fig
-    # --- END OF NEW METHOD ---
+ 
 
     def _create_original_style_plot(self, raster_data, analyzer_results):
         """Creates the plot figure with original gap styling on processed mask."""
@@ -452,18 +449,17 @@ class GapAnalysisPipeline:
         print(f"Loading config: {self.config_file}")
         try:
             with open(self.config_file, 'r') as f:
-                return yaml.safe_load(f) # <--- MODIFIED HERE
+                return yaml.safe_load(f) 
         except FileNotFoundError:
             print(f"Error: Config file '{self.config_file}' not found.")
             raise
-        except yaml.YAMLError as e: # <--- MODIFIED HERE for specific YAML errors
+        except yaml.YAMLError as e: 
             print(f"Error parsing YAML config file '{self.config_file}': {e}")
             raise
         except Exception as e:
             print(f"Unexpected error loading config '{self.config_file}': {e}")
             raise
 
-    # --- MODIFIED: Capture and pass processed_mask ---
     def run_analysis(self):
         """Executes the full analysis pipeline."""
         print("\n--- Starting Gap Identification Pipeline ---")
@@ -519,10 +515,9 @@ class GapAnalysisPipeline:
         except Exception as e:
             print(f"\n--- Pipeline Error ---"); print(f"An critical error occurred: {e}")
             import traceback; traceback.print_exc(); return None
-    # --- END OF MODIFICATION ---
+   
 
-# === Main Execution Block ===
-# (Identical to previous version)
+
 # === Main Execution Block ===
 if __name__ == "__main__":
     default_config_file = 'config/gap_config.yaml' 
