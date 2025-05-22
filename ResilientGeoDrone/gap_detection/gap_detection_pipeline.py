@@ -43,7 +43,6 @@ def get_area_bin_index(area_sqm, bins_sqm):
 
 class RasterData:
     """Handles loading, cleaning, and accessing raster data and metadata."""
-    # (Code identical to the previous version - robust CRS/unit handling)
     def __init__(self, filepath):
         self.filepath = filepath; self.data = None; self.transform = None; self.crs = None
         self.units_name = "unknown"; self.to_meters_factor = 1.0; self.pixel_size_x_crs = None
