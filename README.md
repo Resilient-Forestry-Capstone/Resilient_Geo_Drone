@@ -104,6 +104,9 @@ Program Uses _WebODM_ As The Main Software Facilitator For Point Cloud Generatio
 │       ├── test_result_viewer.py
 │       ├── test_settings_window.py
 │       └── test_webodm.py
+│       └── test_gap_detection.py
+│       └── test_gap_helpers.py
+│       └── test_gap_raster_data.py
 └── gap_detection/ # Standalone or experimental gap detection scripts (separate from src/geospatial)
     ├── gap_detection_demo.py
     ├── gap_renderer.py
@@ -326,6 +329,8 @@ The Output Is Organized In Timestamped Folders For Clear Tracking Of Different P
 
 <h4>Architecture/Codebase Documents (<b>.ipynb</b>):</h4>
 <a href="https://colab.research.google.com/drive/1jNO7_kG1UmCKrqQNBmvPGhgTCfkMYllN?usp=sharing">ResilientGeoDrone User Manual</a><br>
+<a href="https://docs.google.com/document/d/1xH-igd-KIJcGsrvifMtod7xMR0WvYKeU0GEbzOk52jE/edit?usp=sharing">Gap Detection specific User Manual</a><br>
+<a href="https://redhawks.sharepoint.com/:w:/s/INT-25-1INTResilientForestry/EZHhIlHucOBCqI_pXe9LJN4Bi5JNp0Qy7mSS0bmE71RKQw?e=KyzUHs">Gap Detection specific User Manual in word</a><br>
 <a href="https://colab.research.google.com/drive/1jcTHM3HCaJ1qFnkUvrGkAXTe_YUrozMf?usp=sharing">ResilientGeoDrone Documentation</a><br><br>
 
 <h4>Workflow Diagram Document (<b>.drawio</b>):</h4>
