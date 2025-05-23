@@ -3,8 +3,7 @@ import pytest
 import os
 import numpy as np
 from pathlib import Path
-# Assuming your main script is in the parent directory and named gap_detection.py
-# If pytest is run from the project root and the root is in PYTHONPATH:
+
 from gap_detection_pipeline import GapAnalyzer, RasterData # Adjust if your script is named differently
 
 # --- Mock RasterData for GapAnalyzer tests ---

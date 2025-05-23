@@ -1,10 +1,7 @@
 # tests/test_helpers.py
 import pytest
-# Assuming your main script is in the parent directory and named gap_analysis_oop.py
-# If your script is in the same directory or project root, adjust the import:
-# from ..gap_analysis_oop import get_area_bin_index
-# For simplicity if tests/ is a top-level package or script is in PYTHONPATH:
-from gap_detection import get_area_bin_index # Adjust if your script is named differently
+
+from gap_detection import get_area_bin_index 
 
 def test_get_area_bin_index_basic():
     """Test the area classification helper function with various inputs."""

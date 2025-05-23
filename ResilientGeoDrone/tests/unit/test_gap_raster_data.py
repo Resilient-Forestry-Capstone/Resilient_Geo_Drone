@@ -10,9 +10,7 @@ from gap_detection import RasterData # Adjust if needed
 # More advanced mocking might be needed for full coverage without actual files
 # For now, we'll focus on testing methods with controlled inputs or small actual files
 
-# It's better to use small, actual test files for loading tests
-# Create a dummy test raster file for loading tests if not using a fixture
-# For example, in a conftest.py or setup function
+
 
 @pytest.fixture
 def mock_raster_data_meters(tmp_path):
