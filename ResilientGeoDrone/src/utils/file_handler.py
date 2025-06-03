@@ -124,27 +124,22 @@ class FileHandler:
     
     """
     def create_processing_directories(self, base_dir: Union[str, Path]) -> Dict[str, Path]:
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        base_path = Path(base_dir)
         
-        self.logger.info(f"File Handler ID: {self}  -  Creating Processing Directories In {base_dir}...")
-        try:
-          timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-          base_path = Path(base_dir)
-          
-          # Create Processing Directories For Given TimeStamp
-          directories = {
-              'processed': base_path / 'processed' / timestamp,
-              'point_cloud': base_path / 'point_cloud' / timestamp,
-              'analysis': base_path / 'analysis' / timestamp
-          }
-          
-          # Create Directories If They Do Not Exist
-          for dir_path in directories.values():
-              self.create_directory(dir_path)
-          self.logger.info(f"File Handler ID: {self}  -  Processing Directories Created In {base_dir}.")
-          return directories
-        except Exception as e:
-            self.logger.error(f"File Handler ID: {self}  -  Processing Directory Creation Failed: {str(e)}")
-            raise
+        # Create Processing Directories For Given TimeStamp
+        directories = {
+            #'processed': base_path / 'processed' / timestamp,
+            'point_cloud': base_path / 'point_cloud' / timestamp
+            #'analysis': base_path / 'analysis' / timestamp
+        }
+        
+        # Create Directories If They Do Not Exist
+        for dir_path in directories.values():
+            self.create_directory(dir_path)
+            
+        return directories
     
 
     """

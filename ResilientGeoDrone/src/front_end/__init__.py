@@ -4,6 +4,7 @@ from .result_dialog import ResultDialog
 from .settings_window import SettingsWindow
 from .drag_drop_widget import DragDropWidget
 from .progress_bar import ProgressWidget
+from .result_viewer import ResultsViewerWidget
 
 # Package metadata
 __version__ = '0.1.0'
@@ -17,5 +18,6 @@ __all__ = [
     "ResultDialog",
     "SettingsWindow",
     "DragDropWidget",
-    "ProgressWidget"
+    "ProgressWidget",
+    "ResultViewerWidget"
 ]

@@ -6,6 +6,7 @@ from .utils.logger import LoggerSetup
 from .utils.config_loader import ConfigLoader
 from .point_cloud.webodm_client import WebODMClient
 from .preprocessing.batch_processor import BatchProcessor
+from .geospatial.gap_detection import GapDetector
 
 
 # Package metadata
@@ -23,5 +24,6 @@ __all__ = [
     'PipelineWorker',
     'MainClientWindow',
     'DragDropWidget',
+    'GapDetector',
     'ProgressWidget'
 ]

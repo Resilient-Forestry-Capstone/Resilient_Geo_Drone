@@ -2,6 +2,9 @@ from PyQt5.QtWidgets import (QWidget, QProgressBar, QLabel, QPushButton,
                             QVBoxLayout, QHBoxLayout, QFrame)
 from PyQt5.QtCore import pyqtSignal
 
+# Load In Our Logger Setup
+from src.utils.logger import LoggerSetup
+
 
 
 """
@@ -14,6 +17,8 @@ from PyQt5.QtCore import pyqtSignal
 
 """
 class ProgressWidget(QWidget):
+
+  # Define A Signal For Canceling The Request (Goes Up To The Parent Worker)
   cancel_request = pyqtSignal()
 
   """
@@ -34,37 +39,29 @@ class ProgressWidget(QWidget):
 
   """
   def __init__(self):
-    super().__init__()
+    super().__init__(objectName="progressWidget")
     
     # Create Our Main Layout
-    self.setObjectName("progressWidget")
     mainLayout = QVBoxLayout(self)
 
     # Create A Bordered Frame
-    self.frame = QFrame()
-    self.frame.setObjectName("progressFrame")
-    self.frame.setFrameShape(QFrame.StyledPanel)
+    self.frame = QFrame(objectName="progressFrame", frameShape=QFrame.StyledPanel)
     frame_layout = QVBoxLayout(self.frame)
 
     # Progress Title Header
-    self.title_label = QLabel("Pipeline Progress")
-    self.title_label.setObjectName("progressTitle")
+    self.title_label = QLabel("Pipeline Progress", objectName="progressTitle")
     frame_layout.addWidget(self.title_label)
 
     # Status
-    self.status_label = QLabel("Initializing Pipeline...")
-    self.status_label.setObjectName("statusLabel")
+    self.status_label = QLabel("Initializing Pipeline...", objectName="statusLabel")
     frame_layout.addWidget(self.status_label)
 
     # Detail Message
-    self.detail_label = QLabel("Loading Configuration...")
-    self.detail_label.setObjectName("detailLabel")
-    self.detail_label.setWordWrap(True)
+    self.detail_label = QLabel("Loading Configuration...", objectName="detailLabel", wordWrap=True)
     frame_layout.addWidget(self.detail_label)
 
     # Progress Bar
-    self.progress_bar = QProgressBar()
-    self.progress_bar.setObjectName("progressBar")
+    self.progress_bar = QProgressBar(objectName="progressBar")
     self.progress_bar.setRange(0, 100)
     self.progress_bar.setValue(0)
     frame_layout.addWidget(self.progress_bar)
@@ -72,14 +69,17 @@ class ProgressWidget(QWidget):
     # Control Buttons Horizontally
     button_layout = QHBoxLayout()
 
-    # Spacer For Push Button To Right
     button_layout.addStretch()
 
     # Cancellation Button
-    self.cancel_button = QPushButton("Cancel")
-    self.cancel_button.setObjectName("cancelButton")
+    self.cancel_button = QPushButton("Cancel", objectName="cancelButton")
     self.cancel_button.clicked.connect(self.cancel_request.emit)
     button_layout.addWidget(self.cancel_button)
+
+    # Create "WebODM" Button That Opens WebODM In Browser
+    self.webodm_button = QPushButton("Open WebODM", objectName="webodmButton")
+    self.webodm_button.clicked.connect(self.open_webodm)
+    button_layout.addWidget(self.webodm_button)
 
     # Add Button Layout To Frame Layout
     frame_layout.addLayout(button_layout)
@@ -87,6 +87,38 @@ class ProgressWidget(QWidget):
     # Add Frame To Main Layout
     mainLayout.addWidget(self.frame)
 
+
+  def open_webodm(self):
+    logger = LoggerSetup().get_logger()
+    try:
+      # Import Required Libraries
+      import webbrowser
+      import yaml
+      from pathlib import Path
+
+
+      logger.info(f"ProgressBar ID: {self}  -  Attempting to open WebODM...")
+      # Load Our Configuration File
+      config_path = Path(__file__).parent.parent.parent / "config" / "config.yaml"
+
+      with open(config_path, 'r') as file:
+        config = yaml.safe_load(file)
+
+      # Get WebODM Connection URL
+      webodm_config = config['point_cloud']['webodm']
+      webodm_url = f"http://{webodm_config['host']}:{webodm_config['port']}/"
+
+      # Open WebODM In Default Browser
+      webbrowser.open(webodm_url)
+
+      # Log The Action
+      logger.info(f"ProgressBar ID: {self}  -  Opening WebODM at {webodm_url}.")
+
+    except Exception as e:
+      # If There Is An Error, Print It To The Logger
+      logger.error(f"ProgressBar ID: {self}  -  Failed to open WebODM: {str(e)}.")
+
+      
 
   """
   
@@ -106,11 +138,16 @@ class ProgressWidget(QWidget):
         3. Update Detail Message
   
   """
-  def update_progress(self, progress: float, status: str, detail: str):
+  def update_progress(self, progress : int, status : str, detail : str):
+    # Normalize Progress To 0-100 Range
+    if progress < 0:
+      progress = 0
+    elif progress > 100:
+      progress = 100
+
     self.progress_bar.setValue(int(progress))
     self.status_label.setText(status)
     self.detail_label.setText(detail)
-
 
 
   """
@@ -127,5 +164,3 @@ class ProgressWidget(QWidget):
   """
   def set_title(self, title: str):
     self.title_label.setText(title)
-
-    

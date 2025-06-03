@@ -1,16 +1,24 @@
 geospatial:
-  analysis:
-    canopy_threshold: 0.5
-    min_tree_height: 0.0
-    terrain:
-      roughness_threshold: 0.5
-      slope_threshold: 30.0
+  gap_detection:
+    min_area: 20
+    max_area: 8000
+    pixel_size: 0.06232218768944
+    threshold_type: manual
+    manual_threshold: 12.0
+    apply_dilation: true
+    dilation_size: 0
+    apply_erosion: true
+    erosion_size: 10
+    apply_smoothing: true
+    smoothing_sigma: 1.0
+    min_tree_height: 10.0
+    max_tree_height: 1.0
   output:
     formats:
     - geotiff
     - shapefile
     resolution: 0.1
-  output_path: C:\Users\bensp\OneDrive\Desktop\Code Box Two\Python\GeoDrone\ResilientRepo\Resilient_Geo_Drone\data
+  output_path: ..\data\output
 point_cloud:
   webodm:
     environments:
@@ -269,9 +277,9 @@ point_cloud:
         mesh-octree-depth: 11
         mesh-quality: 20000
         mesh-size: 20000
-        mesh_quality: 200000
+        mesh_quality: 20000
         min-num-features: 10001
-        min_num_features: 10000
+        min_num_features: 10001
         no-gpu: false
         optimize-disk-space: false
         orthophoto-cutline: false
@@ -283,7 +291,7 @@ point_cloud:
         pc-sample: 0.0
         pc-skip-geometric: false
         point-cloud-quality: low
-        point_cloud_quality: medium
+        point_cloud_quality: low
         primary-band: auto
         radiometric-calibration: none
         rerun-from: dataset
@@ -314,16 +322,92 @@ point_cloud:
         use-hybrid-bundle-adjustment: false
         video-limit: 500
         video-resolution: 4000
+      uhhh:
+        3d-tiles: false
+        auto-boundary: false
+        auto-boundary-distance: 0.0
+        bg-removal: false
+        boundary: ''
+        camera-lens: auto
+        cameras: ''
+        crop: 3.0
+        dem-decimation: 1
+        dem-euclidean-map: false
+        dem-gapfill-steps: 3
+        dem-resolution: 5.0
+        dsm: true
+        dtm: true
+        end-with: odm_postprocess
+        fast-orthophoto: false
+        feature-quality: high
+        feature-type: dspsift
+        feature_quality: high
+        force-gps: false
+        gps-accuracy: 3.0
+        matcher-neighbors: 0
+        matcher-order: 0
+        matcher-type: flann
+        matcher_type: flann
+        max-concurrency: 16
+        max_concurrency: 16
+        merge: all
+        mesh-octree-depth: 11
+        mesh-quality: 200000
+        mesh-size: 200000
+        mesh_quality: 200000
+        min-num-features: 10000
+        no-gpu: false
+        optimize-disk-space: false
+        orthophoto-cutline: false
+        orthophoto-resolution: 5.0
+        pc-classify: false
+        pc-filter: 5.0
+        pc-quality: medium
+        pc-rectify: false
+        pc-sample: 0.0
+        pc-skip-geometric: false
+        point-cloud-quality: medium
+        primary-band: auto
+        radiometric-calibration: none
+        rerun-from: dataset
+        rolling-shutter: false
+        rolling-shutter-readout: 0
+        sfm-algorithm: incremental
+        sfm-no-partial: false
+        skip-3dmodel: false
+        skip-band-alignment: false
+        skip-orthophoto: false
+        skip-report: false
+        sky-removal: false
+        sm-cluster: None
+        sm-no-align: false
+        smrf-scalar: 1.25
+        smrf-slope: 0.15
+        smrf-threshold: 0.5
+        smrf-window: 18.0
+        split: 999999
+        split-overlap: 150
+        texturing-keep-unseen-faces: false
+        texturing-single-material: false
+        texturing-skip-global-seam-leveling: false
+        tiles: false
+        use-3dmesh: false
+        use-exif: true
+        use-fixed-camera-params: false
+        use-hybrid-bundle-adjustment: false
+        video-limit: 500
+        video-resolution: 4000
     host: localhost
     password: admin
     port: 8000
     timeout: 3600
     username: kingerthanu
+    active_environment: uhhh
 preprocessing:
   blur_threshold: 100
   brightness_range:
-  - 40
-  - 220
+  - 0
+  - 255
   max_workers: 4
   min_resolution:
   - 2920

@@ -1,18 +1,19 @@
-# Python cache files
+# Python Cache Files
 __pycache__/
 *.egg
 
-# Log files
+# Log Files
 *.log
 logs/
 ResilientGeoDrone\logs\
 
-# Point cloud intermediate files
+# Point Cloud Intermediate Files
 **/point_cloud/**/
-# Timestamped output directories
+
+# Timestamped Output Directories
 **/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]_[0-9][0-9][0-9][0-9][0-9][0-9]/
 
-# Image files
+# Image Files
 *.jpg
 *.jpeg
 *.png
@@ -21,33 +22,34 @@ ResilientGeoDrone\logs\
 *.tiff
 *.bmp
 *.webp
-data/raw/Image-Set/
+*.txt
+data/raw/
 data/processed/
 data/output/
 
-# Surface model files
+# Surface Model Files
 *.geojson
 *.tif
 
-# Virtual environments
+# Virtual Environments
 venv/
 ENV/
 env/
 
-# IDE specific files
+# IDE Specific Files
 .idea/
 .vscode/
 *.swp
 *.swo
 *.sublime-workspace
 
-# WebODM outputs
+# WebODM Outputs
 *.laz
 *.zip
 *.glb
 report_*.pdf
 
-# Temporary files
+# Temporary Files
 gap_results/
 .DS_Store
 Thumbs.db

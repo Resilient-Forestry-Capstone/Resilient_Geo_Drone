@@ -16,7 +16,6 @@ Classes:
 from .config_loader import ConfigLoader
 from .file_handler import FileHandler
 from .logger import LoggerSetup
-from .pdf_parser import PDFParser
 
 
 # Package metadata
@@ -29,8 +28,7 @@ __status__ = 'Development'
 __all__ = [
     'ConfigLoader',
     'FileHandler',
-    'LoggerSetup',
-    'PDFParser'
+    'LoggerSetup'
 ]
 
 # Package level constants

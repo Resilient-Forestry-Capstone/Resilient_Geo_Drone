@@ -34,15 +34,9 @@ class BatchProcessor:
     
     """
     def __init__(self, config_loader):
-        try:
-          self.logger = LoggerSetup().get_logger()
-          self.logger.info(f"Batch Processor ID: {self}  -  Initializing Batch Processor...")
-          self.config = config_loader.get_preprocessing_config()
-          self.validator = ImageValidator(config_loader)
-          self.logger.info(f"BatchProcessor ID: {self}  -  Batch Processor Initialized.")
-        except Exception as e:
-          self.logger.error(f"BatchProcessor ID: {self}  -  Batch Processor Initialization Failed: {str(e)}.")
-          raise
+        self.logger = LoggerSetup().get_logger()
+        self.config = config_loader.get_preprocessing_config()
+        self.validator = ImageValidator(config_loader)
         
 
     """

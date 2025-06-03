@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTabWidget, QFormLayout,
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor
 import yaml
-import os
 from datetime import datetime
+
 
 
 """
@@ -62,6 +62,13 @@ class SettingsWindow(QWidget):
         with open(config_path, 'r') as f:
             self.config = yaml.safe_load(f)
 
+        webodm_config = self.config['point_cloud']['webodm']
+        if 'environments' not in webodm_config or not webodm_config['environments']:
+             webodm_config['environments'] = {'sunny': {}} # Ensure at least one default
+        
+        self.active_env = webodm_config.get('active_environment', list(webodm_config['environments'].keys())[0] if webodm_config['environments'] else "sunny")
+
+
         # Set-Up A Vertical Layout (Make Our Overall Settings In A Stacked Order)
         layout = QVBoxLayout(self)
         
@@ -69,7 +76,6 @@ class SettingsWindow(QWidget):
         tabs = QTabWidget()
         self.add_preprocessing_tab(tabs)
         self.add_point_cloud_tab(tabs)
-        #self.add_advanced_webodm_tab(tabs)
         self.add_geospatial_tab(tabs)
         self.add_logs_tab(tabs)
         layout.addWidget(tabs)
@@ -90,6 +96,345 @@ class SettingsWindow(QWidget):
 
         # Add The Buttons Layout To The Main Layout
         layout.addLayout(buttons_layout)
+
+        if self.env_tabs:
+            for indx in range(self.env_tabs.count()):
+                if self.env_tabs.tabText(indx).lower() == self.active_env:
+                    self.env_tabs.setCurrentIndex(indx)
+                    break
+
+
+    def _create_environment_tab_content(self, env_name, env_config_data):
+        # This function encapsulates the creation of widgets for a single environment tab.
+        # It's based on the loop body from your original add_point_cloud_tab.
+        # env_config_data is self.config['point_cloud']['webodm']['environments'][env_name]
+
+        env_tab_widget = QWidget()
+        main_layout = QVBoxLayout(env_tab_widget)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll_content = QWidget()
+        scroll_layout = QVBoxLayout(scroll_content)
+        scroll.setWidget(scroll_content)
+
+        # Tooltips and option definitions (consider making these class-level or module-level constants)
+        tooltips = {
+            '3d-tiles': "Generate OGC 3D Tiles outputs. Useful for web-based 3D visualization.",
+            'auto-boundary': "Automatically set a boundary using camera shot locations to limit reconstruction area. Helps remove distant background artifacts like sky or landscapes.",
+            'auto-boundary-distance': "Distance (meters) between camera locations and boundary edge when using auto-boundary. Set to 0 to automatically choose a value.",
+            'bg-removal': "Use AI to automatically mask and remove image backgrounds. Experimental feature.",
+            'boundary': "GeoJSON polygon defining reconstruction area limits. Can be a file path or JSON string.",
+            'camera-lens': "Camera projection type. Manually setting helps improve geometric undistortion. Options: auto, perspective, brown, fisheye, fisheye_opencv, spherical, equirectangular, dual.",
+            'cameras': "Use camera parameters from another dataset instead of calculating them. Can be a file path or JSON string.",
+            'crop': "Automatically crop outputs by creating a buffer around dataset boundaries, shrunk by N meters. Use 0 to disable.",
+            'dem-decimation': "Reduce point density before DEM generation. 1 is full quality, 100 decimates ~99% of points. Useful for large datasets.",
+            'dem-euclidean-map': "Generate a raster map showing distance from each cell to nearest NODATA value. Helps identify filled areas.",
+            'dem-gapfill-steps': "Number of steps for filling gaps. 0 disables gap filling. Uses progressively larger IDW interpolation radii.",
+            'dem-resolution': "Resolution of DSM/DTM in cm/pixel. Limited by ground sampling distance (GSD) estimate.",
+            'dsm': "Build a Digital Surface Model (ground + objects) using progressive morphological filtering.",
+            'dtm': "Build a Digital Terrain Model (ground only) using morphological filtering.",
+            'end-with': "Stop processing at specified stage. Options: dataset, split, merge, opensfm, openmvs, odm_filterpoints, odm_meshing, mvs_texturing, odm_georeferencing, odm_dem, odm_orthophoto, odm_report, odm_postprocess.",
+            'fast-orthophoto': "Skip dense reconstruction and 3D model generation. Creates orthophoto directly from sparse reconstruction. Faster but less accurate.",
+            'feature-quality': "Quality level for feature extraction. Higher quality means better features but more memory and time.",
+            'feature-type': "Algorithm for keypoint extraction and descriptor computation. Options: akaze, dspsift, hahog, orb, sift.",
+            'force-gps': "Use image GPS data for reconstruction even with GCPs present. Useful with high-precision GPS measurements.",
+            'gps-accuracy': "GPS Dilution of Precision in meters. Lower values can help control bowling effects over large areas.",
+            'ignore-gsd': "Ignore Ground Sampling Distance limitations. Memory intensive but can improve image quality. Use with caution.",
+            'matcher-neighbors': "Match with nearest images based on GPS data. 0 matches by triangulation.",
+            'matcher-order': "Match with nearest N images based on filename order. Speeds up sequential image processing. 0 disables.",
+            'matcher-type': "Algorithm for matching. FLANN is slower but stable, BOW faster but may miss matches, BRUTEFORCE slow but robust.",
+            'max-concurrency': "Maximum processes to use. Each thread requires ~1GB memory per 2MP image resolution.",
+            'merge': "What to merge in split datasets. Options: all, pointcloud, orthophoto, dem.",
+            'mesh-octree-depth': "Octree depth for mesh reconstruction. Higher values create more vertices. Recommended: 8-12.",
+            'mesh-size': "Maximum vertex count in output mesh. Higher values create more detailed models but require more resources.",
+            'min-num-features': "Minimum features to extract per image. More features help match images with little overlap but slow processing.",
+            'no-gpu': "Disable GPU acceleration even if available.",
+            'optimize-disk-space': "Delete intermediate files to save space. Limits restarting from intermediate stages.",
+            'orthophoto-cutline': "Generate polygon around cropping area for seamless mosaic stitching.",
+            'orthophoto-resolution': "Resolution in cm/pixel. Limited by ground sampling distance (GSD) estimate.",
+            'pc-classify': "Classify point cloud outputs. Behavior controlled by --dem-* parameters.",
+            'pc-filter': "Remove points deviating more than N standard deviations from local mean. 0 disables filtering.",
+            'pc-quality': "Point cloud density and quality. Higher quality means denser clouds but more memory and time.",
+            'pc-rectify': "Reclassify ground points and fill gaps in the point cloud. Useful for DTM generation.",
+            'pc-sample': "Keep only one point within radius N (meters). Limits resolution and removes duplicates. 0 disables.",
+            'pc-skip-geometric': "Disable geometric consistency checks. May be necessary for large datasets but reduces accuracy.",
+            'primary-band': "Primary band for multispectral dataset reconstruction. Choose band with sharp details and good focus.",
+            'radiometric-calibration': "Calibration for multispectral/thermal images. 'camera' applies vignetting/exposure corrections, 'camera+sun' adds DLS compensation.",
+            'rerun-from': "Restart processing from specified stage.",
+            'rolling-shutter': "Enable rolling shutter correction for images taken in motion.",
+            'rolling-shutter-readout': "Rolling shutter readout time (ms) for your camera sensor. 0 uses database value.",
+            'sfm-algorithm': "Structure from Motion algorithm. 'triangulation' better for aerial data with GPS, 'planar' faster for nadir imagery.",
+            'sfm-no-partial': "Don't merge partial reconstructions from isolated or non-overlapping images.",
+            'skip-3dmodel': "Skip full 3D model generation. Saves time when only 2D outputs are needed.",
+            'skip-band-alignment': "Skip multispectral band alignment. Use if images are already aligned.",
+            'skip-orthophoto': "Skip orthophoto generation. Saves time when only 3D or DEM outputs are needed.",
+            'skip-report': "Skip PDF report generation to save processing time.",
+            'sky-removal': "Use AI to automatically mask and remove sky from images. Experimental feature.",
+            'sm-cluster': "ClusterODM URL for distributed processing on multiple nodes.",
+            'sm-no-align': "Skip submodel alignment in split-merge. Useful with good GPS on large datasets.",
+            'smrf-scalar': "Simple Morphological Filter elevation scalar parameter. Controls ground point classification.",
+            'smrf-slope': "Simple Morphological Filter slope parameter (rise/run). Controls ground point classification on slopes.",
+            'smrf-threshold': "Simple Morphological Filter elevation threshold (meters). Controls ground point classification.",
+            'smrf-window': "Simple Morphological Filter window radius (meters). Controls terrain feature detection scale.",
+            'split': "Average images per submodel when splitting large datasets. Higher values create fewer, larger submodels.",
+            'split-overlap': "Overlap radius between submodels in meters. Ensures neighboring models connect properly.",
+            'texturing-keep-unseen-faces': "Keep mesh faces not visible in any camera.",
+            'texturing-single-material': "Generate OBJs with single material and texture instead of multiple files.",
+            'texturing-skip-global-seam-leveling': "Skip color normalization across images. Useful for radiometric data.",
+            'tiles': "Generate static map tiles for web viewers like Leaflet or OpenLayers.",
+            'use-3dmesh': "Use full 3D mesh for orthophoto generation instead of 2.5D mesh. Similar results for flat areas.",
+            'use-exif': "Use EXIF information for georeferencing instead of GCP file.",
+            'use-fixed-camera-params': "Turn off camera parameter optimization during bundle adjustment. Can help with doming/bowling issues.",
+            'use-hybrid-bundle-adjustment': "Run local bundle adjustment for each image and global every 100 images. Speeds up large dataset processing.",
+            'video-limit': "Maximum frames to extract from video files. 0 for no limit.",
+            'video-resolution': "Maximum resolution in pixels for extracted video frames."
+        }
+
+        # Boolean Checkbox Options
+        bool_options = [
+            '3d-tiles', 'auto-boundary', 'bg-removal', 'dem-euclidean-map', 
+            'dsm', 'dtm', 'fast-orthophoto', 'force-gps', 'no-gpu',
+            'optimize-disk-space', 'orthophoto-cutline', 'pc-classify', 'pc-rectify',
+            'pc-skip-geometric', 'rolling-shutter', 'sfm-no-partial', 'skip-3dmodel',
+            'skip-band-alignment', 'skip-orthophoto', 'skip-report', 'sky-removal',
+            'sm-no-align', 'texturing-keep-unseen-faces', 'texturing-single-material',
+            'texturing-skip-global-seam-leveling', 'tiles', 'use-3dmesh', 'use-exif',
+            'use-fixed-camera-params', 'use-hybrid-bundle-adjustment'
+        ]
+
+        # Numeric Options
+        float_options = {
+            'auto-boundary-distance': (0, 0, 1000, 0.1), 'crop': (3, 0, 100, 0.1),
+            'dem-resolution': (5, 0.1, 1000, 0.1), 'gps-accuracy': (3, 0, 100, 0.1),
+            'pc-filter': (5, 0, 100, 0.1), 'pc-sample': (0, 0, 100, 0.1),
+            'orthophoto-resolution': (5, 0.1, 100, 0.1), 'smrf-scalar': (1.25, 0.1, 10, 0.05),
+            'smrf-slope': (0.15, 0.01, 1, 0.01), 'smrf-threshold': (0.5, 0.01, 10, 0.01),
+            'smrf-window': (18, 1, 100, 1)
+        }
+        int_options = {
+            'dem-decimation': (1, 1, 100), 'dem-gapfill-steps': (3, 0, 100),
+            'matcher-neighbors': (0, 0, 100), 'matcher-order': (0, 0, 100),
+            'max-concurrency': (16, 1, 32), 'mesh-octree-depth': (11, 1, 14),
+            'mesh-size': (200000, 1000, 1000000), 'min-num-features': (10000, 1000, 50000),
+            'rolling-shutter-readout': (0, 0, 1000), 'split': (999999, 1, 9999999),
+            'split-overlap': (150, 0, 1000), 'video-limit': (500, 0, 10000),
+            'video-resolution': (4000, 100, 10000)
+        }
+        dropdown_options = {
+            'camera-lens': ['auto', 'perspective', 'brown', 'fisheye', 'fisheye_opencv', 'spherical', 'equirectangular', 'dual'], # Added missing options
+            'end-with': ['odm_postprocess', 'odm_filterpoints', 'odm_meshing', 'odm_25dmeshing', 
+                           'odm_texturing', 'mvs_texturing', 'odm_georeferencing', 'odm_dem', 
+                           'odm_orthophoto', 'odm_report'],
+            'feature-quality': ['ultra', 'high', 'medium', 'low', 'lowest'], # Added 'lowest'
+            'feature-type': ['sift', 'dspsift', 'akaze', 'hahog', 'orb'],
+            'matcher-type': ['flann', 'bfmatcher', 'homography'], # Added 'homography'
+            'merge': ['all', 'pointcloud', 'orthophoto', 'dem'],
+            'pc-quality': ['ultra', 'high', 'medium', 'low', 'lowest'], # Added 'lowest'
+            'radiometric-calibration': ['none', 'camera', 'camera+sun'],
+            'rerun-from': ['dataset', 'opensfm', 'openmvs', 'odm_filterpoints', 'odm_meshing', 
+                           'odm_25dmeshing', 'odm_texturing', 'mvs_texturing', 'odm_georeferencing', 
+                           'odm_dem', 'odm_orthophoto', 'odm_report'],
+            'sfm-algorithm': ['incremental', 'planar', 'triangulation']
+        }
+        string_options = {'primary-band': 'auto', 'sm-cluster': 'None'}
+        file_options = ['boundary', 'cameras']
+
+        self.env_widgets[env_name] = {} # Initialize widgets dict for this environment
+
+        general_group = QGroupBox("General Settings"); general_layout = QFormLayout(general_group)
+        mesh_group = QGroupBox("Mesh Settings"); mesh_layout = QFormLayout(mesh_group)
+        dem_group = QGroupBox("DEM & Orthophoto Settings"); dem_layout = QFormLayout(dem_group)
+        point_cloud_group = QGroupBox("Point Cloud Settings"); point_cloud_layout = QFormLayout(point_cloud_group)
+        SfM_group = QGroupBox("Structure from Motion Settings"); SfM_layout = QFormLayout(SfM_group)
+
+        # Ensure all options have a default in env_config_data if not present
+        for opt_cat in [bool_options, list(float_options.keys()), list(int_options.keys()), list(dropdown_options.keys()), list(string_options.keys()), file_options]:
+            for option in (opt_cat if isinstance(opt_cat, list) else [opt_cat]):
+                if option not in env_config_data:
+                    if option in bool_options: env_config_data[option] = False
+                    elif option in float_options: env_config_data[option] = float_options[option][0]
+                    elif option in int_options: env_config_data[option] = int_options[option][0]
+                    elif option in dropdown_options: env_config_data[option] = dropdown_options[option][0]
+                    elif option in string_options: env_config_data[option] = string_options[option]
+                    elif option in file_options: env_config_data[option] = ""
+
+
+        for option in bool_options:
+            checkbox = QCheckBox()
+            checkbox.setChecked(env_config_data.get(option, False)) # Default to False if key missing
+            checkbox.setToolTip(tooltips.get(option, ""))
+            self.env_widgets[env_name][option] = checkbox
+            if option in ['dsm', 'dtm', 'dem-euclidean-map', 'orthophoto-cutline', 'skip-orthophoto', 'fast-orthophoto']: # Added fast-orthophoto
+                dem_layout.addRow(option, checkbox)
+            elif option in ['3d-tiles', 'texturing-keep-unseen-faces', 'texturing-single-material', 
+                        'texturing-skip-global-seam-leveling', 'use-3dmesh', 'skip-3dmodel', 'tiles']: # Added tiles
+                mesh_layout.addRow(option, checkbox)
+            elif option in ['pc-classify', 'pc-rectify', 'pc-skip-geometric']:
+                point_cloud_layout.addRow(option, checkbox)
+            elif option in ['sfm-no-partial', 'use-hybrid-bundle-adjustment', 'force-gps', 'rolling-shutter', 'sm-no-align', 'use-exif', 'use-fixed-camera-params']: # Added more
+                SfM_layout.addRow(option, checkbox)
+            else: # auto-boundary, bg-removal, no-gpu, optimize-disk-space, skip-band-alignment, skip-report, sky-removal
+                general_layout.addRow(option, checkbox)
+        
+        for option, (default, min_val, max_val, step) in float_options.items():
+            spinbox = QDoubleSpinBox()
+            spinbox.setRange(min_val, max_val); spinbox.setSingleStep(step)
+            spinbox.setValue(env_config_data.get(option, default))
+            spinbox.setToolTip(tooltips.get(option, ""))
+            self.env_widgets[env_name][option] = spinbox
+            if option in ['dem-resolution', 'orthophoto-resolution', 'crop', 'auto-boundary-distance']: # Added crop, auto-boundary-distance
+                dem_layout.addRow(option, spinbox)
+            elif option.startswith('smrf-') or option in ['pc-filter', 'pc-sample']: # pc-filter, pc-sample moved here
+                 point_cloud_layout.addRow(option, spinbox)
+            else: # gps-accuracy
+                general_layout.addRow(option, spinbox)
+
+        for option, (default, min_val, max_val) in int_options.items():
+            spinbox = QSpinBox()
+            spinbox.setRange(min_val, max_val)
+            spinbox.setValue(env_config_data.get(option, default))
+            spinbox.setToolTip(tooltips.get(option, ""))
+            self.env_widgets[env_name][option] = spinbox
+            if option in ['dem-decimation', 'dem-gapfill-steps', 'video-limit', 'video-resolution']: # Added video options
+                dem_layout.addRow(option, spinbox)
+            elif option in ['mesh-octree-depth', 'mesh-size']:
+                mesh_layout.addRow(option, spinbox)
+            elif option in ['min-num-features', 'matcher-neighbors', 'matcher-order', 'rolling-shutter-readout']: # Added rolling-shutter-readout
+                SfM_layout.addRow(option, spinbox)
+            else: # max-concurrency, split, split-overlap
+                general_layout.addRow(option, spinbox)
+
+        for option, values in dropdown_options.items():
+            dropdown = QComboBox(); dropdown.addItems(values)
+            current = env_config_data.get(option, values[0])
+            if current in values: dropdown.setCurrentText(current)
+            dropdown.setToolTip(tooltips.get(option, ""))
+            self.env_widgets[env_name][option] = dropdown
+            if option in ['feature-quality', 'feature-type', 'sfm-algorithm', 'camera-lens', 'matcher-type']: # Added camera-lens, matcher-type
+                SfM_layout.addRow(option, dropdown)
+            elif option in ['pc-quality']:
+                point_cloud_layout.addRow(option, dropdown)
+            elif option in ['radiometric-calibration']: # Added radiometric-calibration
+                 dem_layout.addRow(option, dropdown)
+            else: # end-with, merge, rerun-from
+                general_layout.addRow(option, dropdown)
+        
+        for option, default in string_options.items():
+            text_field = QLineEdit(env_config_data.get(option, default))
+            text_field.setToolTip(tooltips.get(option, ""))
+            self.env_widgets[env_name][option] = text_field
+            if option in ['primary-band']:
+                dem_layout.addRow(option, text_field)
+            else: # sm-cluster
+                general_layout.addRow(option, text_field)
+
+        for option in file_options:
+            file_layout = QHBoxLayout()
+            text_field = QLineEdit(env_config_data.get(option, ''))
+            browse_btn = QPushButton("Browse...")
+            browse_btn.setToolTip(tooltips.get(option, ""))
+            def make_browse_function(field, opt_name): # Renamed 'opt' to 'opt_name'
+                def browse_file():
+                    path, _ = QFileDialog.getOpenFileName(self, f"Select {opt_name} JSON file", "", "JSON Files (*.json)")
+                    if path: field.setText(path)
+                return browse_file
+            browse_btn.clicked.connect(make_browse_function(text_field, option))
+            file_layout.addWidget(text_field); file_layout.addWidget(browse_btn)
+            self.env_widgets[env_name][option] = text_field
+            # Decide group based on option
+            if option == 'boundary':
+                dem_layout.addRow(f"{option} (json)", file_layout)
+            elif option == 'cameras':
+                SfM_layout.addRow(f"{option} (json)", file_layout)
+            else:
+                general_layout.addRow(f"{option} (json)", file_layout)
+
+
+        scroll_layout.addWidget(general_group)
+        scroll_layout.addWidget(SfM_group)
+        scroll_layout.addWidget(point_cloud_group)
+        scroll_layout.addWidget(dem_group)
+        scroll_layout.addWidget(mesh_group)
+        
+        main_layout.addWidget(scroll)
+        note_label = QLabel("Note: These are advanced WebODM processing options. Incorrect settings may cause processing to fail.")
+        note_label.setStyleSheet("color: #FFA500;")
+        main_layout.addWidget(note_label)
+        
+        return env_tab_widget
+
+
+    def _on_env_tab_changed(self, index):
+        if self.env_tabs and index >= 0:
+            new_env_name = self.env_tabs.tabText(index).lower()
+            self.active_env = new_env_name
+            self.config['point_cloud']['webodm']['active_environment'] = new_env_name
+            
+
+    def _add_environment_preset(self):
+        from copy import deepcopy
+
+        new_env_name, ok = QInputDialog.getText(self, "Add Environment Preset", "Enter new environment name:")
+        if ok and new_env_name:
+            new_env_name = new_env_name.lower().replace(" ", "_")
+            if new_env_name in self.config['point_cloud']['webodm']['environments']:
+                QMessageBox.warning(self, "Error", f"Environment preset '{new_env_name}' already exists.")
+                return
+
+            # Copy settings from the current active environment, or 'sunny' if not available
+            base_env_name = self.active_env
+            if base_env_name not in self.config['point_cloud']['webodm']['environments']:
+                # Fallback to the first available environment or an empty dict
+                available_envs = list(self.config['point_cloud']['webodm']['environments'].keys())
+                base_env_name = available_envs[0] if available_envs else None
+            
+            if base_env_name and base_env_name in self.config['point_cloud']['webodm']['environments']:
+                 new_env_data = deepcopy(self.config['point_cloud']['webodm']['environments'][base_env_name])
+            else: # Absolute fallback: create a minimal structure
+                new_env_data = {} # Will be populated with defaults by _create_environment_tab_content
+
+            self.config['point_cloud']['webodm']['environments'][new_env_name] = new_env_data
+            
+            env_tab_content = self._create_environment_tab_content(new_env_name, new_env_data)
+            self.env_tabs.addTab(env_tab_content, new_env_name.capitalize())
+            self.env_tabs.setCurrentWidget(env_tab_content) # Switch to the new tab
+            self.active_env = new_env_name # Update active environment
+            self.config['point_cloud']['webodm']['active_environment'] = new_env_name
+
+
+    def _remove_environment_preset(self):
+        if not self.env_tabs or self.env_tabs.count() == 0:
+            return
+
+        current_tab_index = self.env_tabs.currentIndex()
+        if current_tab_index < 0:
+            return
+
+        if self.env_tabs.count() <= 1:
+            QMessageBox.warning(self, "Cannot Remove", "At least one environment preset must remain.")
+            return
+
+        env_to_remove = self.env_tabs.tabText(current_tab_index).lower()
+
+        reply = QMessageBox.question(self, "Remove Preset", 
+                                     f"Are you sure you want to remove the '{env_to_remove.capitalize()}' preset?",
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.env_tabs.removeTab(current_tab_index)
+            if env_to_remove in self.config['point_cloud']['webodm']['environments']:
+                del self.config['point_cloud']['webodm']['environments'][env_to_remove]
+            if env_to_remove in self.env_widgets:
+                del self.env_widgets[env_to_remove]
+            
+            # Update active environment if the removed one was active
+            if self.active_env == env_to_remove:
+                new_active_index = self.env_tabs.currentIndex()
+                if new_active_index >=0:
+                    self.active_env = self.env_tabs.tabText(new_active_index).lower()
+                else: # Should not happen if count > 1 check is effective
+                    self.active_env = list(self.config['point_cloud']['webodm']['environments'].keys())[0]
+                self.config['point_cloud']['webodm']['active_environment'] = self.active_env
+
 
 
     """
@@ -227,368 +572,78 @@ class SettingsWindow(QWidget):
 
     """
     def add_point_cloud_tab(self, tabs):
-        # Create A Tab For Point Cloud
         tab = QWidget()
         layout = QVBoxLayout(tab)
 
-        # Set-Up WebODM Connection Settings Group
         webodm_group = QGroupBox("WebODM Connection")
         webodm_layout = QFormLayout()
-
-        # Create A Entry For Our Port And Host Name For WebODM API 
-        self.host = QLineEdit(self.config['point_cloud']['webodm']['host'])
-        self.port = QSpinBox()
-        self.port.setRange(0, 65535)
-
-        self.port.setValue(self.config['point_cloud']['webodm']['port'])
-
-        # Ask The Authentication Information For Their WebODM Session
-        self.username = QLineEdit(self.config['point_cloud']['webodm']['username'])
-        self.password = QLineEdit(self.config['point_cloud']['webodm']['password'])
-
-        # Censor The Password
+        self.host = QLineEdit(self.config['point_cloud']['webodm'].get('host', 'localhost'))
+        self.port = QSpinBox(); self.port.setRange(0, 65535)
+        self.port.setValue(self.config['point_cloud']['webodm'].get('port', 8000))
+        self.username = QLineEdit(self.config['point_cloud']['webodm'].get('username', ''))
+        self.password = QLineEdit(self.config['point_cloud']['webodm'].get('password', ''))
         self.password.setEchoMode(QLineEdit.Password)
-
-        # Ask For The Timeout For The WebODM Session (For API Access Key)
-        self.timeout = QSpinBox()
-        self.timeout.setRange(0, 86400)
-        
-        self.timeout.setValue(self.config['point_cloud']['webodm']['timeout'])
-
-        # Add The Widgets To The Layout In A Row Format
-        webodm_layout.addRow("Host:", self.host)
-        webodm_layout.addRow("Port:", self.port)
-        webodm_layout.addRow("Username:", self.username)
-        webodm_layout.addRow("Password:", self.password)
+        self.timeout = QSpinBox(); self.timeout.setRange(0, 86400)
+        self.timeout.setValue(self.config['point_cloud']['webodm'].get('timeout', 3600))
+        webodm_layout.addRow("Host:", self.host); webodm_layout.addRow("Port:", self.port)
+        webodm_layout.addRow("Username:", self.username); webodm_layout.addRow("Password:", self.password)
         webodm_layout.addRow("Timeout (s):", self.timeout)
-
-        # Add The Layout To The Group
         webodm_group.setLayout(webodm_layout)
         layout.addWidget(webodm_group)
 
-        # Environment Settings Group
         env_group = QGroupBox("Environment Settings")
         env_layout = QVBoxLayout(env_group)
 
+        # Preset management buttons
+        preset_buttons_layout = QHBoxLayout()
+        add_preset_btn = QPushButton("+")
+        add_preset_btn.setToolTip("Add new environment preset")
+        add_preset_btn.clicked.connect(self._add_environment_preset)
+        remove_preset_btn = QPushButton("-")
+        remove_preset_btn.setToolTip("Remove current environment preset")
+        remove_preset_btn.clicked.connect(self._remove_environment_preset)
+        
+        preset_buttons_layout.addWidget(add_preset_btn)
+        preset_buttons_layout.addWidget(remove_preset_btn)
+        preset_buttons_layout.addStretch()
+        env_layout.addLayout(preset_buttons_layout)
+
         self.env_tabs = QTabWidget()
+        # Ensure environments key exists
+        if 'environments' not in self.config['point_cloud']['webodm']:
+            self.config['point_cloud']['webodm']['environments'] = {'sunny': {}} # Default if missing
+        
+        # Populate tabs from config
+        for env_name, env_data in self.config['point_cloud']['webodm']['environments'].items():
+            env_tab_content = self._create_environment_tab_content(env_name, env_data)
+            self.env_tabs.addTab(env_tab_content, env_name.capitalize())
+            if env_name == self.active_env: # Set current tab based on loaded active_environment
+                self.env_tabs.setCurrentWidget(env_tab_content)
 
-        tooltips = {
-            '3d-tiles': "Generate OGC 3D Tiles outputs. Useful for web-based 3D visualization.",
-            'auto-boundary': "Automatically set a boundary using camera shot locations to limit reconstruction area. Helps remove distant background artifacts like sky or landscapes.",
-            'auto-boundary-distance': "Distance (meters) between camera locations and boundary edge when using auto-boundary. Set to 0 to automatically choose a value.",
-            'bg-removal': "Use AI to automatically mask and remove image backgrounds. Experimental feature.",
-            'boundary': "GeoJSON polygon defining reconstruction area limits. Can be a file path or JSON string.",
-            'camera-lens': "Camera projection type. Manually setting helps improve geometric undistortion. Options: auto, perspective, brown, fisheye, fisheye_opencv, spherical, equirectangular, dual.",
-            'cameras': "Use camera parameters from another dataset instead of calculating them. Can be a file path or JSON string.",
-            'crop': "Automatically crop outputs by creating a buffer around dataset boundaries, shrunk by N meters. Use 0 to disable.",
-            'dem-decimation': "Reduce point density before DEM generation. 1 is full quality, 100 decimates ~99% of points. Useful for large datasets.",
-            'dem-euclidean-map': "Generate a raster map showing distance from each cell to nearest NODATA value. Helps identify filled areas.",
-            'dem-gapfill-steps': "Number of steps for filling gaps. 0 disables gap filling. Uses progressively larger IDW interpolation radii.",
-            'dem-resolution': "Resolution of DSM/DTM in cm/pixel. Limited by ground sampling distance (GSD) estimate.",
-            'dsm': "Build a Digital Surface Model (ground + objects) using progressive morphological filtering.",
-            'dtm': "Build a Digital Terrain Model (ground only) using morphological filtering.",
-            'end-with': "Stop processing at specified stage. Options: dataset, split, merge, opensfm, openmvs, odm_filterpoints, odm_meshing, mvs_texturing, odm_georeferencing, odm_dem, odm_orthophoto, odm_report, odm_postprocess.",
-            'fast-orthophoto': "Skip dense reconstruction and 3D model generation. Creates orthophoto directly from sparse reconstruction. Faster but less accurate.",
-            'feature-quality': "Quality level for feature extraction. Higher quality means better features but more memory and time.",
-            'feature-type': "Algorithm for keypoint extraction and descriptor computation. Options: akaze, dspsift, hahog, orb, sift.",
-            'force-gps': "Use image GPS data for reconstruction even with GCPs present. Useful with high-precision GPS measurements.",
-            'gps-accuracy': "GPS Dilution of Precision in meters. Lower values can help control bowling effects over large areas.",
-            'ignore-gsd': "Ignore Ground Sampling Distance limitations. Memory intensive but can improve image quality. Use with caution.",
-            'matcher-neighbors': "Match with nearest images based on GPS data. 0 matches by triangulation.",
-            'matcher-order': "Match with nearest N images based on filename order. Speeds up sequential image processing. 0 disables.",
-            'matcher-type': "Algorithm for matching. FLANN is slower but stable, BOW faster but may miss matches, BRUTEFORCE slow but robust.",
-            'max-concurrency': "Maximum processes to use. Each thread requires ~1GB memory per 2MP image resolution.",
-            'merge': "What to merge in split datasets. Options: all, pointcloud, orthophoto, dem.",
-            'mesh-octree-depth': "Octree depth for mesh reconstruction. Higher values create more vertices. Recommended: 8-12.",
-            'mesh-size': "Maximum vertex count in output mesh. Higher values create more detailed models but require more resources.",
-            'min-num-features': "Minimum features to extract per image. More features help match images with little overlap but slow processing.",
-            'no-gpu': "Disable GPU acceleration even if available.",
-            'optimize-disk-space': "Delete intermediate files to save space. Limits restarting from intermediate stages.",
-            'orthophoto-cutline': "Generate polygon around cropping area for seamless mosaic stitching.",
-            'orthophoto-resolution': "Resolution in cm/pixel. Limited by ground sampling distance (GSD) estimate.",
-            'pc-classify': "Classify point cloud outputs. Behavior controlled by --dem-* parameters.",
-            'pc-filter': "Remove points deviating more than N standard deviations from local mean. 0 disables filtering.",
-            'pc-quality': "Point cloud density and quality. Higher quality means denser clouds but more memory and time.",
-            'pc-rectify': "Reclassify ground points and fill gaps in the point cloud. Useful for DTM generation.",
-            'pc-sample': "Keep only one point within radius N (meters). Limits resolution and removes duplicates. 0 disables.",
-            'pc-skip-geometric': "Disable geometric consistency checks. May be necessary for large datasets but reduces accuracy.",
-            'primary-band': "Primary band for multispectral dataset reconstruction. Choose band with sharp details and good focus.",
-            'radiometric-calibration': "Calibration for multispectral/thermal images. 'camera' applies vignetting/exposure corrections, 'camera+sun' adds DLS compensation.",
-            'rerun-from': "Restart processing from specified stage.",
-            'rolling-shutter': "Enable rolling shutter correction for images taken in motion.",
-            'rolling-shutter-readout': "Rolling shutter readout time (ms) for your camera sensor. 0 uses database value.",
-            'sfm-algorithm': "Structure from Motion algorithm. 'triangulation' better for aerial data with GPS, 'planar' faster for nadir imagery.",
-            'sfm-no-partial': "Don't merge partial reconstructions from isolated or non-overlapping images.",
-            'skip-3dmodel': "Skip full 3D model generation. Saves time when only 2D outputs are needed.",
-            'skip-band-alignment': "Skip multispectral band alignment. Use if images are already aligned.",
-            'skip-orthophoto': "Skip orthophoto generation. Saves time when only 3D or DEM outputs are needed.",
-            'skip-report': "Skip PDF report generation to save processing time.",
-            'sky-removal': "Use AI to automatically mask and remove sky from images. Experimental feature.",
-            'sm-cluster': "ClusterODM URL for distributed processing on multiple nodes.",
-            'sm-no-align': "Skip submodel alignment in split-merge. Useful with good GPS on large datasets.",
-            'smrf-scalar': "Simple Morphological Filter elevation scalar parameter. Controls ground point classification.",
-            'smrf-slope': "Simple Morphological Filter slope parameter (rise/run). Controls ground point classification on slopes.",
-            'smrf-threshold': "Simple Morphological Filter elevation threshold (meters). Controls ground point classification.",
-            'smrf-window': "Simple Morphological Filter window radius (meters). Controls terrain feature detection scale.",
-            'split': "Average images per submodel when splitting large datasets. Higher values create fewer, larger submodels.",
-            'split-overlap': "Overlap radius between submodels in meters. Ensures neighboring models connect properly.",
-            'texturing-keep-unseen-faces': "Keep mesh faces not visible in any camera.",
-            'texturing-single-material': "Generate OBJs with single material and texture instead of multiple files.",
-            'texturing-skip-global-seam-leveling': "Skip color normalization across images. Useful for radiometric data.",
-            'tiles': "Generate static map tiles for web viewers like Leaflet or OpenLayers.",
-            'use-3dmesh': "Use full 3D mesh for orthophoto generation instead of 2.5D mesh. Similar results for flat areas.",
-            'use-exif': "Use EXIF information for georeferencing instead of GCP file.",
-            'use-fixed-camera-params': "Turn off camera parameter optimization during bundle adjustment. Can help with doming/bowling issues.",
-            'use-hybrid-bundle-adjustment': "Run local bundle adjustment for each image and global every 100 images. Speeds up large dataset processing.",
-            'video-limit': "Maximum frames to extract from video files. 0 for no limit.",
-            'video-resolution': "Maximum resolution in pixels for extracted video frames."
-        }
-
-        # Boolean Checkbox Options
-        bool_options = [
-            '3d-tiles', 'auto-boundary', 'bg-removal', 'dem-euclidean-map', 
-            'dsm', 'dtm', 'fast-orthophoto', 'force-gps', 'no-gpu',
-            'optimize-disk-space', 'orthophoto-cutline', 'pc-classify', 'pc-rectify',
-            'pc-skip-geometric', 'rolling-shutter', 'sfm-no-partial', 'skip-3dmodel',
-            'skip-band-alignment', 'skip-orthophoto', 'skip-report', 'sky-removal',
-            'sm-no-align', 'texturing-keep-unseen-faces', 'texturing-single-material',
-            'texturing-skip-global-seam-leveling', 'tiles', 'use-3dmesh', 'use-exif',
-            'use-fixed-camera-params', 'use-hybrid-bundle-adjustment'
-        ]
-
-        # Numeric Options
-        float_options = {
-            'auto-boundary-distance': (0, 0, 1000, 0.1),
-            'crop': (3, 0, 100, 0.1),
-            'dem-resolution': (5, 0.1, 1000, 0.1),
-            'gps-accuracy': (3, 0, 100, 0.1),
-            'pc-filter': (5, 0, 100, 0.1),
-            'pc-sample': (0, 0, 100, 0.1),
-            'orthophoto-resolution': (5, 0.1, 100, 0.1),
-            'smrf-scalar': (1.25, 0.1, 10, 0.05),
-            'smrf-slope': (0.15, 0.01, 1, 0.01),
-            'smrf-threshold': (0.5, 0.01, 10, 0.01),
-            'smrf-window': (18, 1, 100, 1)
-        }
-
-        # Integer options
-        int_options = {
-            'dem-decimation': (1, 1, 100),
-            'dem-gapfill-steps': (3, 0, 100),
-            'matcher-neighbors': (0, 0, 100),
-            'matcher-order': (0, 0, 100),
-            'max-concurrency': (16, 1, 32),
-            'mesh-octree-depth': (11, 1, 14),
-            'mesh-size': (200000, 1000, 1000000),
-            'min-num-features': (10000, 1000, 50000),
-            'rolling-shutter-readout': (0, 0, 1000),
-            'split': (999999, 1, 9999999),
-            'split-overlap': (150, 0, 1000),
-            'video-limit': (500, 0, 10000),
-            'video-resolution': (4000, 100, 10000)
-        }
-
-        dropdown_options = {
-            'camera-lens': ['auto', 'perspective', 'brown', 'fisheye', 'fisheye_opencv'],
-            'end-with': ['odm_postprocess', 'odm_filterpoints', 'odm_meshing', 'odm_25dmeshing', 
-                    'odm_texturing', 'mvs_texturing', 'odm_georeferencing', 'odm_dem', 
-                    'odm_orthophoto', 'odm_report'],
-            'feature-quality': ['ultra', 'high', 'medium', 'low'],
-            'feature-type': ['sift', 'dspsift', 'akaze', 'hahog', 'orb'],
-            'matcher-type': ['flann', 'bfmatcher'],
-            'merge': ['all', 'pointcloud', 'orthophoto', 'dem'],
-            'pc-quality': ['ultra', 'high', 'medium', 'low'],
-            'radiometric-calibration': ['none', 'camera', 'camera+sun'],
-            'rerun-from': ['dataset', 'opensfm', 'openmvs', 'odm_filterpoints', 'odm_meshing', 
-                        'odm_25dmeshing', 'odm_texturing', 'mvs_texturing', 'odm_georeferencing', 
-                        'odm_dem', 'odm_orthophoto', 'odm_report'],
-            'sfm-algorithm': ['incremental', 'planar', 'triangulation']
-        }
-
-        for env in ['sunny', 'rainy', 'foggy', 'night']:
-
-            # Add Dictionary Element
-            self.env_widgets[env] = {}
-
-            # Create Our Tab And Its Layout
-            env_tab = QWidget()
-            main_layout = QVBoxLayout(env_tab)
-
-            # Add Scroll Area For The Tab
-            scroll = QScrollArea()
-            scroll.setWidgetResizable(True)
-
-            scroll_content = QWidget()
-            scroll_layout = QVBoxLayout(scroll_content)
-            scroll.setWidget(scroll_content)
-
-            # Create Settings Sections
-            general_group = QGroupBox("General Settings")
-            general_layout = QFormLayout(general_group)
-
-            mesh_group = QGroupBox("Mesh Settings")
-            mesh_layout = QFormLayout(mesh_group)
-
-            dem_group = QGroupBox("DEM & Orthophoto Settings")
-            dem_layout = QFormLayout(dem_group)
-
-            point_cloud_group = QGroupBox("Point Cloud Settings")
-            point_cloud_layout = QFormLayout(point_cloud_group)
-
-            SfM_group = QGroupBox("Structure from Motion Settings")
-            SfM_layout = QFormLayout(SfM_group)
-
-            # Get Config Ref For Advanced Settings
-            adv_config = self.config['point_cloud']['webodm']['environments'][env]
-
-            # Create Settings List
-            for option in bool_options:
-                checkbox = QCheckBox()
-                checkbox.setChecked(adv_config[option])
-                checkbox.setToolTip(tooltips.get(option, ""))
-                self.env_widgets[env][option] = checkbox
-
-                # Add To Right Group
-                if option in ['dsm', 'dtm', 'dem-euclidean-map', 'orthophoto-cutline', 'skip-orthophoto']:
-                    dem_layout.addRow(option, checkbox)
-                elif option in ['3d-tiles', 'texturing-keep-unseen-faces', 'texturing-single-material', 
-                            'texturing-skip-global-seam-leveling', 'use-3dmesh', 'skip-3dmodel']:
-                    mesh_layout.addRow(option, checkbox)
-                elif option in ['pc-classify', 'pc-rectify', 'pc-skip-geometric']:
-                    point_cloud_layout.addRow(option, checkbox)
-                elif option in ['sfm-no-partial', 'use-hybrid-bundle-adjustment', 'force-gps']:
-                    SfM_layout.addRow(option, checkbox)
-                else:
-                    general_layout.addRow(option, checkbox)
-
-            for option, (default, min_val, max_val, step) in float_options.items():
-                spinbox = QDoubleSpinBox()
-                spinbox.setRange(min_val, max_val)
-                spinbox.setSingleStep(step)
-                spinbox.setValue(adv_config.get(option, default))
-                spinbox.setToolTip(tooltips.get(option, ""))
-                self.env_widgets[env][option] = spinbox
-                
-                # Add to appropriate group
-                if option in ['dem-resolution', 'orthophoto-resolution']:
-                    dem_layout.addRow(option, spinbox)
-                elif option.startswith('smrf-'):
-                    point_cloud_layout.addRow(option, spinbox)
-                elif option in ['pc-filter', 'pc-sample']:
-                    point_cloud_layout.addRow(option, spinbox)
-                else:
-                    general_layout.addRow(option, spinbox)
-            
-            for option, (default, min_val, max_val) in int_options.items():
-                spinbox = QSpinBox()
-                spinbox.setRange(min_val, max_val)
-                spinbox.setValue(adv_config.get(option, default))
-                spinbox.setToolTip(tooltips.get(option, ""))
-                self.env_widgets[env][option] = spinbox
-                
-                # Add to appropriate group
-                if option in ['dem-decimation', 'dem-gapfill-steps']:
-                    dem_layout.addRow(option, spinbox)
-                elif option in ['mesh-octree-depth', 'mesh-size']:
-                    mesh_layout.addRow(option, spinbox)
-                elif option in ['min-num-features', 'matcher-neighbors', 'matcher-order']:
-                    SfM_layout.addRow(option, spinbox)
-                else:
-                    general_layout.addRow(option, spinbox)
-            
-            for option, values in dropdown_options.items():
-                dropdown = QComboBox()
-                dropdown.addItems(values)
-                current = adv_config.get(option, values[0])
-                if current in values:
-                    dropdown.setCurrentText(current)
-
-                dropdown.setToolTip(tooltips.get(option, ""))
-                self.env_widgets[env][option] = dropdown
-                
-                # Add to appropriate group
-                if option in ['feature-quality', 'feature-type', 'sfm-algorithm']:
-                    SfM_layout.addRow(option, dropdown)
-                elif option in ['pc-quality']:
-                    point_cloud_layout.addRow(option, dropdown)
-                elif option in ['end-with', 'rerun-from']:
-                    general_layout.addRow(option, dropdown)
-                else:
-                    general_layout.addRow(option, dropdown)
-
-            # String field options
-            string_options = {
-                'primary-band': 'auto',
-                'sm-cluster': 'None'
-            }
-            
-            for option, default in string_options.items():
-                text_field = QLineEdit(adv_config.get(option, default))
-                self.env_widgets[env][option] = text_field
-                text_field.setToolTip(tooltips.get(option, ""))
-                general_layout.addRow(option, text_field)
-            
-            # File chooser options
-            file_options = ['boundary', 'cameras']
-
-            for option in file_options:
-                file_layout = QHBoxLayout()
-                text_field = QLineEdit(adv_config.get(option, ''))
-                browse_btn = QPushButton("Browse...")
-
-                browse_btn.setToolTip(tooltips.get(option, ""))
-                
-                # Connect browse button to file dialog
-                def make_browse_function(field, opt):
-                    def browse_file():
-                        path, _ = QFileDialog.getOpenFileName(self, f"Select {opt} JSON file", "", "JSON Files (*.json)")
-                        if path:
-                            field.setText(path)
-                    return browse_file
-                
-                browse_btn.clicked.connect(make_browse_function(text_field, option))
-                
-                file_layout.addWidget(text_field)
-                file_layout.addWidget(browse_btn)
-                
-                self.env_widgets[env][option] = text_field
-                general_layout.addRow(f"{option} (json)", file_layout)
-
-            
-            # Set layouts for all groups
-            general_group.setLayout(general_layout)
-            mesh_group.setLayout(mesh_layout)
-            dem_group.setLayout(dem_layout)
-            point_cloud_group.setLayout(point_cloud_layout)
-            SfM_group.setLayout(SfM_layout)
-            
-            # Add all groups to the scroll layout
-            scroll_layout.addWidget(general_group)
-            scroll_layout.addWidget(SfM_group)
-            scroll_layout.addWidget(point_cloud_group)
-            scroll_layout.addWidget(dem_group)
-            scroll_layout.addWidget(mesh_group)
-            
-            # Add scroll area to main layout
-            main_layout.addWidget(scroll)
-            
-            # Add a note about these being advanced settings
-            note_label = QLabel("Note: These are advanced WebODM processing options. Incorrect settings may cause processing to fail.")
-            note_label.setStyleSheet("color: #FFA500;") # Orange warning color
-            main_layout.addWidget(note_label)
-
-            # Add The Tab To The Environment Tabs
-            self.env_tabs.addTab(env_tab, env.capitalize())
 
         env_layout.addWidget(self.env_tabs)
-
-        # Add The Environment Layout To The Group
+        env_group.setLayout(env_layout)
         layout.addWidget(env_group)
-
-        # Add The Environment Group To The Main Layout
         tabs.addTab(tab, "Point Cloud")
 
 
+    """
+    
+        Desc: Function Adds A Tab For Logs. The Tab Will Allow The User
+        To View The Log Files And Their Content. The Tab Will Allow The
+        Content To Be Scrolled And Will Allow The User To Delete All Logs.
+        The Tab Will Also Allow The User To Refresh The List Of Log Files.
+
+        Preconditions:
+            1. tabs Should Be A QTabWidget Object
+
+        Postconditions:
+            1. Add A Tab For Logs To The Tab Widget
+            2. Add A List Of Log Files And Their Content To The Tab
+            3. Add A Button To Delete All Logs
+            4. Add A Button To Refresh The List Of Log Files
+    
+    """
     def add_logs_tab(self, tabs):
         # Create A Tab Widget And Main Layout
         tab = QWidget()
@@ -651,6 +706,25 @@ class SettingsWindow(QWidget):
         tabs.addTab(tab, "Logs")
 
 
+    """
+    
+        Desc: Function Refreshes The List Of Log Files. It Will Clear
+        The List And Then Get All Log Files In The Logs Directory. It Will
+        Sort The Log Files By Date And Add Each Log File To The List.
+        It Will Also Display The Size Of Each Log File In KB And The
+        Modification Time Of Each Log File.
+
+        Preconditions:
+            1. logs_dir Should Be The Path To The Logs Directory
+
+        Postconditions:
+            1. The List Of Log Files Will Be Cleared
+            2. The List Of Log Files Will Be Refreshed
+            3. The List Of Log Files Will Be Sorted By Date
+            4. The Size Of Each Log File Will Be Displayed In KB
+            5. The Modification Time Of Each Log File Will Be Displayed
+    
+    """
     def refresh_logs_list(self):
         # Refresh The List Of Log Files
         self.logs_list.clear()
@@ -674,6 +748,25 @@ class SettingsWindow(QWidget):
             item.setData(Qt.UserRole, str(log_file))
             self.logs_list.addItem(item)
 
+
+    """
+    
+        Desc: Function Displays The Content Of The Selected Log File.
+        It Will Read The Log File And Display The Content In The Text Edit.
+        It Will Also Scroll To The End Of The Text Edit. If No Log File
+        Is Selected, It Will Clear The Text Edit.
+
+        Preconditions:
+            1. logs_list Should Be A QListWidget Object
+            2. log_content Should Be A QTextEdit Object
+        
+        Postconditions:
+            1. The Content Of The Selected Log File Will Be Displayed
+            2. The Text Edit Will Scroll To The End
+            3. If No Log File Is Selected, The Text Edit Will Be Cleared
+            4. If The Log File Cannot Be Read, An Error Message Will Be Displayed
+    
+    """
     def display_log_content(self):
         #  Check For Selected Item
         selected = self.logs_list.selectedItems()
@@ -700,6 +793,22 @@ class SettingsWindow(QWidget):
         except Exception as e:
             self.log_content.setText(f"Error Reading Log File: {str(e)}")
 
+    """
+    
+        Desc: Function Deletes All Log Files In The Logs Directory.
+        It Will Prompt The User For Confirmation Before Deleting The Files.
+
+        Preconditions:
+            1. logs_dir Should Be The Path To The Logs Directory
+
+        Postconditions:
+            1. All Log Files In The Logs Directory Will Be Deleted
+            2. The List Of Log Files Will Be Refreshed
+            3. The Text Edit Will Be Cleared
+            4. A Success Message Will Be Displayed
+            5. If The Deletion Fails, An Error Message Will Be Displayed
+    
+    """
     def delete_all_logs(self):
         # Confirm They Want To Delete
         reply = QMessageBox.question(
@@ -779,7 +888,7 @@ class SettingsWindow(QWidget):
         self.tree_height = QDoubleSpinBox()
         self.tree_height.setRange(0, 100)
 
-        self.tree_height.setValue(self.config['geospatial']['analysis']['min_tree_height'])
+        self.tree_height.setValue(self.config['geospatial']['gap_detection']['min_tree_height'])
 
         # Create A Double Spin Box For The Canopy Threshold
         analysis_layout.addRow("Min Tree Height (m):", self.tree_height)
@@ -788,34 +897,8 @@ class SettingsWindow(QWidget):
         self.canopy.setRange(0, 1)
         self.canopy.setSingleStep(0.1)
 
-        self.canopy.setValue(self.config['geospatial']['analysis']['canopy_threshold'])
+        self.canopy.setValue(self.config['geospatial']['gap_detection']['max_tree_height'])
         analysis_layout.addRow("Canopy Threshold:", self.canopy)
-
-        # Set-Up Terrain Settings Group
-        terrain_group = QGroupBox("Terrain Analysis")
-        terrain_layout = QFormLayout()
-
-        # Set-Up Slope And Roughness Thresholds
-        self.slope = QDoubleSpinBox()
-        self.slope.setRange(0, 90)
-
-        self.slope.setValue(self.config['geospatial']['analysis']['terrain']['slope_threshold'])
-
-        # Create A Double Spin Box For The Roughness Threshold
-        analysis_layout.addRow("Slope Threshold (°):", self.slope)
-
-        self.roughness = QDoubleSpinBox()
-        self.roughness.setRange(0, 1)
-        self.roughness.setSingleStep(0.1)
-
-        self.roughness.setValue(self.config['geospatial']['analysis']['terrain']['roughness_threshold'])
-
-        # Add The Roughness Threshold To The Layout
-        terrain_layout.addRow("Roughness Threshold:", self.roughness)
-
-        # Add The Terrain Layout To The Group
-        terrain_group.setLayout(terrain_layout)
-        analysis_layout.addRow(terrain_group)
 
         # Add The Analysis Layout To The Group
         analysis_group.setLayout(analysis_layout)
@@ -927,85 +1010,141 @@ class SettingsWindow(QWidget):
     """
     def save_settings(self, silent: bool = True):
         try:
-            # Update Preprocessing Settings (unchanged)
-            self.config['preprocessing']['supported_formats'] = [
+            # Ensure top-level keys exist, matching the structure of your new config
+            # This helps if starting from a minimal or partially formed self.config
+            if 'preprocessing' not in self.config:
+                self.config['preprocessing'] = {}
+            if 'point_cloud' not in self.config:
+                self.config['point_cloud'] = {}
+            if 'webodm' not in self.config['point_cloud']:
+                self.config['point_cloud']['webodm'] = {}
+            if 'environments' not in self.config['point_cloud']['webodm']:
+                self.config['point_cloud']['webodm']['environments'] = {}
+            if 'geospatial' not in self.config:
+                self.config['geospatial'] = {}
+            if 'gap_detection' not in self.config['geospatial']:
+                self.config['geospatial']['gap_detection'] = {}
+            if 'output' not in self.config['geospatial']:
+                self.config['geospatial']['output'] = {}
+
+            # Update Preprocessing Settings
+            preprocessing_config = self.config['preprocessing']
+            preprocessing_config['supported_formats'] = [
                 self.formats_list.item(i).text() 
                 for i in range(self.formats_list.count())
             ]
-            self.config['preprocessing']['min_resolution'] = [
+            preprocessing_config['min_resolution'] = [
                 self.width.value(),
                 self.height.value()
             ]
-            self.config['preprocessing']['blur_threshold'] = self.blur.value()
-            self.config['preprocessing']['brightness_range'] = [
+            preprocessing_config['blur_threshold'] = self.blur.value()
+            preprocessing_config['brightness_range'] = [
                 self.bright_min.value(),
                 self.bright_max.value()
             ]
-            self.config['preprocessing']['max_workers'] = self.max_workers.value()
+            preprocessing_config['max_workers'] = self.max_workers.value()
 
-            # Update Point Cloud Settings
-            webodm = self.config['point_cloud']['webodm']
-            webodm['host'] = self.host.text()
-            webodm['port'] = self.port.value()
-            webodm['username'] = self.username.text()
-            webodm['password'] = self.password.text()
-            webodm['timeout'] = self.timeout.value()
+            # Update Point Cloud Settings - WebODM Connection
+            webodm_base_config = self.config['point_cloud']['webodm']
+            webodm_base_config['host'] = self.host.text()
+            webodm_base_config['port'] = self.port.value()
+            webodm_base_config['username'] = self.username.text()
+            webodm_base_config['password'] = self.password.text()
+            webodm_base_config['timeout'] = self.timeout.value()
+            webodm_base_config['active_environment'] = self.active_env
 
-            # Update Environment Settings
-            for env in ['sunny', 'rainy', 'foggy', 'night']:                
-                env_config = webodm['environments'][env]
+            # Update Point Cloud Settings - WebODM Environment Settings
+            for env_name in ['sunny', 'rainy', 'foggy', 'night']:
+                if env_name not in webodm_base_config['environments']: # Ensure environment key exists
+                    webodm_base_config['environments'][env_name] = {}
                 
-                # Save all WebODM settings directly to the environment config
-                for option in self.env_widgets[env]:
-                    widget = self.env_widgets[env][option]
-                    
-                    # Get the proper value from the widget based on its type
-                    if isinstance(widget, QCheckBox):
-                        value = widget.isChecked()
-                    elif isinstance(widget, QSpinBox) or isinstance(widget, QDoubleSpinBox):
-                        value = widget.value()
-                    elif isinstance(widget, QComboBox):
-                        value = widget.currentText()
-                    elif isinstance(widget, QLineEdit):
-                        value = widget.text()
-                    else:
-                        continue  # Skip if widget type isn't supported
-                    
-                    # Save kebab-case option directly to config (matches config format)
-                    env_config[option] = value
-                    
-                    # Also save to traditional keys for backward compatibility
-                    # with ConfigLoader.get_webodm_params method
-                    if option == 'feature-quality':
-                        env_config['feature-quality'] = value
-                    elif option == 'min-num-features':
-                        env_config['min-num-features'] = value  
-                    elif option == 'matcher-type':
-                        env_config['matcher-type'] = value
-                    elif option == 'pc-quality':
-                        env_config['point-cloud-quality'] = value
-                    elif option == 'mesh-size':
-                        env_config['mesh-quality'] = value
-                    elif option == 'max-concurrency':
-                        env_config['max-concurrency'] = value
-                    elif env == 'foggy' and option == 'ignore-gsd':
-                        env_config['ignore-gsd'] = value
-                    
-                # Update Geospatial Settings (unchanged)
-                self.config['geospatial']['output_path'] = self.output_path.text()
-                self.config['geospatial']['analysis']['min_tree_height'] = self.tree_height.value()
-                self.config['geospatial']['analysis']['canopy_threshold'] = self.canopy.value()
-                self.config['geospatial']['analysis']['terrain']['slope_threshold'] = self.slope.value()
-                self.config['geospatial']['analysis']['terrain']['roughness_threshold'] = self.roughness.value()
-                self.config['geospatial']['output']['formats'] = [
-                    self.geo_formats_list.item(i).text() 
-                    for i in range(self.geo_formats_list.count())
-                ]
-                self.config['geospatial']['output']['resolution'] = self.resolution.value()
+                env_specific_config = webodm_base_config['environments'][env_name]
+                
+                if env_name in self.env_widgets: # Check if UI widgets for this environment were initialized
+                    for option_key, widget in self.env_widgets[env_name].items():
+                        value = None
+                        if isinstance(widget, QCheckBox):
+                            value = widget.isChecked()
+                        elif isinstance(widget, QSpinBox) or isinstance(widget, QDoubleSpinBox):
+                            value = widget.value()
+                        elif isinstance(widget, QComboBox):
+                            value = widget.currentText()
+                        elif isinstance(widget, QLineEdit):
+                            value = widget.text()
+                        else:
+                            continue # Skip unsupported widget types
+                        
+                        # Save to the primary kebab-case key (which matches the widget key)
+                        env_specific_config[option_key] = value
+                        
+                        # Handle cases where the new YAML has both kebab-case and snake_case
+                        # or specific remappings for conceptual duplicates.
+                        # Update the snake_case version if it exists in the loaded config for that environment.
+                        if option_key == 'feature-quality' and 'feature_quality' in env_specific_config:
+                            env_specific_config['feature_quality'] = value
+                        elif option_key == 'min-num-features' and 'min_num_features' in env_specific_config:
+                            env_specific_config['min_num_features'] = value
+                        elif option_key == 'matcher-type' and 'matcher_type' in env_specific_config:
+                            env_specific_config['matcher_type'] = value
+                        elif option_key == 'max-concurrency' and 'max_concurrency' in env_specific_config:
+                            env_specific_config['max_concurrency'] = value
+                        elif option_key == 'pc-quality':
+                            if 'point-cloud-quality' in env_specific_config: # kebab-case conceptual equivalent
+                                env_specific_config['point-cloud-quality'] = value
+                            if 'point_cloud_quality' in env_specific_config: # snake_case conceptual equivalent
+                                env_specific_config['point_cloud_quality'] = value
+                        elif option_key == 'mesh-size': # widget key
+                            if 'mesh-quality' in env_specific_config: # kebab-case conceptual equivalent
+                                env_specific_config['mesh-quality'] = value
+                            if 'mesh_quality' in env_specific_config: # snake_case conceptual equivalent
+                                env_specific_config['mesh_quality'] = value
+                        # Note: 'ignore-gsd' was in the old logic but is not a standard WebODM param
+                        # and not in the provided new YAML structure for environments.
+                        # If it were, it would be handled like other boolean options by `env_specific_config[option_key] = value`.
+
+            # Update Geospatial Settings (Moved outside the environment loop)
+            geospatial_config = self.config['geospatial']
+            
+            geospatial_config['output_path'] = self.output_path.text()
+
+            # Gap Detection settings
+            gap_detection_config = geospatial_config['gap_detection']
+            # Save values from existing UI widgets
+            gap_detection_config['min_tree_height'] = self.tree_height.value() # From self.tree_height widget
+            gap_detection_config['max_tree_height'] = self.canopy.value()    # From self.canopy widget
+
+            # For other gap_detection parameters present in your new YAML:
+            # (min_area, max_area, pixel_size, threshold_type, manual_threshold,
+            #  apply_dilation, dilation_size, apply_erosion, erosion_size,
+            #  apply_smoothing, smoothing_sigma)
+            # Since no UI widgets (e.g., self.min_area_widget, self.pixel_size_widget etc.)
+            # are defined for these in the `add_geospatial_tab` method you've shown,
+            # this `save_settings` function cannot get new values for them from the UI.
+            # Their existing values in `self.config['geospatial']['gap_detection']`
+            # (loaded from the YAML file) will be preserved when the config is saved.
+            # If you add UI widgets for these parameters later, you would add lines here to save them, e.g.:
+            # if hasattr(self, 'min_area_widget'):
+            #     gap_detection_config['min_area'] = self.min_area_widget.value()
+            # ...and so on for other parameters if their widgets are added.
+
+            # Geospatial Output settings
+            geospatial_output_config = geospatial_config['output']
+            geospatial_output_config['formats'] = [
+                self.geo_formats_list.item(i).text() 
+                for i in range(self.geo_formats_list.count())
+            ]
+            geospatial_output_config['resolution'] = self.resolution.value()
+
+            # Clean up old 'analysis' structure if it exists from a previous config version
+            if 'analysis' in geospatial_config:
+                del geospatial_config['analysis']
+                if 'terrain' in geospatial_config.get('analysis', {}): # defensive
+                    del geospatial_config['analysis']['terrain']
+
 
             # Save To File
             with open(self.config_path, 'w') as f:
-                yaml.safe_dump(self.config, f, default_flow_style=False)
+                yaml.safe_dump(self.config, f, default_flow_style=False, sort_keys=False)
 
             if not silent:
                 QMessageBox.information(self, "Success", "Settings saved successfully!")

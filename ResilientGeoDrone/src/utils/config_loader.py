@@ -49,7 +49,7 @@ class ConfigLoader:
         And Geospatial Sections.
 
         Preconditions:
-            1. config_path Is Intiialized
+            1. config_path Is A Valid Path To A YAML File
 
         Postconditions:
             1. Loads And Validates Configuration File
@@ -212,11 +212,25 @@ class ConfigLoader:
             raise
 
 
+    """
+    
+        Desc: This Function Gets All WebODM Parameters In The Format
+        Expected By The WebODM API. This Involves Converting The Parameters
+        To Kebab-Case (With Hyphens) And Ensuring That The Values Are
+        Strings. The Function Returns A List Of Dictionaries With 'name'
+        And 'value' Keys.
+
+        Preconditions:
+            1. config Is Initialized
+            2. environment Is A Valid Environment Name
+        
+        Postconditions:
+            1. Get WebODM Parameters In The Format Expected By The WebODM API
+            2. Return Parameters As A List Of Dictionaries
+            3. The List Contains Dictionaries With 'name' And 'value' Keys
+    
+    """
     def get_webodm_params(self, environment: str) -> list:
-        """
-        Gets all WebODM parameters in the format expected by the WebODM API.
-        Returns a list of dictionaries with 'name' and 'value' keys.
-        """
         try:
             self.logger.info(f"WebODM ID: {self}  -  Getting WebODM Parameters...")
             

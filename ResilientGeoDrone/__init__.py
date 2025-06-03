@@ -8,7 +8,7 @@ from .src.utils import ConfigLoader, FileHandler, LoggerSetup
 from .src.point_cloud import WebODMClient
 from .src.preprocessing import BatchProcessor
 from .src.front_end import PipelineWorker, MainClientWindow, DragDropWidget, ProgressWidget, PipelineWorker
-
+from .src.geospatial.gap_detection import GapDetector
 
 
 
@@ -29,6 +29,7 @@ __all__ = [
     'PipelineWorker',
     'MainClientWindow',
     'DragDropWidget',
+    'GapDetector',
     'ProgressWidget'
 ]
 

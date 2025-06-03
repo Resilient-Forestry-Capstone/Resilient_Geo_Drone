@@ -18,6 +18,19 @@ QLabel#sectionHeader {
     margin-bottom: 10px;
 }
 
+QPushButton#webodmButton {
+    background-color: #2D5A3D;
+    color: #D4C5B9;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+QPushButton#webodmButton:hover {
+    background-color: #3D6A4D;
+}
+
 QLabel#sectionDescription {
     font-size: 14px;
     color: #7f8c8d;

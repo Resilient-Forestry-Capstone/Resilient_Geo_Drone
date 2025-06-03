@@ -35,15 +35,8 @@ class ImageValidator:
     """
     def __init__(self, config_loader):
         self.logger = LoggerSetup().get_logger()
-
-        try:
-          self.logger.info(f"Image Validator ID: {self}  -  Initializing Image Validator...")
-          self.config = config_loader.get_preprocessing_config()
-          self.metrics = QualityMetrics(self.config)
-          self.logger.info(f"ImageValidator ID: {self}  -  Image Validator Initialized.")
-        except Exception as e:
-          self.logger.error(f"ImageValidator ID: {self}  -  Image Validator Initialization Failed: {str(e)}.")
-          raise
+        self.config = config_loader.get_preprocessing_config()
+        self.metrics = QualityMetrics(self.config)
 
 
     """
