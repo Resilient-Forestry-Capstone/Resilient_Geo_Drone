@@ -16,6 +16,7 @@ from matplotlib.colors import Normalize
 import cv2
 
 from src.utils.config_loader import ConfigLoader
+from src.utils.logger import LoggerSetup
 
 
 """
@@ -48,41 +49,55 @@ class ResultsViewerWidget(QWidget):
 
   """ 
   def __init__(self):
-    super().__init__()
+    try:
+      super().__init__()
 
-    # Setup Window's Title And Size
-    self.setObjectName("resultsViewer")
-    self.setWindowTitle("Results Viewer")
-    self.setMinimumSize(900, 600)
-    
-    # Setup The Base Directory For The Output Files
-    self.output_base_dir = Path(ConfigLoader().load()['geospatial']['output_path'] + '/point_cloud')
+      # Setup Our Logger
+      self.logger = LoggerSetup().get_logger()
 
-    # Setup The Current Task Path And File Path (Remember For Accession Throughout The Class)
-    self.current_task_path = None
-    self.current_file_path = None
+      self.logger.info("Results Viewer ID: {self}  -  Initializing Results Viewer...")
 
-    # Set-Up Base Resolution Of Viewed Images (Mainly .tifs)
-    self.scale_factor_override = 1.0  # Default = Full Resolution
+      # Setup Window's Title And Size
+      self.setObjectName("resultsViewer")
+      self.setWindowTitle("Results Viewer")
+      self.setMinimumSize(900, 600)
+      
+      # Setup The Base Directory For The Output Files
+      self.output_base_dir = Path(ConfigLoader().load()['geospatial']['output_path'] + '/point_cloud')
 
-    # Normally, We Want To Auto Scale The Image
-    self.auto_scaling = True 
-    self.contour_line_count = 5
-    self.current_colormap = 'viridis'
+      # Setup The Current Task Path And File Path (Remember For Accession Throughout The Class)
+      self.current_task_path = None
+      self.current_file_path = None
 
-    # Initialize drag state for fullscreen viewer
-    self.is_dragging = False
-    self.drag_start_pos = None
-    self.drag_start_h_scroll = 0
-    self.drag_start_v_scroll = 0
-    self.current_scale_factor = 1.0
-    self.original_pixmap_size = None
-    self.fullscreen_overlay = None
-    self.fullscreen_image = None
-    self.fullscreen_scroll_area = None
+      # Set-Up Base Resolution Of Viewed Images (Mainly .tifs)
+      self.scale_factor_override = 1.0  # Default = Full Resolution
 
-    # Setup The UI Layout
-    self._setup_ui()
+      # Normally, We Want To Auto Scale The Image
+      self.auto_scaling = True 
+      self.contour_line_count = 5
+      self.current_colormap = 'viridis'
+
+      # Initialize drag state for fullscreen viewer
+      self.is_dragging = False
+      self.drag_start_pos = None
+      self.drag_start_h_scroll = 0
+      self.drag_start_v_scroll = 0
+      self.current_scale_factor = 1.0
+      self.original_pixmap_size = None
+      self.fullscreen_overlay = None
+      self.fullscreen_image = None
+      self.fullscreen_scroll_area = None
+
+      self.logger.info("Results Viewer ID: {self}  -  Results Viewer Initialized.")
+
+      # Setup The UI Layout
+      self.logger.info("Results Viewer ID: {self}  -  Setting Up Results Viewer UI...")
+      self._setup_ui()
+      self.logger.info("Results Viewer ID: {self}  -  Results Viewer UI Set Up Successfully.")
+    except Exception as e:
+      self.logger.error(f"Results Viewer ID: {self}  -  Failed To Initialize Results Viewer: {str(e)}")
+      QMessageBox.critical(self, "Initialization Error", f"Failed to initialize Results Viewer: {str(e)}")
+      raise e
 
 
   """
@@ -118,10 +133,12 @@ class ResultsViewerWidget(QWidget):
 
   """
   def _apply_contour_changes(self):
+    self.logger.info(f"Results Viewer ID: {self}  -  Applying Contour Line Count: {self.contour_slider.value()}")
     self.contour_line_count = self.contour_slider.value()
 
     # Reload Our TIF File With The New Contour Line Count
     if self.current_file_path and self.current_file_path.suffix.lower() in ('.tiff', '.tif'):
+      self.logger.info(f"Results Viewer ID: {self}  -  Reloading TIF File: {self.current_file_path} with Contour Line Count: {self.contour_line_count}")
       self._load_tif_file(self.current_file_path)
 
 
@@ -388,6 +405,7 @@ class ResultsViewerWidget(QWidget):
   """
   def _open_output_directory(self):
     try:
+      self.logger.info(f"Results Viewer ID: {self}  -  Attempting to open output directory...")
       import os
       import subprocess
       import platform
@@ -412,8 +430,10 @@ class ResultsViewerWidget(QWidget):
         subprocess.run(("open", str(directory_to_open)))
       else:  # Linux and Other Systems
         subprocess.run(("xdg-open", str(directory_to_open)))
+      self.logger.info(f"Results Viewer ID: {self}  -  Successfully opened directory: {directory_to_open}")
 
     except Exception as e:
+      self.logger.error(f"Results Viewer ID: {self}  -  Failed to open directory: {str(e)}")
       # Show Error Message If We Cannot Open The Directory
       QMessageBox.critical(self, "Error Opening Directory", f"Could not open the directory: {str(e)}")
 
@@ -436,11 +456,13 @@ class ResultsViewerWidget(QWidget):
 
   """
   def _toggle_scale_slider(self, state : bool):
+    self.logger.info(f"Results Viewer ID: {self}  -  Toggling Auto Scaling: {'Enabled' if state else 'Disabled'}")
     self.auto_scaling = state
     self.scale_slider.setEnabled(not self.auto_scaling)
     
     # If We Just Turned Autoscaling Back On, Reload The Current File
     if self.auto_scaling and self.current_file_path and self.current_file_path.suffix.lower() in ('.tiff', '.tif'):
+      self.logger.info(f"Results Viewer ID: {self}  -  Reloading TIF File: {self.current_file_path} with Auto Scaling Enabled")
       self._load_tif_file(self.current_file_path)
 
 
@@ -482,15 +504,22 @@ class ResultsViewerWidget(QWidget):
   """
   def _on_image_clicked(self, event):
     if event.button() == Qt.LeftButton:
+      # Log The Click Event
+      self.logger.info(f"Results Viewer ID: {self}  -  Image clicked in TIF Viewer.")
+
       # Only Expand If We Have A Image Setup
       if not self.tif_image.pixmap() or self.tif_image.pixmap().isNull():
+        self.logger.warning(f"Results Viewer ID: {self}  -  No valid image to display in full screen.")
         return
       
       # Get Our Current Pixmap
       pixmap = self.tif_image.pixmap()
       if pixmap:
+        self.logger.info(f"Results Viewer ID: {self}  -  Showing image in full screen.")
         # If We Have A Pixmap, Show It In Full Screen
         self._show_full_screen_image(pixmap)
+      else:
+        self.logger.warning(f"Results Viewer ID: {self}  -  No valid pixmap to display in full screen.")
 
   """
   
@@ -510,16 +539,24 @@ class ResultsViewerWidget(QWidget):
   """
   def _on_png_clicked(self, event):
     if event.button() == Qt.LeftButton:
+      # Log The Click Event
+      self.logger.info(f"Results Viewer ID: {self}  -  PNG image clicked in PNG Viewer.")
+
       # Only Expand If We Have An Image Setup
       if not self.png_image.pixmap() or self.png_image.pixmap().isNull():
+        self.logger.warning(f"Results Viewer ID: {self}  -  No valid PNG image to display in full screen.")
         return
       
       # Get Our Current Pixmap
       pixmap = self.png_image.pixmap()
 
       if pixmap:
+        self.logger.info(f"Results Viewer ID: {self}  -  Showing PNG image in full screen.")
         # If We Have A Pixmap, Show It In Full Screen
         self._show_full_screen_image(pixmap)
+      else:
+        self.logger.warning(f"Results Viewer ID: {self}  -  No valid PNG pixmap to display in full screen.")
+
 
   """
 
@@ -542,6 +579,10 @@ class ResultsViewerWidget(QWidget):
 
   """
   def _show_full_screen_image(self, pixmap):
+
+    # Log The Full-Screen Image Display
+    self.logger.info(f"Results Viewer ID: {self}  -  Showing image in full screen overlay.")
+
     # Setup Our Full-Screen Overlay Widget
     overlay = QWidget(self.window())
     overlay.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
@@ -592,6 +633,8 @@ class ResultsViewerWidget(QWidget):
     # Show The Overlay
     overlay.showFullScreen()
 
+    self.logger.info(f"Results Viewer ID: {self}  -  Full screen overlay displayed successfully.")
+
 
   """
 
@@ -611,14 +654,19 @@ class ResultsViewerWidget(QWidget):
 
   """
   def eventFilter(self, obj, event):
+
     # Handles ESC Key To Exit Full-Screen
     if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Escape:
+
+      self.logger.info(f"Results Viewer ID: {self}  -  Exiting full screen overlay.")
+
       # Close The Full-Screen Overlay
       self.fullscreen_overlay.close()
       return True
     
     # Handle Mouse Wheel Events For Zooming
     if event.type() == QEvent.Wheel and self.fullscreen_image:
+      
       # Calculate Zoom Factor
       zoom_in_factor = 1.15
       zoom_out_factor = 1 / zoom_in_factor
@@ -732,6 +780,9 @@ class ResultsViewerWidget(QWidget):
   """
   def refresh_task_folders(self):
     
+    # Log The Refresh Action
+    self.logger.info(f"Results Viewer ID: {self}  -  Refreshing task folders list from {self.output_base_dir}")
+
     # Clear List And Viewer Content
     self.task_folders_list.clear()
     self.files_list.clear()
@@ -747,11 +798,14 @@ class ResultsViewerWidget(QWidget):
     
     # Check If Directory Exists
     if not self.output_base_dir.exists():
+      # If The Directory Does Not Exist, Show An Error Message And Log
+      self.logger.error(f"Results Viewer ID: {self}  -  Output base directory does not exist: {self.output_base_dir}")
       self.task_folders_list.setEnabled(False)
       self.task_folders_list.addItem("No output directory found")
       return
     
     # Find All Task Directories
+    self.logger.info(f"Results Viewer ID: {self}  -  Scanning for task directories in {self.output_base_dir}")
     task_dirs = []
     try:
       # Get All Subdirectories In The Output Base Directory
@@ -759,17 +813,25 @@ class ResultsViewerWidget(QWidget):
       
       # Sort By Modification Time (Newest First)
       task_dirs = sorted(task_dirs, key=lambda d: d.stat().st_mtime, reverse=True)
+      self.logger.info(f"Results Viewer ID: {self}  -  Found {len(task_dirs)} task directories")
     except Exception as e:
+      # Log The Error And Show It In The UI
+      self.logger.error(f"Results Viewer ID: {self}  -  Error scanning directory: {str(e)}")
+
       # Handle Errors While Scanning Directory
       self.task_folders_list.addItem(f"Error scanning directory: {str(e)}")
       return
     
     # No Task Folders Were Found
     if not task_dirs:
+      self.logger.info(f"Results Viewer ID: {self}  -  No task folders found in {self.output_base_dir}")
       # Make It So You Cannot Select A Task Folder
       self.task_folders_list.setEnabled(False)
       self.task_folders_list.addItem("No task folders found")
       return
+    
+    # Log The Number Of Task Folders Found
+    self.logger.info(f"Results Viewer ID: {self}  -  Found {len(task_dirs)} task folders in {self.output_base_dir}")
     
     # Add All Task Folders To The List
     for task_dir in task_dirs:
@@ -794,6 +856,11 @@ class ResultsViewerWidget(QWidget):
       item = QListWidgetItem(display_name)
       item.setData(Qt.UserRole, str(task_dir))
       self.task_folders_list.addItem(item)
+
+    # Enable The Task Folders List (If It Was Disabled [e.g., No Folders Found, Then Refreshed After Running Pipeline With Same Instance Of Viewer])
+    self.task_folders_list.setEnabled(True)
+
+    self.logger.info(f"Results Viewer ID: {self}  -  Task folders list refreshed successfully.")
 
 
   """
@@ -824,6 +891,8 @@ class ResultsViewerWidget(QWidget):
   """
   def _on_task_selected(self):
 
+    # Log The Task Selection
+    self.logger.info(f"Results Viewer ID: {self}  -  Task folder selected: {self.task_folders_list.currentItem().text() if self.task_folders_list.currentItem() else 'None'}")
 
     # Clear Files And Viewer Content
     self.files_list.clear()
@@ -868,10 +937,13 @@ class ResultsViewerWidget(QWidget):
         item = QListWidgetItem(f"{description} - {file_path.name} ({size_str})")
         item.setData(Qt.UserRole, str(file_path))
         self.files_list.addItem(item)
-    
+
     # Prompt User When There's No Files Retrieved
     if not files_found:
+      self.logger.info(f"Results Viewer ID: {self}  -  No output files found in task folder: {task_path}")
       self.files_list.addItem("No output files found in this folder")
+    else:
+      self.logger.info(f"Results Viewer ID: {self}  -  Found {self.files_list.count()} output files in task folder: {task_path}")
 
 
   """
@@ -897,11 +969,16 @@ class ResultsViewerWidget(QWidget):
 
   """
   def _on_file_selected(self):
+
+    # Log The File Selection
+    self.logger.info(f"Results Viewer ID: {self}  -  File selected: {self.files_list.currentItem().text() if self.files_list.currentItem() else 'None'}")
+
     # Get Selected Item From The List
     selected_items = self.files_list.selectedItems()
 
     # Clear Viewer Content If No File Is Selected
     if not selected_items:
+      self.logger.info(f"Results Viewer ID: {self}  -  No file selected, resetting viewer.")
       self.file_viewers.setCurrentIndex(1)  # Empty state
       self.file_info.setText("No file selected")
       self.colormap_label.setVisible(False)
@@ -926,18 +1003,24 @@ class ResultsViewerWidget(QWidget):
     
     # If A .tif File (View As Image)
     if extension in ['.tif', '.tiff']:
+      self.logger.info(f"Results Viewer ID: {self}  -  Loading TIF file: {file_path}")
       self._load_tif_file(file_path)
       # Show Colormap Only For .tif Files
       self._update_file_config(True)
     # If A .png File (View As Simple Image)
     elif extension == '.png':
+      self.logger.info(f"Results Viewer ID: {self}  -  Loading PNG file: {file_path}")
       self._load_png_file(file_path)
       self._update_file_config(False)  # No Colormap For PNG
     # If A .txt file (View As Text) - NEW
     elif extension == '.txt':
+      self.logger.info(f"Results Viewer ID: {self}  -  Loading TXT file: {file_path}")
       self._load_txt_file(file_path)
       self._update_file_config(False)  # No Colormap For Text
     else:
+      # For Unsupported File Types, Show Empty State
+      self.logger.warning(f"Results Viewer ID: {self}  -  Unsupported file type selected: {extension}")
+
       # For Other Files, Request Client To Open In External Viewer
       self.file_viewers.setCurrentIndex(1)  # Empty State
       self.empty_state.setText(f"File type {extension} cannot be previewed.\nUse 'Open in External Viewer' to view this file.")
@@ -961,11 +1044,16 @@ class ResultsViewerWidget(QWidget):
   """
   def _load_png_file(self, file_path : Path):
     try:
+
+      # Log The PNG File Loading
+      self.logger.info(f"Results Viewer ID: {self}  -  Loading PNG file: {file_path}")
+
       # Load The .png Image Using QPixmap
       pixmap = QPixmap(str(file_path))
       
       if pixmap.isNull():
-          raise Exception("Invalid PNG file or unsupported format")
+        self.logger.error(f"Results Viewer ID: {self}  -  Failed to load PNG file: {file_path}")
+        raise Exception("Invalid PNG file or unsupported format")
       
       # Get Image Dimensions And File Size For Info Display
       width = pixmap.width()
@@ -979,6 +1067,7 @@ class ResultsViewerWidget(QWidget):
       # Scale Image If It's Too Large For Comfortable Viewing
       max_display_size = 1200
       if width > max_display_size or height > max_display_size:
+          self.logger.info(f"Results Viewer ID: {self}  -  Scaling PNG image to fit within {max_display_size}px")
           pixmap = pixmap.scaled(max_display_size, max_display_size, 
                                 Qt.KeepAspectRatio, Qt.SmoothTransformation)
       
@@ -988,10 +1077,14 @@ class ResultsViewerWidget(QWidget):
       
       # Switch To .png Viewer
       self.file_viewers.setCurrentIndex(2)
-        
+      # Log Successful PNG Load
+      self.logger.info(f"Results Viewer ID: {self}  -  Successfully loaded PNG file: {file_path}")        
+
+      
     except Exception as e:
       self.file_viewers.setCurrentIndex(1)  # Empty State
       self.empty_state.setText(f"Error loading PNG file: {str(e)}")
+      self.logger.error(f"Results Viewer ID: {self}  -  Error loading PNG file: {str(e)}")
 
 
   """
@@ -1014,9 +1107,16 @@ class ResultsViewerWidget(QWidget):
   """
   def _load_txt_file(self, file_path):
     try:
+
+      # Log The TXT File Loading
+      self.logger.info(f"Results Viewer ID: {self}  -  Loading TXT file: {file_path}")
+
       # Read The .txt File Content
       with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
+
+      # Log Successful Read
+      self.logger.info(f"Results Viewer ID: {self}  -  Successfully read TXT file: {file_path}")
       
       # Limit Content Size For Display (Prevent UI Freezing With Huge Files)
       max_chars = 50000  # ~50kb Of Text
@@ -1037,9 +1137,15 @@ class ResultsViewerWidget(QWidget):
       
       # Switch To Text Viewer
       self.file_viewers.setCurrentIndex(3)
+
+      # Log Successful TXT Load
+      self.logger.info(f"Results Viewer ID: {self}  -  Successfully loaded TXT file: {file_path}")
         
     except UnicodeDecodeError:
       try:
+        # Log Attempting Latin-1 Encoding
+        self.logger.warning(f"Results Viewer ID: {self}  -  UTF-8 decoding failed for {file_path}, trying latin-1 encoding.")
+
         # Try Different Encoding If Utf-8 Fails
         with open(file_path, 'r', encoding='latin-1') as f:
           content = f.read()
@@ -1047,11 +1153,16 @@ class ResultsViewerWidget(QWidget):
         self.text_viewer.setPlainText(content)
         self.file_info.setText(f"{file_path.name} - Loaded with latin-1 encoding")
         self.file_viewers.setCurrentIndex(3)
+        self.logger.info(f"Results Viewer ID: {self}  -  Successfully loaded TXT file with latin-1 encoding: {file_path}")
           
       except Exception as e:
+        # Log The Error And Show It In The UI
+        self.logger.error(f"Results Viewer ID: {self}  -  Error loading TXT file with latin-1 encoding: {str(e)}")
         self.file_viewers.setCurrentIndex(1)  # Empty State
         self.empty_state.setText(f"Error loading text file: {str(e)}")
     except Exception as e:
+      # Log The Error And Show It In The UI
+      self.logger.error(f"Results Viewer ID: {self}  -  Error loading TXT file: {str(e)}")
       self.file_viewers.setCurrentIndex(1)  # Empty State
       self.empty_state.setText(f"Error loading text file: {str(e)}")
 
@@ -1078,6 +1189,8 @@ class ResultsViewerWidget(QWidget):
 
   """
   def _update_file_config(self, state : bool):
+    # Log The Configuration Update
+    self.logger.info(f"Results Viewer ID: {self}  -  Updated file viewer configuration to {'show' if state else 'hide'} colormap and contour options.")
     self.colormap_label.setVisible(state)
     self.colormap_selector.setVisible(state)
     self.contour_label.setVisible(state)
@@ -1112,12 +1225,20 @@ class ResultsViewerWidget(QWidget):
   """
   def _load_tif_file(self, file_path):
     try:
+      # Log The TIF File Loading
+      self.logger.info(f"Results Viewer ID: {self}  -  Loading TIF file: {file_path}")
+
       with rasterio.Env(GDAL_CACHEMAX=512):
         with rasterio.open(str(file_path)) as src:
           # Single Band Photo (e.g. DSM, DTM) Or Multi-Band (e.g. RGB)
           if src.count == 1:
+
+            self.logger.info(f"Results Viewer ID: {self}  -  Detected single-band TIF file.")
+
             # If Single-Band, Read The Data
-            data_original = src.read(1).astype(np.float32) # Use float32 for consistency
+            self.logger.info(f"Results Viewer ID: {self}  -  Reading single-band data from TIF file.")
+            data_original = src.read(1).astype(np.float32) 
+            self.logger.info(f"Results Viewer ID: {self}  -  Successfully read single-band data from TIF file.")
             # For Given NoData Value, Set To NaN For Visualization
             if src.nodata is not None:
               data_original[data_original == src.nodata] = np.nan
@@ -1135,15 +1256,21 @@ class ResultsViewerWidget(QWidget):
             height, width = data_for_display.shape                # Get The Height And Width Of The Image
             
             if height * width > 4000000:              # 4 Megapixels Threshold
+              self.logger.info(f"Results Viewer ID: {self}  -  Image size {height}x{width} exceeds 4MP, applying scaling.")
               if self.auto_scaling:
+                # If Auto Scaling Is Enabled, Use A Scale Factor Based On Image Size
+                self.logger.info(f"Results Viewer ID: {self}  -  Using automatic scaling based on image size.")
+
                 # Use Automatic Scaling Based On Image Size 
                 scale_factor = np.sqrt(5000000 / (height * width))
               else:
+                self.logger.info(f"Results Viewer ID: {self}  -  Using user-defined scale factor override: {self.scale_factor_override}")
                 # Use User-Defined Scaling Factor
                 scale_factor = self.scale_factor_override
                   
               # Don't Scale Up If Scale Factor > 1
               if scale_factor < 1.0:
+                self.logger.info(f"Results Viewer ID: {self}  -  Scaling image by factor: {scale_factor:.2f}")
                 new_height = int(height * scale_factor)
                 new_width = int(width * scale_factor)
                 
@@ -1161,6 +1288,8 @@ class ResultsViewerWidget(QWidget):
                 height, width = data_for_display.shape
                 dpi = int(dpi / scale_factor) # This line was present, consider its effect
                 
+            # Log The Image Size After Scaling
+            self.logger.info(f"Results Viewer ID: {self}  -  Displaying image of size {height}x{width} at {dpi} DPI.")
 
             figsize = (width/dpi, height/dpi)          # Figure Size Will Depend On Our DPI And Image Size
             fig = Figure(figsize=figsize, dpi=dpi)     # Setup Our Figures Size With Its Overall DPI
@@ -1181,11 +1310,17 @@ class ResultsViewerWidget(QWidget):
             rgb = ls.shade(data_for_display, cmap=cmap, blend_mode='soft', 
                         vmin=vmin_display, vmax=vmax_display, vert_exag=3)
             
+            # Log The Colormap And Hillshade Application
+            self.logger.info(f"Results Viewer ID: {self}  -  Applied colormap '{self.current_colormap}' with hillshading.")
+            
             # Add Contour Lines On .tif Image To Help With Texturing (Optional To Avoid Cluttering In Small Images)
             # Use original min/max for contour levels if they should reflect true elevation
             levels = np.linspace(original_min, original_max, self.contour_line_count) 
             contour = ax.contour(data_for_display, levels=levels, colors='black', 
                             alpha=0.25, linewidths=0.4, linestyles='solid')
+            
+            # Log The Contour Lines Application
+            self.logger.info(f"Results Viewer ID: {self}  -  Applied contour lines with {self.contour_line_count} levels.")
 
             # Display Our RGB Formatted Image To User
             ax.imshow(rgb)
@@ -1227,12 +1362,18 @@ class ResultsViewerWidget(QWidget):
                   "Mean elevation": f"{original_mean:.2f}ft",
                   "Resolution": f"{src.res[0]:.2f}ft/pixel" # Original resolution
             }
+
+            # Log The Statistics
+            self.logger.info(f"Results Viewer ID: {self}  -  TIF file statistics: {stats}")
+
             # Format With Key: Value Pairs
             stats_str = " | ".join([f"{k}: {v}" for k, v in stats.items()])
             self.file_info.setText(f"{file_path.name} - {stats_str}")
 
               
           else:
+            self.logger.info(f"Results Viewer ID: {self}  -  Detected multi-band TIF file with {src.count} bands.")
+
             # Multi-Band Image (RGB) Will Simply Just Be Displayed Without Filter
             rgb = np.zeros((src.height, src.width, 3), dtype=np.uint8)
             
@@ -1250,21 +1391,27 @@ class ResultsViewerWidget(QWidget):
                 else:
                   # Increment Through Our Buffer And Set Our Values For Each Entry
                   rgb[:,:,i] = np.clip((band - min_val) * 255 / (max_val - min_val), 0, 255).astype(np.uint8)
-        
+
             # Create A QImage With RGB Data And Then Pass It Into Pixmap For Display
             qimg = QImage(rgb.data, rgb.shape[1], rgb.shape[0], rgb.shape[1] * 3, QImage.Format_RGB888)
             pixmap = QPixmap.fromImage(qimg)
             self.file_info.setText(f"{file_path.name} - Minimum Elevation: {min_val:.2f}ft | Maximum Elevation: {max_val:.2f}ft")
-        
+            # Log The Pixmap Elevation Statistics
+            self.logger.info(f"Results Viewer ID: {self}  -  Multi-band TIF file statistics: Min elevation {min_val:.2f}ft, Max elevation {max_val:.2f}ft")
+
+
           # Update The Image Label With The Pixmap
           self.tif_image.setPixmap(pixmap)
           self.tif_image.setMinimumSize(QSize(1, 1))  # Allow Our Images Scaling
           
           # Set Our Current View To The .tif Viewer
           self.file_viewers.setCurrentIndex(0)
+          # Log Successful TIF Load
+          self.logger.info(f"Results Viewer ID: {self}  -  Successfully loaded TIF file: {file_path}")
       
       # Else If We Fail, Set To Empty State And Return To User A Traceback Error
     except Exception as e:
+      self.logger.error(f"Results Viewer ID: {self}  -  Error loading TIF file: {str(e)}")
       self.file_viewers.setCurrentIndex(1)  # Empty state
       self.empty_state.setText(f"Error loading TIF file: {str(e)}")
 
@@ -1288,12 +1435,19 @@ class ResultsViewerWidget(QWidget):
 
   """
   def _on_colormap_changed(self, colormap_name):
+    # Log The Colormap Change
+    self.logger.info(f"Results Viewer ID: {self}  -  Changing colormap to: {colormap_name}")
     # Set The Current Colormap To The Selected One
     self.current_colormap = colormap_name
     
     # Reload The .tif File With The New Colormap
     if self.current_file_path and self.current_file_path.suffix.lower() in ('.tif', '.tiff'):
+      self.logger.info(f"Results Viewer ID: {self}  -  Reloading TIF file with new colormap: {colormap_name}")
       self._load_tif_file(self.current_file_path)
+      # Log Successful Colormap Change
+      self.logger.info(f"Results Viewer ID: {self}  -  Successfully applied colormap '{colormap_name}' to TIF file.")
+    else:
+      self.logger.warning(f"Results Viewer ID: {self}  -  No valid TIF file selected to apply colormap: {colormap_name}")
 
 
   """
@@ -1316,8 +1470,11 @@ class ResultsViewerWidget(QWidget):
 
   """
   def _open_external(self):
+    # Log The External Open Request
+    self.logger.info(f"Results Viewer ID: {self}  -  Attempting to open file in external viewer: {self.current_file_path.name if self.current_file_path else 'None'}")
     # If We Have No File Selected, Return
     if not self.current_file_path:
+      self.logger.warning(f"Results Viewer ID: {self}  -  No file selected to open in external viewer.")
       return
     
     # Attempt To Open The Users File In Their Default Software
@@ -1328,15 +1485,22 @@ class ResultsViewerWidget(QWidget):
       
       # If Windows OS
       if platform.system() == 'Windows':
+        # Log Opening File In Windows
+        self.logger.info(f"Results Viewer ID: {self}  -  Opening file in Windows default viewer: {self.current_file_path}")
         os.startfile(str(self.current_file_path))
       # If MacOS OS
       elif platform.system() == 'Darwin':  # macOS
+        # Log Opening File In MacOS
+        self.logger.info(f"Results Viewer ID: {self}  -  Opening file in macOS default viewer: {self.current_file_path}")
         subprocess.call(('open', str(self.current_file_path)))
       # If Linux OS
       else:  # Linux
+        # Log Opening File In Linux
+        self.logger.info(f"Results Viewer ID: {self}  -  Opening file in Linux default viewer: {self.current_file_path}")
         subprocess.call(('xdg-open', str(self.current_file_path)))
     # Else If We Fail To Open A Provided File Prompt User With An Error Message
     except Exception as e:
+      self.logger.error(f"Results Viewer ID: {self}  -  Error opening file in external viewer: {str(e)}")
       QMessageBox.warning(self, "Error", f"Could not open file: {str(e)}")
 
 
@@ -1360,10 +1524,18 @@ class ResultsViewerWidget(QWidget):
 
   """
   def _export_file(self):
+
+    # Log The Export Request
+    self.logger.info(f"Results Viewer ID: {self}  -  Attempting to export file: {self.current_file_path.name if self.current_file_path else 'None'}")
+
     # If We Selected No File, Return
     if not self.current_file_path:
+      self.logger.warning(f"Results Viewer ID: {self}  -  No file selected to export.")
       return
     
+    # Log Asking User
+    self.logger.info(f"Results Viewer ID: {self}  -  Prompting user for export destination for file: {self.current_file_path.name}")
+
     # Get The Destination Path For Our File To Be Copied To
     dest_path, _ = QFileDialog.getSaveFileName(
         self, 
@@ -1371,18 +1543,24 @@ class ResultsViewerWidget(QWidget):
         str(self.current_file_path.name),
         f"*{self.current_file_path.suffix}"
     )
+    # Log The Destination Path
+    self.logger.info(f"Results Viewer ID: {self}  -  Selected export destination: {dest_path}")
     
     # IF Not A Valid Destination Path, Return
     if not dest_path:
+      self.logger.warning(f"Results Viewer ID: {self}  -  No destination path selected for export.")
       return
 
     # Attempt To Copy Our File Into Our Destination Path
     try:
       import shutil
       shutil.copy2(self.current_file_path, dest_path)
+      # Log Successful Export
+      self.logger.info(f"Results Viewer ID: {self}  -  Successfully exported file to: {dest_path}")
       QMessageBox.information(self, "Success", f"File exported to {dest_path}")
     # If We Fail Copying Our File's Contents, Return Error Message
     except Exception as e:
+      self.logger.error(f"Results Viewer ID: {self}  -  Error exporting file: {str(e)}")
       QMessageBox.warning(self, "Error", f"Could not export file: {str(e)}")
 
 
@@ -1401,6 +1579,10 @@ class ResultsViewerWidget(QWidget):
       
   """
   def _go_back_to_pipeline(self):
+    # Log The Return To Pipeline Request
+    self.logger.info(f"Results Viewer ID: {self}  -  Returning to pipeline page.")
+
     # Close UI Window We're Associated With
     self.close()
+    self.logger.info(f"Results Viewer ID: {self}  -  Closed results viewer window.")
     del self
