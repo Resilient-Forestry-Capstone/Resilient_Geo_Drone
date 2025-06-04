@@ -135,6 +135,21 @@ python -m venv venv
 venv\Scripts\activate              # Windows
 source venv/bin/activate           # macOS/Linux</code></pre>
 
+<h4>Alternative: Run Without Activation</h4>
+<p>Instead of activating the virtual environment, you can run directly:</p>
+
+<pre><code># Install dependencies without activation
+venv\Scripts\python.exe -m pip install -r requirements.txt        # Windows
+venv/bin/python -m pip install -r requirements.txt                # macOS/Linux
+
+# Run the application
+venv\Scripts\python.exe main.py                                   # Windows
+venv/bin/python main.py                                           # macOS/Linux
+
+# View help and CLI options
+venv\Scripts\python.exe main.py --help                            # Windows
+venv/bin/python main.py --help                                    # macOS/Linux</code></pre>
+
 
 <h3>3. Install Dependencies</h3>
 <pre><code>pip install -r requirements.txt</code></pre>
