@@ -119,71 +119,63 @@ Program Uses _WebODM_ As The Main Software Facilitator For Point Cloud Generatio
 
 
 
-<h3 id="quick-start">🏃 Quick Start</h3>
+<h2>🏃 Quick Start</h2>
 
-<ol>
-  <li>
-    <strong>Clone &amp; enter the repo:</strong><br>
-    <pre><code>git clone https://github.com/Resilient-Forestry-Capstone/Resilient_Geo_Drone.git
-cd ResilientGeoDrone</code></pre>
-  </li>
+<h3>1. Clone Repository</h3>
+<pre><code>git clone https://github.com/Resilient-Forestry-Capstone/Resilient_Geo_Drone.git
+cd Resilient_Geo_Drone/ResilientGeoDrone</code></pre>
 
-  <li>
-    <strong>Create &amp; activate a virtual environment:</strong><br>
-    <pre><code><!-- Windows -->python -m venv venv
-venv\Scripts\activate
-<!-- macOS / Linux -->
-python3 -m venv venv
-source venv/bin/activate</code></pre>
-  </li>
 
-  <li>
-    <strong>Install Python dependencies:</strong><br>
-    <pre><code>pip install -r requirements.txt</code></pre>
-  </li>
+<h3>2. Create Virtual Environment (Optional)</h3>
+<pre><code># Create virtual environment
+python -m venv venv
 
-  <li>
-    <strong>Start WebODM:</strong>
-    <ul>
-      <li>Install Docker Desktop: <a href="https://docs.docker.com/desktop/">https://docs.docker.com/desktop/</a></li>
-      <li>Open a Docker-enabled shell and run:
-        <pre><code>git clone https://github.com/OpenDroneMap/WebODM \
-  --config core.autocrlf=input --depth 1
+<br>
+# Activate virtual environment
+venv\Scripts\activate              # Windows
+source venv/bin/activate           # macOS/Linux</code></pre>
+
+
+<h3>3. Install Dependencies</h3>
+<pre><code>pip install -r requirements.txt</code></pre>
+
+
+<h3>4. Setup WebODM</h3>
+<p><strong>Install <a href="https://docs.docker.com/desktop/">Docker Desktop</a> first</strong></p>
+<pre><code># Clone and start WebODM
+git clone https://github.com/OpenDroneMap/WebODM --depth 1
 cd WebODM
 ./webodm.sh start</code></pre>
-      </li>
-      <li>Point your browser at <a href="http://localhost:8000">http://localhost:8000</a> and create your WebODM account.</li>
-    </ul>
-  </li>
-
-  <li>
-    <strong>Configure the pipeline:</strong><br>
-    <pre><code>cp config/config.example.yaml config/config.yaml</code></pre>
-    Edit <code>config/config.yaml</code> to set your WebODM <code>host</code>, <code>port</code>, <code>username</code>, and <code>password</code>.
-  </li>
-
-  <li>
-    <strong>Launch ResilientGeoDrone:</strong>
-    <ul>
-      <li>GUI mode:
-        <pre><code>python -m resilientgeodrone.gui</code></pre>
-      </li>
-      <li>CLI mode:
-        <pre><code>python main.py --images /path/to/your/image/folder</code></pre>
-      </li>
-    </ul>
-  </li>
-
-  <li>
-    <strong>View results:</strong><br>
-    In GUI: click <em>View Results</em>. <br>
-    In CLI: inspect outputs under <code>data/output/point_cloud</code> (DSM, DTM, CHM, point-cloud, PDF).
-  </li>
-</ol>
+<p>Create an account at <a href="http://localhost:8000">http://localhost:8000</a></p>
 
 
+<h3>5. Configure Application</h3>
+<pre><code>nano config/config.yaml      # Linux/macOS
+notepad config/config.yaml   # Windows</code></pre>
 
-Press `Ctrl + Z` Then `Enter` To Then Actually Start The Pipeline (The _**QGIS**_ Needs To Call Python To Load In Everything For Python Before We Execute).
+
+<h3>6. Run Pipeline</h3>
+
+<p><strong>GUI Mode (Recommended):</strong></p>
+<pre><code>python main.py
+<br>
+# OR
+<br>
+python main.py --gui</code></pre>
+
+
+<p><strong>CLI Mode:</strong></p>
+<pre><code># View all CLI options and examples
+python main.py --help
+
+<br>
+# Quick example - process drone images
+python main.py --input ./drone_images --output ./results</code></pre>
+
+<h3>7. View Results</h3>
+<p><strong>GUI:</strong> Click "View Results" button to browse processed files</p>
+<p><strong>CLI:</strong> Check your output directory (Determined In Your <code>config.yaml</code>) for DSM, DTM, CHM, and analysis files (formatted like <code>YYYYMMDD_HHMMSS/</code>)</p>
+<br>
 
 
 <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> <img src="https://github.com/user-attachments/assets/2770954d-c025-4fbc-bb42-a33b38385cad" alt="Monkeys With A Drone" width="55" height="59"> 
