@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# filepath: c:\Users\bensp\OneDrive\Desktop\Code Box Two\Python\GeoDrone\ResilientRepo\Resilient_Geo_Drone\ResilientGeoDrone\main.py
 from datetime import datetime
 from pathlib import Path
 import argparse
