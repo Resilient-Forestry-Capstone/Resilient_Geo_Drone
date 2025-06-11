@@ -245,24 +245,28 @@ class WebODMClient:
 
 
             signal.emit(50.01, 'Packaging Point Cloud', 'Packaging Image-Set Data...')
-            # Upload Images To Create A New Task
-            files = [('images', (path.name, open(path, 'rb'), 'image/jpeg')) 
-                    for path in image_paths]
             
-            signal.emit(66.66668, 'Packaging Point Cloud', 'Sending Task To WebODM API...')
+            # Create A Quick Opening Of Our Files When We Send Them (Don't Hold On To Open Files Could 2x Memory Usage)
+            from contextlib import ExitStack
+            with ExitStack() as stack:
+                files = [
+                    ('images', (path.name, stack.enter_context(open(path, 'rb')), 'image/jpeg'))
+                    for path in image_paths
+                ]
+                
+                retep = self.config.get_webodm_params(environment)
 
-            retep = self.config.get_webodm_params(environment)
+                signal.emit(66.66668, 'Packaging Point Cloud', 'Sending Task To WebODM API...')
+                
+                response = self.session.post(
+                    f"{self.base_url}/api/projects/{project_id}/tasks/",
+                    files=files,
+                    data={
+                        "options": json.dumps(retep),
+                    }
+                )
+                response.raise_for_status()
 
-            response = self.session.post(
-                f"{self.base_url}/api/projects/{project_id}/tasks/",
-                files=files,
-                data={
-                    "options": json.dumps(retep),
-
-
-                }
-            )
-            response.raise_for_status()
 
             signal.emit(83.35, 'Packaging Point Cloud', 'Extracting Task From WebODM API...')
             # Get Task ID

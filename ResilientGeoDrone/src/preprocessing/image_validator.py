@@ -68,8 +68,7 @@ class ImageValidator:
             checks = all([
                 self.metrics.check_resolution(img),
                 self.metrics.check_blur(img),
-                self.metrics.check_brightness(img),
-                self.metrics.check_contrast(img)
+                self.metrics.check_brightness(img)
             ])
             
             self.logger.info(f"ImageValidator ID: {self}  -  Image {image_path} Validation Results: {checks}")
